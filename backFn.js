@@ -1,6 +1,6 @@
-function backFn(progressLog){
+function backFn(progressLog, triggerFn){
     progressLog.pop()
-    createDNDCharacter()
+    triggerFn()
 }
 
 module.exports = backFn

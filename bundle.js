@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-function backFn(progressLog){
+function backFn(progressLog, triggerFn){
     progressLog.pop()
-    createDNDCharacter()
+    triggerFn()
 }
 
 module.exports = backFn
@@ -350,7 +350,7 @@ module.exports = subraces
 },{"./languages":5,"./spells":8}],10:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 
-function display(choiceObj, progressLog){
+function display(choiceObj, progressLog, triggerFn){
     let choiceCount = 1
     if(Array.isArray(choiceObj)){
         choiceCount = choiceObj[0]
@@ -378,11 +378,11 @@ function display(choiceObj, progressLog){
 
     let cards = document.querySelectorAll('.card')
     for(let i = 0; i < cards.length; i++){
-        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog)})
+        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog, triggerFn)})
     }  
 }
 
-function select(e, numOfChoices, progressLog){
+function select(e, numOfChoices, progressLog, triggerFn){
     let finalChoice = []
     let selectedItem = event.currentTarget
     let next = document.getElementById('next')
@@ -418,10 +418,10 @@ function select(e, numOfChoices, progressLog){
         }
         next.classList.remove('inactive')
         next.classList.add('active')
-
+        
     }
     
-    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice)})
+    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice, triggerFn)})
 }
 
 module.exports = display
@@ -434,8 +434,11 @@ const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 const spells = require('./data-objects/spells')
+
+
 const display = require('./display')
 const backFn = require('./backFn')
+const userInput = require('./userInput')
 
 const userProgress = []
 
@@ -446,21 +449,24 @@ function createDNDCharacter(){
     }
 
     const back = document.getElementById('back')
-    back.addEventListener('click', function(){backFn(userProgress)})
+    back.addEventListener('click', function(){backFn(userProgress, createDNDCharacter)})
    
     switch(userProgress.length){
         case 0:
             //function to display races
             document.getElementById('back').classList.remove('active')
             document.getElementById('back').classList.add('inactive')
-            display(races, userProgress)
+            display(races, userProgress, createDNDCharacter)
             break
         case 1:
             //funtion to choose name
-            
+            let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="">'
+            userInput("what's in a name?", inputTag, createDNDCharacter, userProgress)
+            console.log(userProgress)
             break
         case 2:
             //choose a language if applicable
+            console.log('woohoo! :)', userProgress)
             break
         case 3:
             //choose skills if applicable
@@ -519,16 +525,58 @@ function createDNDCharacter(){
 }
 
 createDNDCharacter()
-},{"./backFn":1,"./data-objects/backgrounds":2,"./data-objects/classes":3,"./data-objects/dragonbreath":4,"./data-objects/languages":5,"./data-objects/races":6,"./data-objects/skills":7,"./data-objects/spells":8,"./data-objects/subraces":9,"./display":10}],12:[function(require,module,exports){
-function selectionComplete(progressLog, finalChoice){
+
+const expObj = {createDNDCharacter, userProgress}
+
+module.exports = expObj
+},{"./backFn":1,"./data-objects/backgrounds":2,"./data-objects/classes":3,"./data-objects/dragonbreath":4,"./data-objects/languages":5,"./data-objects/races":6,"./data-objects/skills":7,"./data-objects/spells":8,"./data-objects/subraces":9,"./display":10,"./userInput":13}],12:[function(require,module,exports){
+function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
-    console.log(progressLog, finalChoice)
-    console.log('worked')
     let back = document.getElementById('back')
     back.classList.remove('inactive')
     back.classList.add('active')
-    createDNDCharacter()
+    
+    triggerFn()
+
 }
 
 module.exports = selectionComplete
+},{}],13:[function(require,module,exports){
+//import dndcharacter function
+
+//classList.toggle
+//event.target.inputName.value (use instead of queryselector().value)
+
+function userInput(title, inputTag, triggerFn, progressLog){
+
+    document.getElementById('holder').innerHTML = ''
+    let content  = `<h2>${title}</h2>
+    ${inputTag}`
+    document.getElementById('holder').innerHTML = content
+    next.addEventListener('click', function(){inputComplete(triggerFn, progressLog)})
+    //validation
+
+    document.querySelector('#userInput').addEventListener('keyup', function(e){
+        if(e.target.value.length > 0){
+            document.getElementById('next').classList.remove('inactive')
+            document.getElementById('next').classList.add('active')
+        }
+        else{
+            document.getElementById('next').classList.add('inactive')    
+        }
+    })
+} 
+
+function inputComplete(triggerFn, progressLog){
+    let finalInput = [document.getElementById('userInput').value]
+    progressLog.push(finalInput)
+    let back = document.getElementById('back')
+    back.classList.remove('inactive')
+    back.classList.add('active')
+    
+    triggerFn()
+
+}
+
+module.exports = userInput
 },{}]},{},[11]);

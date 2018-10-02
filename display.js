@@ -1,6 +1,6 @@
 const selectionComplete = require('./selectionComplete')
 
-function display(choiceObj, progressLog){
+function display(choiceObj, progressLog, triggerFn){
     let choiceCount = 1
     if(Array.isArray(choiceObj)){
         choiceCount = choiceObj[0]
@@ -28,11 +28,11 @@ function display(choiceObj, progressLog){
 
     let cards = document.querySelectorAll('.card')
     for(let i = 0; i < cards.length; i++){
-        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog)})
+        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog, triggerFn)})
     }  
 }
 
-function select(e, numOfChoices, progressLog){
+function select(e, numOfChoices, progressLog, triggerFn){
     let finalChoice = []
     let selectedItem = event.currentTarget
     let next = document.getElementById('next')
@@ -68,10 +68,10 @@ function select(e, numOfChoices, progressLog){
         }
         next.classList.remove('inactive')
         next.classList.add('active')
-
+        
     }
     
-    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice)})
+    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice, triggerFn)})
 }
 
 module.exports = display
