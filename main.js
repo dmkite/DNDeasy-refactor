@@ -7,6 +7,7 @@ const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 const spells = require('./data-objects/spells')
 const display = require('./display')
+const backFn = require('./backFn')
 
 const userProgress = []
 
@@ -15,13 +16,20 @@ function createDNDCharacter(){
         document.getElementById('next').classList.remove('active')
         document.getElementById('next').classList.add('inactive')
     }
+
+    const back = document.getElementById('back')
+    back.addEventListener('click', function(){backFn(userProgress)})
+   
     switch(userProgress.length){
         case 0:
             //function to display races
+            document.getElementById('back').classList.remove('active')
+            document.getElementById('back').classList.add('inactive')
             display(races, userProgress)
             break
         case 1:
             //funtion to choose name
+            
             break
         case 2:
             //choose a language if applicable

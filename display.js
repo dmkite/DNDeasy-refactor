@@ -1,43 +1,4 @@
-// function displayX(type){
-//     for(let i = 0; i < Object.keys(races).length; i++){
-//       buildDom(getFirstEl, '#holder', createEl, 'div', appendEl)
-//       let div = document.querySelectorAll('#holder div')[i]
-//       div.innerHTML = `<h3>${Object.keys(type)[i]}</h3>`
-//       div.classList.add('card')
-//       div.appendChild(createEl('p'))
-//       getXEl('p',i).innerHTML = type[Object.keys(type)[i]].desc
-//       div.addEventListener('click', select)
-//     }
-//   }
-
-
-
-//   function displayX(choiceArray, key){
-//     document.getElementById('holder').innerHTML = ''
-//     let counter = choiceArray[0]
-//     let choiceList = Object.keys(choiceArray[1])
-//     let userList = races[userProgress[0]][key]
-//     for(let i = 0; i < userList.length; i++){
-//       //in the user's race, loop through the keyword, e.g. languages, etc.
-//       /*remove list  */
-//       if(choiceList.includes(userList[i])){
-//         choiceList.splice(choiceList.indexOf(userList[i]), 1)
-//       }
-//     }
-//     choiceList.forEach(
-//         (choice, i) =>{
-//           buildDom(getFirstEl, '#holder', createEl, 'div', appendEl)
-//           let div = document.querySelectorAll('#holder div')[i]
-//           div.innerHTML = `<h3>${choice}</h3>`
-//           div.classList.add('card')
-//           div.appendChild(createEl('p'))
-//           getXEl('p',i).innerHTML = races[userProgress[0]].choices[key][1][choice]
-//           let numOfChoices = races[userProgress[0]].choices[key][0]
-//           div.addEventListener('click', select)
-//           // div.addEventListener('click', function(e){select(e, numOfChoices)})
-//         }
-//       )
-//     }
+const selectionComplete = require('./selectionComplete')
 
 function display(choiceObj, progressLog){
     let choiceCount = 1
@@ -68,9 +29,7 @@ function display(choiceObj, progressLog){
     let cards = document.querySelectorAll('.card')
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog)})
-    }
-    
-    
+    }  
 }
 
 function select(e, numOfChoices, progressLog){
@@ -112,9 +71,7 @@ function select(e, numOfChoices, progressLog){
 
     }
     
-    next.addEventListener('click', () => {
-        progressLog.push(finalChoice)
-        console.log(progressLog)
-    })
+    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice)})
 }
+
 module.exports = display

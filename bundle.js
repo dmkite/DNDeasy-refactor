@@ -1,4 +1,11 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+function backFn(progressLog){
+    progressLog.pop()
+    createDNDCharacter()
+}
+
+module.exports = backFn
+},{}],2:[function(require,module,exports){
 const backgrounds = {
   Sailor:{
     desc: 'sailor...',
@@ -18,7 +25,7 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 const classes = {
   Barbarian : {
       classType: 'Barbarian',
@@ -36,7 +43,7 @@ const classes = {
 }
 
 module.exports = classes
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 const dragonbreath = {
     dragonBreath1:'abc',
     dragonBreath2: 'xyz',
@@ -44,7 +51,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const languages = {
     Common: {desc:'The language common to all races'},
     Elvish: {desc:'The language of the Elves'},
@@ -56,7 +63,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -222,7 +229,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":3,"./languages":4,"./skills":6,"./subraces":8}],6:[function(require,module,exports){
+},{"./dragonbreath":4,"./languages":5,"./skills":7,"./subraces":9}],7:[function(require,module,exports){
 const skills = {
   Athletics: 'info on ath',
   'Animal Handling': 'blah',
@@ -230,14 +237,14 @@ const skills = {
 }
 
 module.exports = skills
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const spells = {
     cantrips: null,
     level1: null
 }
 
 module.exports = spells
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const languages = require('./languages')
 const spells = require('./spells')
 
@@ -340,47 +347,8 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":4,"./spells":7}],9:[function(require,module,exports){
-// function displayX(type){
-//     for(let i = 0; i < Object.keys(races).length; i++){
-//       buildDom(getFirstEl, '#holder', createEl, 'div', appendEl)
-//       let div = document.querySelectorAll('#holder div')[i]
-//       div.innerHTML = `<h3>${Object.keys(type)[i]}</h3>`
-//       div.classList.add('card')
-//       div.appendChild(createEl('p'))
-//       getXEl('p',i).innerHTML = type[Object.keys(type)[i]].desc
-//       div.addEventListener('click', select)
-//     }
-//   }
-
-
-
-//   function displayX(choiceArray, key){
-//     document.getElementById('holder').innerHTML = ''
-//     let counter = choiceArray[0]
-//     let choiceList = Object.keys(choiceArray[1])
-//     let userList = races[userProgress[0]][key]
-//     for(let i = 0; i < userList.length; i++){
-//       //in the user's race, loop through the keyword, e.g. languages, etc.
-//       /*remove list  */
-//       if(choiceList.includes(userList[i])){
-//         choiceList.splice(choiceList.indexOf(userList[i]), 1)
-//       }
-//     }
-//     choiceList.forEach(
-//         (choice, i) =>{
-//           buildDom(getFirstEl, '#holder', createEl, 'div', appendEl)
-//           let div = document.querySelectorAll('#holder div')[i]
-//           div.innerHTML = `<h3>${choice}</h3>`
-//           div.classList.add('card')
-//           div.appendChild(createEl('p'))
-//           getXEl('p',i).innerHTML = races[userProgress[0]].choices[key][1][choice]
-//           let numOfChoices = races[userProgress[0]].choices[key][0]
-//           div.addEventListener('click', select)
-//           // div.addEventListener('click', function(e){select(e, numOfChoices)})
-//         }
-//       )
-//     }
+},{"./languages":5,"./spells":8}],10:[function(require,module,exports){
+const selectionComplete = require('./selectionComplete')
 
 function display(choiceObj, progressLog){
     let choiceCount = 1
@@ -411,9 +379,7 @@ function display(choiceObj, progressLog){
     let cards = document.querySelectorAll('.card')
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog)})
-    }
-    
-    
+    }  
 }
 
 function select(e, numOfChoices, progressLog){
@@ -455,13 +421,11 @@ function select(e, numOfChoices, progressLog){
 
     }
     
-    next.addEventListener('click', () => {
-        progressLog.push(finalChoice)
-        console.log(progressLog)
-    })
+    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice)})
 }
+
 module.exports = display
-},{}],10:[function(require,module,exports){
+},{"./selectionComplete":12}],11:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
@@ -471,6 +435,7 @@ const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 const spells = require('./data-objects/spells')
 const display = require('./display')
+const backFn = require('./backFn')
 
 const userProgress = []
 
@@ -479,13 +444,20 @@ function createDNDCharacter(){
         document.getElementById('next').classList.remove('active')
         document.getElementById('next').classList.add('inactive')
     }
+
+    const back = document.getElementById('back')
+    back.addEventListener('click', function(){backFn(userProgress)})
+   
     switch(userProgress.length){
         case 0:
             //function to display races
+            document.getElementById('back').classList.remove('active')
+            document.getElementById('back').classList.add('inactive')
             display(races, userProgress)
             break
         case 1:
             //funtion to choose name
+            
             break
         case 2:
             //choose a language if applicable
@@ -547,4 +519,16 @@ function createDNDCharacter(){
 }
 
 createDNDCharacter()
-},{"./data-objects/backgrounds":1,"./data-objects/classes":2,"./data-objects/dragonbreath":3,"./data-objects/languages":4,"./data-objects/races":5,"./data-objects/skills":6,"./data-objects/spells":7,"./data-objects/subraces":8,"./display":9}]},{},[10]);
+},{"./backFn":1,"./data-objects/backgrounds":2,"./data-objects/classes":3,"./data-objects/dragonbreath":4,"./data-objects/languages":5,"./data-objects/races":6,"./data-objects/skills":7,"./data-objects/spells":8,"./data-objects/subraces":9,"./display":10}],12:[function(require,module,exports){
+function selectionComplete(progressLog, finalChoice){
+    progressLog.push(finalChoice)
+    console.log(progressLog, finalChoice)
+    console.log('worked')
+    let back = document.getElementById('back')
+    back.classList.remove('inactive')
+    back.classList.add('active')
+    createDNDCharacter()
+}
+
+module.exports = selectionComplete
+},{}]},{},[11]);
