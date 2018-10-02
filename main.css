@@ -1,0 +1,31 @@
+#holder{
+    border:1px solid #333;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content: space-around;
+    
+  }
+  
+#holder div{
+   padding:10px;
+  }
+  
+#holder div:hover{
+    opacity:.7;
+    cursor:pointer;
+  }
+  
+div.card{
+    width:20%;
+    border:2px solid black;
+    margin:20px;
+}
+
+.selected{
+    transform: scale(.9);
+    opacity:1 !important;
+}
+
+.active{
+
+}
