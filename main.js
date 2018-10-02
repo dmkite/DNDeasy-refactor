@@ -8,15 +8,17 @@ const dragonbreath = require('./data-objects/dragonbreath')
 const spells = require('./data-objects/spells')
 const display = require('./display')
 
-console.log(races, languages, subraces, skills, backgrounds, classes, dragonbreath, spells)
-
 const userProgress = []
 
 function createDNDCharacter(){
+    if(document.getElementById('next').classList.contains('active')){
+        document.getElementById('next').classList.remove('active')
+        document.getElementById('next').classList.add('inactive')
+    }
     switch(userProgress.length){
         case 0:
             //function to display races
-            display(subraces.Elf['High Elf'].choices.languages)
+            display(races, userProgress)
             break
         case 1:
             //funtion to choose name

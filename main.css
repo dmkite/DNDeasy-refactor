@@ -27,5 +27,34 @@ div.card{
 }
 
 .active{
+    opacity: 1;
+}
 
+.active:hover{
+    cursor:pointer;
+}
+
+input[type="button"]{
+    height:50px;
+    width:50px;
+    border-radius:50%;
+    border:none
+}
+
+input[type="button"]:hover{
+    cursor:pointer;
+    opacity:.8
+}
+
+.inactive{
+    opacity:.5;
+}
+
+input.inactive:hover{
+    cursor: default;
+    opacity:.5;
+}
+.card img{
+    width:90%;
+    margin:20px auto;
 }
