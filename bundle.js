@@ -1,10 +1,33 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 function backFn(progressLog, triggerFn){
-    progressLog.pop()
-    triggerFn()
+    console.log(progressLog[progressLog.length - 1],'xxxxxxxxxxxxx')
+    if(progressLog[progressLog.length - 1] === null){
+        for(let i = progressLog.length - 1; i >= 0; i--){
+            console.log(progressLog[i], i)
+            if(progressLog[i] === null){
+                progressLog.pop()
+            }
+            else{
+                progressLog.pop()
+                console.log(progressLog.length, '----------------------------')
+                break
+            }
+        }
+        console.log('broke out because of ', progressLog[progressLog.length - 1])
+    }
+    else{
+        progressLog.pop()
+    }
+    console.log('======about to enter dnd function again=========')
+    triggerFn(progressLog)
 }
 
-module.exports = backFn
+function choiceNotPresent(progressLog, triggerFn){
+    console.log('--no choice to make--')
+    progressLog.push(null)
+    triggerFn()
+}
+module.exports = {backFn, choiceNotPresent}
 },{}],2:[function(require,module,exports){
 const backgrounds = {
   Sailor:{
@@ -377,51 +400,61 @@ function display(choiceObj, progressLog, triggerFn){
     holder.innerHTML = options.join('\n')
 
     let cards = document.querySelectorAll('.card')
+    let finalChoice = []
+    let prepCardsForSelection = function(e){select2(e, choiceCount, finalChoice, progressLog, triggerFn)}
     for(let i = 0; i < cards.length; i++){
-        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog, triggerFn)})
+        cards[i].addEventListener('click', prepCardsForSelection)
     }  
 }
 
-function select(e, numOfChoices, progressLog, triggerFn){
-    let finalChoice = []
-    let selectedItem = event.currentTarget
-    let next = document.getElementById('next')
-    let back = document.getElementById('back')
 
-    let cards = document.querySelectorAll('main div')
-    for(let i = 0; i < cards.length; i++){
-        if(cards[i].classList.contains('selected')){
-            numOfChoices--
-            finalChoice.pop()
+function select2(event, numOfChoices,finalChoice, progressLog, triggerFn){
+    let origLength = progressLog.length;
+    let next = document.querySelector('#next')
+    let choiceCount = numOfChoices - finalChoice.length
+    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)}
+
+    if(choiceCount !== 0){ //have choices left
+        if(event.currentTarget.classList.contains('selected')){
+            event.currentTarget.classList.remove('selected')
+            choiceCount++
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
+            // next.removeEventListener('click', logSelectionMoveOn)
+        }
+        else{
+            event.currentTarget.classList.add('selected')
+            choiceCount--
+            finalChoice.push(event.currentTarget.children[1].textContent)
         }
     }
-    // ^^go through, if any cards are selected, reduce number of choices
-
-    if(selectedItem.classList.contains('selected')){
-        selectedItem.classList.remove('selected')
-        numOfChoices++
-        for(let i = 0; i < cards.length; i++){
-            cards[i].classList.remove('inactive')
+    else{                   //have no choices left
+        if(event.currentTarget.classList.contains('selected')){
+            event.currentTarget.classList.remove('selected')
+            choiceCount++
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
+            // next.removeEventListener('click', logSelectionMoveOn)
         }
-        next.classList.add('inactive')
-        next.classList.remove('active')
-    }
-    else if(numOfChoices !== 0){
-        selectedItem.classList.add('selected')
-        finalChoice.push(event.currentTarget.children[1].innerHTML)
-        numOfChoices--
-    }
-
-    if(numOfChoices === 0){
-        for(let i = 0; i < cards.length; i++){
-            cards[i].classList.add('inactive')
+        else{
+            console.log('nope')
+            // return false;
         }
-        next.classList.remove('inactive')
-        next.classList.add('active')
-        
     }
     
-    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice, triggerFn)})
+    if(choiceCount === 0 && finalChoice.length === numOfChoices){
+        next.classList.remove('hidden')
+        // next.addEventListener('click', logSelectionMoveOn, {once:true})
+        next.onclick = logSelectionMoveOn
+    }else if(choiceCount !== 0){
+        next.classList.add('hidden')
+        // next.removeEventListener('click', logSelectionMoveOn)
+    }
+    // if(progressLog.length === origLength){
+    //     progressLog.push(finalChoice)
+    // }
+    // else if(progressLog.length > origLength){
+    //     progressLog.pop()
+    //     progressLog.push(finalChoice)
+    // }
 }
 
 module.exports = display
@@ -437,16 +470,18 @@ const spells = require('./data-objects/spells')
 
 
 const display = require('./display')
-const backFn = require('./backFn')
+const {backFn, choiceNotPresent} = require('./backFn')
 const userInput = require('./userInput')
 
 const userProgress = []
 
 function createDNDCharacter(){
-    if(document.getElementById('next').classList.contains('active')){
-        document.getElementById('next').classList.remove('active')
-        document.getElementById('next').classList.add('inactive')
-    }
+    
+    console.log(userProgress, 'at beginning of CDC')
+    // if(document.getElementById('next').classList.contains('active')){
+    //     document.getElementById('next').classList.remove('active')
+    //     document.getElementById('next').classList.add('inactive')
+    // }
 
     const back = document.getElementById('back')
     back.addEventListener('click', function(){backFn(userProgress, createDNDCharacter)})
@@ -462,23 +497,48 @@ function createDNDCharacter(){
             //funtion to choose name
             let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="">'
             userInput("what's in a name?", inputTag, createDNDCharacter, userProgress)
-            console.log(userProgress)
+
             break
         case 2:
-            //choose a language if applicable
-            console.log('woohoo! :)', userProgress)
+            // choose a language if applicable
+            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.languages){
+                choiceNotPresent(userProgress, createDNDCharacter)
+                
+            }
+            else{
+                display(races[userProgress[0]].choices.languages, userProgress, createDNDCharacter)
+            }
             break
         case 3:
             //choose skills if applicable
+            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.skills){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                display(races[userProgress[0]].choices.skills, userProgress, createDNDCharacter)
+            }
             break
         case 4:
             //choose stats if applicable
+            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.stats){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                display(races[userProgress[0]].choices.stats, userProgress, createDNDCharacter)
+            }
             break
         case 5: 
             //choose dragon breath if applicable
+            if(userProgress[0] !== 'Dragonborn'){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                display(races.Dragonborn.choices.weapons, userProgress, createDNDCharacter)
+            }
             break
         case 6:
             //choose subrace if applicable
+            document.getElementById('holder').innerHTML = 'this is just a holder'
             break
         case 7: 
             //choose subrace language
@@ -522,6 +582,7 @@ function createDNDCharacter(){
         default:
             return 'youre done!'
     }
+    
 }
 
 createDNDCharacter()
@@ -536,10 +597,12 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
     back.classList.remove('inactive')
     back.classList.add('active')
     
+    document.querySelector('#next').classList.toggle('hidden')
+
     triggerFn()
 
 }
-
+//problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
 module.exports = selectionComplete
 },{}],13:[function(require,module,exports){
 //import dndcharacter function
@@ -550,32 +613,40 @@ module.exports = selectionComplete
 function userInput(title, inputTag, triggerFn, progressLog){
 
     document.getElementById('holder').innerHTML = ''
+
     let content  = `<h2>${title}</h2>
     ${inputTag}`
     document.getElementById('holder').innerHTML = content
-    next.addEventListener('click', function(){inputComplete(triggerFn, progressLog)})
+
+    // let next = document.getElementById('next')
+
     //validation
 
     document.querySelector('#userInput').addEventListener('keyup', function(e){
         if(e.target.value.length > 0){
-            document.getElementById('next').classList.remove('inactive')
-            document.getElementById('next').classList.add('active')
+            let next = document.querySelector('#next')
+            let addUserInputToLog = function(){inputComplete(triggerFn, progressLog)}
+            next.onclick = addUserInputToLog
+            next.classList.remove('hidden')
         }
-        else{
-            document.getElementById('next').classList.add('inactive')    
+        else if(e.target.value.length === 0){
+            next.classList.add('hidden')
         }
+        
     })
+    
 } 
 
 function inputComplete(triggerFn, progressLog){
     let finalInput = [document.getElementById('userInput').value]
     progressLog.push(finalInput)
-    let back = document.getElementById('back')
-    back.classList.remove('inactive')
-    back.classList.add('active')
     
-    triggerFn()
+    //vv back button stuff
+    let back = document.getElementById('back')
+    back.classList.toggle('hidden')
 
+    document.querySelector('#next').classList.toggle('hidden')
+    triggerFn()
 }
 
 module.exports = userInput

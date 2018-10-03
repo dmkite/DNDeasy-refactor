@@ -6,32 +6,40 @@
 function userInput(title, inputTag, triggerFn, progressLog){
 
     document.getElementById('holder').innerHTML = ''
+
     let content  = `<h2>${title}</h2>
     ${inputTag}`
     document.getElementById('holder').innerHTML = content
-    next.addEventListener('click', function(){inputComplete(triggerFn, progressLog)})
+
+    // let next = document.getElementById('next')
+
     //validation
 
     document.querySelector('#userInput').addEventListener('keyup', function(e){
         if(e.target.value.length > 0){
-            document.getElementById('next').classList.remove('inactive')
-            document.getElementById('next').classList.add('active')
+            let next = document.querySelector('#next')
+            let addUserInputToLog = function(){inputComplete(triggerFn, progressLog)}
+            next.onclick = addUserInputToLog
+            next.classList.remove('hidden')
         }
-        else{
-            document.getElementById('next').classList.add('inactive')    
+        else if(e.target.value.length === 0){
+            next.classList.add('hidden')
         }
+        
     })
+    
 } 
 
 function inputComplete(triggerFn, progressLog){
     let finalInput = [document.getElementById('userInput').value]
     progressLog.push(finalInput)
-    let back = document.getElementById('back')
-    back.classList.remove('inactive')
-    back.classList.add('active')
     
-    triggerFn()
+    //vv back button stuff
+    let back = document.getElementById('back')
+    back.classList.toggle('hidden')
 
+    document.querySelector('#next').classList.toggle('hidden')
+    triggerFn()
 }
 
 module.exports = userInput

@@ -27,51 +27,61 @@ function display(choiceObj, progressLog, triggerFn){
     holder.innerHTML = options.join('\n')
 
     let cards = document.querySelectorAll('.card')
+    let finalChoice = []
+    let prepCardsForSelection = function(e){select2(e, choiceCount, finalChoice, progressLog, triggerFn)}
     for(let i = 0; i < cards.length; i++){
-        cards[i].addEventListener('click', function(e){select(e, choiceCount, progressLog, triggerFn)})
+        cards[i].addEventListener('click', prepCardsForSelection)
     }  
 }
 
-function select(e, numOfChoices, progressLog, triggerFn){
-    let finalChoice = []
-    let selectedItem = event.currentTarget
-    let next = document.getElementById('next')
-    let back = document.getElementById('back')
 
-    let cards = document.querySelectorAll('main div')
-    for(let i = 0; i < cards.length; i++){
-        if(cards[i].classList.contains('selected')){
-            numOfChoices--
-            finalChoice.pop()
+function select2(event, numOfChoices,finalChoice, progressLog, triggerFn){
+    let origLength = progressLog.length;
+    let next = document.querySelector('#next')
+    let choiceCount = numOfChoices - finalChoice.length
+    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)}
+
+    if(choiceCount !== 0){ //have choices left
+        if(event.currentTarget.classList.contains('selected')){
+            event.currentTarget.classList.remove('selected')
+            choiceCount++
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
+            // next.removeEventListener('click', logSelectionMoveOn)
+        }
+        else{
+            event.currentTarget.classList.add('selected')
+            choiceCount--
+            finalChoice.push(event.currentTarget.children[1].textContent)
         }
     }
-    // ^^go through, if any cards are selected, reduce number of choices
-
-    if(selectedItem.classList.contains('selected')){
-        selectedItem.classList.remove('selected')
-        numOfChoices++
-        for(let i = 0; i < cards.length; i++){
-            cards[i].classList.remove('inactive')
+    else{                   //have no choices left
+        if(event.currentTarget.classList.contains('selected')){
+            event.currentTarget.classList.remove('selected')
+            choiceCount++
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
+            // next.removeEventListener('click', logSelectionMoveOn)
         }
-        next.classList.add('inactive')
-        next.classList.remove('active')
-    }
-    else if(numOfChoices !== 0){
-        selectedItem.classList.add('selected')
-        finalChoice.push(event.currentTarget.children[1].innerHTML)
-        numOfChoices--
-    }
-
-    if(numOfChoices === 0){
-        for(let i = 0; i < cards.length; i++){
-            cards[i].classList.add('inactive')
+        else{
+            console.log('nope')
+            // return false;
         }
-        next.classList.remove('inactive')
-        next.classList.add('active')
-        
     }
     
-    next.addEventListener('click', function(){selectionComplete(progressLog, finalChoice, triggerFn)})
+    if(choiceCount === 0 && finalChoice.length === numOfChoices){
+        next.classList.remove('hidden')
+        // next.addEventListener('click', logSelectionMoveOn, {once:true})
+        next.onclick = logSelectionMoveOn
+    }else if(choiceCount !== 0){
+        next.classList.add('hidden')
+        // next.removeEventListener('click', logSelectionMoveOn)
+    }
+    // if(progressLog.length === origLength){
+    //     progressLog.push(finalChoice)
+    // }
+    // else if(progressLog.length > origLength){
+    //     progressLog.pop()
+    //     progressLog.push(finalChoice)
+    // }
 }
 
 module.exports = display

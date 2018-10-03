@@ -58,3 +58,17 @@ input.inactive:hover{
     width:90%;
     margin:20px auto;
 }
+
+#next{
+    position:fixed;
+    top:300px;
+    right:50px;
+}
+
+.hidden{
+    display:none;
+}
+
+.visible{
+    display:default;
+}
