@@ -5,10 +5,12 @@ const skills = require('./data-objects/skills')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
-const spells = require('./data-objects/spells')
+// const spells = require('./data-objects/spells')
 
 
-const display = require('./display')
+const { display, select } = require('./display')
+const spellList = require('./spellList')
+const prepareSpellOptions = require('./spellDisplay')
 const {backFn, choiceNotPresent} = require('./backFn')
 const userInput = require('./userInput')
 
@@ -24,12 +26,11 @@ function createDNDCharacter(){
 
     const back = document.getElementById('back')
     back.addEventListener('click', function(){backFn(userProgress, createDNDCharacter)})
-   
+    
+
     switch(userProgress.length){
         case 0:
             //function to display races
-            document.getElementById('back').classList.remove('active')
-            document.getElementById('back').classList.add('inactive')
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
@@ -40,56 +41,76 @@ function createDNDCharacter(){
             break
         case 2:
             // choose a language if applicable
-            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.languages){
+            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.languages){
                 choiceNotPresent(userProgress, createDNDCharacter)
                 
             }
             else{
-                display(races[userProgress[0]].choices.languages, userProgress, createDNDCharacter)
+                display(races[userProgress[0][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
             }
             break
         case 3:
             //choose skills if applicable
-            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.skills){
+            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.skills){
                 choiceNotPresent(userProgress, createDNDCharacter)
             }
             else{
-                display(races[userProgress[0]].choices.skills, userProgress, createDNDCharacter)
+                display(races[userProgress[0][0]].choices.skills, userProgress, createDNDCharacter)
             }
             break
         case 4:
             //choose stats if applicable
-            if(!races[userProgress[0]].choices || !races[userProgress[0]].choices.stats){
+            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.stats){
                 choiceNotPresent(userProgress, createDNDCharacter)
             }
             else{
-                display(races[userProgress[0]].choices.stats, userProgress, createDNDCharacter)
+                display(races[userProgress[0][0]].choices.stats, userProgress, createDNDCharacter)
             }
             break
         case 5: 
             //choose dragon breath if applicable
-            if(userProgress[0] !== 'Dragonborn'){
+            if(userProgress[0][0] !== 'Dragonborn'){
                 choiceNotPresent(userProgress, createDNDCharacter)
             }
             else{
+                console.log('is dragonborn')
                 display(races.Dragonborn.choices.weapons, userProgress, createDNDCharacter)
             }
             break
         case 6:
             //choose subrace if applicable
-            document.getElementById('holder').innerHTML = 'this is just a holder'
+            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.subrace){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                display(races[userProgress[0][0]].choices.subrace, userProgress, createDNDCharacter)
+            }
             break
         case 7: 
-            //choose subrace language
+            //choose spell
+            if(userProgress[6] === null || userProgress[6][0] !== 'High Elf'){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                prepareSpellOptions(0, null, 1, userProgress, createDNDCharacter)
+            }
             break
         case 8:
-            //choose cantrip
+            if (userProgress[6] === null || userProgress[6][0] !== 'High Elf') {
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else {
+                display(subraces.Elf[userProgress[6][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
+            }
             break
         case 9:
             //choose class
+            display(classes, userProgress, createDNDCharacter)
             break
         case 10:
             //choose skills
+            //This must be changed eventually!!!! bump this down
+            
             break
         case 11:
             //choose class specific traits
@@ -104,19 +125,22 @@ function createDNDCharacter(){
             //choose spells
             break
         case 15:
-            //traits
+            //choose alignment
             break
         case 16:
-            //ideals
+            //choose background
             break
         case 17:
-            //bonds
+            //traits
             break
         case 18:
-            //flaws
+            //ideals
             break
         case 19:
-            //get char sheet
+            //bonds
+            break
+        case 20:
+            // flaws
             break
         default:
             return 'youre done!'

@@ -72,3 +72,14 @@ input.inactive:hover{
 .visible{
     display:default;
 }
+
+main.charsheet{
+    width:1000px;
+    display:grid;
+    grid-template-areas:
+    '. name class background'
+    '. race alignment dc'
+    'stats savingThrows HP charInfo'
+    'stats skills attacks features'
+    'profAndLang equipment features'
+}

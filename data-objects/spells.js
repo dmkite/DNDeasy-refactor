@@ -1,6 +1,2 @@
-const spells = {
-    cantrips: null,
-    level1: null
-}
-
+const spells = {level1:null, cantrips:null}
 module.exports = spells

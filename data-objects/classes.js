@@ -8,7 +8,7 @@ const classes = {
           weapons:['simple weapons', 'martial weapons']
       },
       armorType:[],
-      skillChoices:['animalHandling', 'athletics', 'intimidation', 'nature', 'perception','survival'],
+      choices: {skills: [1, ['animalHandling', 'athletics', 'intimidation', 'nature', 'perception','survival']]},
       equipment:['Great Axe', '2 Hand Axes', "explorer's pack",  '4 Javelins'],
       features:['Unarmored Defense']
   }

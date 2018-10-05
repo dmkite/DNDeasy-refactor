@@ -1,7 +1,10 @@
 const selectionComplete = require('./selectionComplete')
+const races = require('./data-objects/races')
 
-function display(choiceObj, progressLog, triggerFn){
+function display(choiceObj, progressLog, triggerFn, topic){
+    
     let choiceCount = 1
+
     if(Array.isArray(choiceObj)){
         choiceCount = choiceObj[0]
         choiceObj = choiceObj[1]
@@ -15,6 +18,12 @@ function display(choiceObj, progressLog, triggerFn){
     let options = []
     let placeholder = 'https://cdn.tutsplus.com/net/uploads/legacy/958_placeholders/placehold.gif'
     for(let choices of choiceArray){
+        if(progressLog.length > 0 && !!races[progressLog[0][0]][topic] === true ){
+            if( races[progressLog[0][0]][topic].includes(choices) ){
+                continue
+            }
+
+        }
         options.push(`
         <div class="card">
             <img src="${placeholder}" alt="image of ${choices}">
@@ -28,14 +37,14 @@ function display(choiceObj, progressLog, triggerFn){
 
     let cards = document.querySelectorAll('.card')
     let finalChoice = []
-    let prepCardsForSelection = function(e){select2(e, choiceCount, finalChoice, progressLog, triggerFn)}
+    let prepCardsForSelection = function(e){select(e, choiceCount, finalChoice, progressLog, triggerFn)}
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', prepCardsForSelection)
     }  
 }
 
 
-function select2(event, numOfChoices,finalChoice, progressLog, triggerFn){
+function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
     let origLength = progressLog.length;
     let next = document.querySelector('#next')
     let choiceCount = numOfChoices - finalChoice.length
@@ -82,6 +91,7 @@ function select2(event, numOfChoices,finalChoice, progressLog, triggerFn){
     //     progressLog.pop()
     //     progressLog.push(finalChoice)
     // }
+    
 }
 
-module.exports = display
+module.exports = { display, select}

@@ -33,7 +33,7 @@ const subraces = {
         spells: ['+1 cantrip'],
         language:['+1 language'],
         choices: {languages: [1, languages],
-                    spells: [1, spells.cantrips],
+                    spells: [1, 'spells'],
                 }
         },
         
@@ -76,7 +76,7 @@ const subraces = {
             features:['Advantage on saving throws against poison, resistance against poison damage']
         }
     },
-    "Gnome": {
+    Gnome: {
         "Forest Gnome" : {
             subType:'Forest Gnome',
             desc: '...',
