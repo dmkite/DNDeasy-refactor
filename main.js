@@ -7,13 +7,17 @@ const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 const alignment = require('./data-objects/alignment')
 // const spells = require('./data-objects/spells')
-const classChoices = require('./classChoices')
+const progressChoices = require('./classChoices')
+const diceStats = require('./diceStats')
 
 const { display, select } = require('./display')
 const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
 const {backFn, choiceNotPresent} = require('./backFn')
 const userInput = require('./userInput')
+const hpRoll = require('./hpRoll')
+
+const displayStats = require('./diceStats')
 
 
 
@@ -38,7 +42,7 @@ function createDNDCharacter(){
             break
         case 1:
             //funtion to choose name
-            let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="">'
+            let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="" autofocus>'
             userInput("what's in a name?", inputTag, createDNDCharacter, userProgress)
 
             break
@@ -114,20 +118,20 @@ function createDNDCharacter(){
             //choose skills
             // console.log(userProgress[9])
             // display(classes[userProgress[9][0]].choices.skills, userProgress, createDNDCharacter)
-            classChoices(userProgress, 0, createDNDCharacter)
+            progressChoices(classes, userProgress, 0, createDNDCharacter)
             
             break
         case 11:
             //choose class choices 2
-            classChoices(userProgress, 1, createDNDCharacter)
+            progressChoices(classes, userProgress, 1, createDNDCharacter)
             break
         case 12: 
             //choose class choices 3
-            classChoices(userProgress, 2, createDNDCharacter)
+            progressChoices(classes, userProgress, 2, createDNDCharacter)
             break
         case 13:
             //choose class choices 4
-            classChoices(userProgress, 3, createDNDCharacter)
+            progressChoices(classes, userProgress, 3, createDNDCharacter)
             break
         case 14: 
             //choose alignment
@@ -135,22 +139,47 @@ function createDNDCharacter(){
             console.log(alignment)
             break
         case 15:
-            //choose background
+            display(backgrounds, userProgress, createDNDCharacter)
             break
         case 16:
-            //choose background
+            //choose background choices 
+            if(!!backgrounds[userProgress[15][0]].choices === false){
+                choiceNotPresent(userProgress, createDNDCharacter)
+            }
+            else{
+                display(languages, userProgress, createDNDCharacter, 'languages')
+            }
             break
         case 17:
-            //traits
+            //attribute stats
+            displayStats(userProgress, createDNDCharacter)
             break
         case 18:
-            //ideals
+            //roll HP
+            hpRoll(userProgress, createDNDCharacter)
             break
         case 19:
-            //bonds
+            //traits
+            let inputTag = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
+            userInput('What are your traits?', inputTag, createDNDCharacter, userProgress)
+
             break
         case 20:
+            //ideals
+            let inputTag = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
+            userInput("what do you believe in?", inputTag, createDNDCharacter, userProgress)
+
+            break
+        case 21:
+            //bonds
+            let inputTag = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
+            userInput("what are you connected to?", inputTag, createDNDCharacter, userProgress)
+
+            break
+        case 22:
             // flaws
+            let inputTag = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
+            userInput("what's wrong with you?", inputTag, createDNDCharacter, userProgress)
             break
         default:
             return 'youre done!'

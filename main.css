@@ -61,7 +61,7 @@ input.inactive:hover{
 
 #next{
     position:fixed;
-    top:300px;
+    bottom:100px;
     right:50px;
 }
 
@@ -73,6 +73,84 @@ input.inactive:hover{
     display:default;
 }
 
+.numContainer{
+    outline:1px solid black;
+    height:25px;
+    width:25px;
+    line-height:25px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.statDropContainer{
+    outline:1px dotted green;
+    width:200%;
+    padding:0;
+    margin:0;
+}
+.statDropContainer span{vertical-align:center;}
+
+.col1{
+    outline:1px solid blue;
+    min-width:45px;
+}
+
+.statHolder{
+    outline:1px dashed red;
+    display:inline-block;
+    height:45px;
+    width:45px;
+    margin:0;
+}
+
+.dice:hover{
+    opacity:1 !important
+}
+
+.dice{
+    text-align:center;
+    color:white;
+    font: 300 36px/40px sans;
+    width: 80px;
+    height: 40px;
+    background: red;
+    position: relative;
+    margin: 50px 0 0 50px;
+}
+.dice:before {
+	content: "";
+	position: absolute;
+	top: -25px;
+	left: 0;
+	width: 0;
+	height: 0;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 25px solid red;
+}
+.dice:after {
+	content: "";
+	position: absolute;
+	bottom: -25px;
+	left: 0;
+	width: 0;
+	height: 0;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-top: 25px solid red;
+}
+
+@keyframes grow{
+  0%{font: 300 36px/40px sans}
+  100%{font: 700 48px/40px sans}
+}
+
+.animatedNum{
+  font: 700 48px/40px sans;
+  animation: grow 1s ease-in;
+}
+
+
 main.charsheet{
     width:1000px;
     display:grid;
@@ -83,3 +161,4 @@ main.charsheet{
     'stats skills attacks features'
     'profAndLang equipment features'
 }
+
