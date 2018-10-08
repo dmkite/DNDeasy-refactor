@@ -5,6 +5,7 @@ const skills = require('./data-objects/skills')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
+const alignment = require('./data-objects/alignment')
 // const spells = require('./data-objects/spells')
 const classChoices = require('./classChoices')
 
@@ -129,11 +130,12 @@ function createDNDCharacter(){
             classChoices(userProgress, 3, createDNDCharacter)
             break
         case 14: 
-            //choose spells
-            console.log('made it fthrough')
+            //choose alignment
+            display(alignment, userProgress, createDNDCharacter)
+            console.log(alignment)
             break
         case 15:
-            //choose alignment
+            //choose background
             break
         case 16:
             //choose background

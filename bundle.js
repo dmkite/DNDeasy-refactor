@@ -60,7 +60,48 @@ function classChoices(progressLog, number, triggerFn){
 module.exports = classChoices
 
 
-},{"./backFn":1,"./data-objects/classes":4,"./display":11,"./spellDisplay":14}],3:[function(require,module,exports){
+},{"./backFn":1,"./data-objects/classes":5,"./display":12,"./spellDisplay":15}],3:[function(require,module,exports){
+const alignment = {
+    "Lawful Good":{
+        name:"Lawful Good",
+        desc:'Combining honor and compassion'
+    },
+    "Neutral Good":{
+        name: "Neutral Good",
+        desc: 'Doing what is good without bias for or against order'
+    },
+    "Chaotic Good": {
+        name:'Chaotic Good',
+        desc:'Combinng a good heart with a free spirit'
+    },
+    "Lawful Neutral":{
+        name: 'Lawful Neutral',
+        desc: 'Reliable and honorable without being a zealot'
+    },
+    "True Neutral": {
+        name:"True Neutral",
+        desc: 'Acting naturally wihout prejudice or compulsion'
+    },
+    "Chaotic Neutral": {
+        name: "Chaotic Neutral",
+        desc:"Freedom from societal restrictions and a do-gooder's mentality"
+    },
+    "Lawful Evil": {
+        name:"Chaotic Neutral",
+        desc:"A combination of honor and dedicated self-interest"
+    },
+    "Neutral Evil": {
+        name:"Neutral Evil",
+        desc:'An ability to advance oneself without regard for others'
+    },
+    "Chaotic Evil": {
+        name:"Chaotic Evil",
+        desc:'A combination of self interest and complete freedom'
+    }
+}
+
+module.exports = alignment
+},{}],4:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = {
@@ -155,7 +196,7 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{"./languages":6}],4:[function(require,module,exports){
+},{"./languages":7}],5:[function(require,module,exports){
 const skills = require('./skills')
 const spells= require('./spells')
 const { createDNDCharacter, userProgress } = require('../main')
@@ -365,7 +406,7 @@ const classes = {
 }
 
 module.exports = classes
-},{"../main":12,"./skills":8,"./spells":9}],5:[function(require,module,exports){
+},{"../main":13,"./skills":9,"./spells":10}],6:[function(require,module,exports){
 const dragonbreath = {
     "Black Dragon":"Spit acid in a 5' by 30' line",
     "Blue Dragon": "Breathe lightning in a 5' by 30' line",
@@ -380,7 +421,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const languages = {
     Common: {desc:'The language common to all races'},
     Elvish: {desc:'The language of the Elves'},
@@ -392,7 +433,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -565,7 +606,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":5,"./languages":6,"./skills":8,"./subraces":10}],8:[function(require,module,exports){
+},{"./dragonbreath":6,"./languages":7,"./skills":9,"./subraces":11}],9:[function(require,module,exports){
 const skills = {
    Acrobatics: { 
   name: 'Acrobatics',
@@ -659,10 +700,10 @@ Survival:{
 }}
 
 module.exports = skills
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const spells = {level1:null, cantrips:null}
 module.exports = spells
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 const languages = require('./languages')
 const spells = require('./spells')
 
@@ -766,7 +807,7 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":6,"./spells":9}],11:[function(require,module,exports){
+},{"./languages":7,"./spells":10}],12:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 const races = require('./data-objects/races')
 
@@ -864,7 +905,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
 }
 
 module.exports = { display, select}
-},{"./data-objects/races":7,"./selectionComplete":13}],12:[function(require,module,exports){
+},{"./data-objects/races":8,"./selectionComplete":14}],13:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
@@ -872,6 +913,7 @@ const skills = require('./data-objects/skills')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
+const alignment = require('./data-objects/alignment')
 // const spells = require('./data-objects/spells')
 const classChoices = require('./classChoices')
 
@@ -996,11 +1038,12 @@ function createDNDCharacter(){
             classChoices(userProgress, 3, createDNDCharacter)
             break
         case 14: 
-            //choose spells
-            console.log('made it fthrough')
+            //choose alignment
+            display(alignment, userProgress, createDNDCharacter)
+            console.log(alignment)
             break
         case 15:
-            //choose alignment
+            //choose background
             break
         case 16:
             //choose background
@@ -1028,7 +1071,7 @@ createDNDCharacter()
 const expObj = {createDNDCharacter, userProgress}
 
 module.exports = expObj
-},{"./backFn":1,"./classChoices":2,"./data-objects/backgrounds":3,"./data-objects/classes":4,"./data-objects/dragonbreath":5,"./data-objects/languages":6,"./data-objects/races":7,"./data-objects/skills":8,"./data-objects/subraces":10,"./display":11,"./spellDisplay":14,"./spellList":15,"./userInput":16}],13:[function(require,module,exports){
+},{"./backFn":1,"./classChoices":2,"./data-objects/alignment":3,"./data-objects/backgrounds":4,"./data-objects/classes":5,"./data-objects/dragonbreath":6,"./data-objects/languages":7,"./data-objects/races":8,"./data-objects/skills":9,"./data-objects/subraces":11,"./display":12,"./spellDisplay":15,"./spellList":16,"./userInput":17}],14:[function(require,module,exports){
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
     let back = document.getElementById('back')
@@ -1042,7 +1085,7 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
 }
 //problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
 module.exports = selectionComplete
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const spells = require('./spellList')
 const { createDNDCharacter, userProgress } = require('./main')
 const {display, select} = require('./display')
@@ -1092,7 +1135,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
 
 module.exports = prepareSpellOptions
 
-},{"./display":11,"./main":12,"./spellList":15}],15:[function(require,module,exports){
+},{"./display":12,"./main":13,"./spellList":16}],16:[function(require,module,exports){
 let spellList = [
     {
         "index": 1,
@@ -14525,7 +14568,7 @@ spells = spells.reduce((acc, spell) => {
 
 
 module.exports = spells
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 //import dndcharacter function
 
 //classList.toggle
@@ -14571,4 +14614,4 @@ function inputComplete(triggerFn, progressLog){
 }
 
 module.exports = userInput
-},{}]},{},[12]);
+},{}]},{},[13]);
