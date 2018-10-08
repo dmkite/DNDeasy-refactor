@@ -29,26 +29,105 @@ function choiceNotPresent(progressLog, triggerFn){
 }
 module.exports = {backFn, choiceNotPresent}
 },{}],2:[function(require,module,exports){
+const languages = require('./languages')
+
 const backgrounds = {
-  Sailor:{
-    desc: 'sailor...',
-    skills: ['Animal Handling'],
-    equipment: ['XYZ']
+  Acolyte: {
+    skills: ['Insight', 'Religion'], 
+    choices:{languages: [2, languages]},
+    equipment: ['holy symbol', 'prayer book', '5 sticks of incense', 'vestments', 'common clothes', '15 GP'],
+    desc:''
+  },
+  Charlatan: {
+    skills: ['Deception', 'Sleight of Hand'],
+    profs:{tools:['disguise kit', 'forgery kit']},
+    equipment: ['fine clothes', 'disguise kit', 'tools of a con of your choice', '15 GP'],
+    desc: ''
+  },
+  Criminal: {
+    skills: ['Deception', 'Stealth'],
+    profs: { tools: ['One type of gaming set', "thieve's tools"] },
+    equipment: ['crowbar', 'dark common clothes', '15 GP'],
+    desc: ''
+  },
+  Entertainer: {
+    skills: ['Acrobatics', 'Performance'],
+    profs: { tools: ['disguise kit', 'musical instrument'] },
+    equipment: ['musical instrument', 'the favor of an admirer', 'costume', '15 GP'],
+    desc: ''
+  },
+  Charlatan: {
+    skills: ['Deception', 'Sleight of Hand'],
+    profs: { tools: ['disguise kit', 'forgery kit'] },
+    equipment: ['fine clothes', 'disguise kit', 'tools of a con of your choice', '15 GP'],
+    desc: ''
+  },
+  "Folk Hero": {
+    skills: ['Animal Handling', 'Survival'],
+    profs: { tools: ["artisan's tools", 'land vehicles'] },
+    equipment: ["artisan's tools of your choice", 'shovel', 'iron pot', 'common clothes', '10 GP'],
+    desc: ''
+  },
+  "Guild Artisan": {
+    skills: ['Insight', 'Persuasion'],
+    profs: { tools: ["artisan's tools", 'land vehicles'] },
+    choices: { languages: [1, languages] },
+    equipment: ["artisan's tools of your choice", 'a letter of introduction from your guild', "traveler's clothes", '15 GP'],
+    desc: ''
+  },
+  Hermit:{
+    skills: ['Medicine', 'Religion'],
+    profs: { tools: ['herbalism kit'] },
+    choices: { languages: [1, languages] },
+    equipment: ['scroll case full of notes from studies or prayers', 'winter blanket', 'common clothes', 'herbalism kit', '5 GP'],
+    desc: ''
+  },
+  Noble: {
+    skills: ['History', 'Persuasion'],
+    profs: { tools: ['One type of gaming set'] },
+    choices: { languages: [1, languages] },
+    equipment: ['scroll of pedigree', 'signet ring', 'fine clothes', '25 GP'],
+    desc: ''
+  },
+  Outlander: {
+    skills: ['Athletics', 'Survival'],
+    profs: { tools: ['musical instrument'] },
+    choices: { languages: [1, languages] },
+    equipment: ['staff', 'hunting trap', 'trophy from an animal you killed', "traveler's kit", '10 GP'],
+    desc: ''
+  },
+  Sage: {
+    skills: ['Arcana', 'History'],
+    choices: { languages: [2, languages] },
+    equipment: ['bottle of black ink', 'quill', 'small knife', 'letter from dead colleague posing an unanswered question', 'common clothes', '10 GP'],
+    desc: ''
+  },
+  Sailor: {
+    skills: ['Athletics', 'Perception'],
+    profs: { tools: ["navigator's tools", 'water vehicles'] },
+    equipment: ['club', 'silk rope (50ft)', 'lucky charm', "common clothes", '10 GP'],
+    desc: ''
   },
   Soldier: {
-    desc: 'soldier...',
-    skills: ['nature'],
-    equipment: ['ABC']
+    skills: ['Athletics', 'Intimidation'],
+    profs: { tools: ['disguise kit', 'land vehicles'] },
+    equipment: ['insignia of rank', 'trophy from a fallen enemy', 'common clothes', '10 GP'],
+    desc: ''
   },
   Urchin: {
-    desc: 'urchin...',
-    skills: ['perception'],
-    equipment: ['DEF']
+    skills: ['Sleight of Hand', 'Stealth'],
+    profs: { tools: ['disguise kit', "thieves' tools"] },
+    equipment: ['small knife', 'map of home town', 'pet mouse', 'a toke to remember your parents', 'common clothes', '10 GP'],
+    desc: ''
   }
 }
 
 module.exports = backgrounds
-},{}],3:[function(require,module,exports){
+},{"./languages":5}],3:[function(require,module,exports){
+const skills = require('./skills')
+const spells= require('./spells')
+const { createDNDCharacter, userProgress } = require('../main')
+
 const classes = {
   Barbarian : {
       classType: 'Barbarian',
@@ -61,16 +140,211 @@ const classes = {
       armorType:[],
       choices: {skills: [1, ['animalHandling', 'athletics', 'intimidation', 'nature', 'perception','survival']]},
       equipment:['Great Axe', '2 Hand Axes', "explorer's pack",  '4 Javelins'],
-      features:['Unarmored Defense']
-  }
+      features:['Unarmored Defense'],
+      desc: '',
+      reverse: '',
+      img: ''
+  },
+    Bard: {
+        classType: 'Bard',
+        hitDie:8,
+        savingThrows: ['DEX', 'CHA'],
+        profs: {
+            armor: ['light armor'],
+            weapons: ['simple weapons', 'Hand crossbows', 'longswords', 'rapiers', 'shortswords']
+        },
+        armorType: ['leather'],
+        choices:  { skills: [3, skills], cantrips: [2, spells.cantrips], spells:[4, spells.level1] }, 
+        equipment: ['Rapier', "diplomat's pack", "lute", 'dagger'],
+        features: ['Bardic Inspiration'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'CHA'
+    },
+    Cleric: {
+        classType: 'Cleric',
+        hitDie: 8,
+        savingThrows: ['WIS', 'CHA'],
+        profs: {
+            armor: ['light armor', 'medium armor', 'shields'],
+            weapons: ['all simple weapons']
+        },
+        armorType: ['scale'],
+        choices: { skills: [2, {History:'', Insight:'', Medicine:'', Persuasion:'', Religion:''}], cantrips: [3, spells], spells: [2, spells] },
+        equipment: ['Mace', "priest's pack", "light crossbow", 'shield', 'holy symbol'],
+        features: [''],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'WIS'
+    },
+    Druid: {
+        classType: 'Druid',
+        hitDie: 8,
+        savingThrows: ['INT', 'WIS'],
+        profs: {
+            armor: ['light armor', 'medium armor', 'shields'],
+            weapons: ['clubs', 'daggers','darts', 'javelins', 'maces', 'quarterstaffs', 'scimitars', 'sickles', 'slings', 'spears']
+        },
+        armorType: ['leather'],
+        choices: { skills: [2, { Arcana: '', 'Animal Handling': '', Insight: '', Medicine: '', Perception: '', Religion: '', Survival: '' }], cantrips: [2, spells] },
+        equipment: ['Wooden Shield', 'Scimitar', "explorer's pack", 'druidic focus'],
+        features: ['You can speak Druidic, the language of the druids'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'WIS'
+    },
+    Fighter: {
+        classType: 'Fighter',
+        hitDie: 10,
+        savingThrows: ['STR', 'CON'],
+        profs: {
+            armor: ['all armor', 'shields'],
+            weapons: ['simple weapons', 'martial weapons']
+        },
+        armorType: ['scale'],
+        choices: { skills: [2, { Acrobatics: '', 'Animal Handling': '', Athletics: '', Insight: '', Intimidation: '', Perception: '', Survival: '' }], 'Fighting Style': [1, {Archery:'', Defense:'', Dueling:'',"Great Weapon Fighing":'', Protection:'', "Two Weapon Fighting":''}] },
+        equipment: ['longbow', 'longsword', 'shield', 'light crossbow', "dungeoneer's pack"],
+        features: ['Second Wind'],
+        desc: '',
+        reverse: '',
+        img: ''
+    },
+    Monk: {
+        classType: 'Monk',
+        hitDie: 8,
+        savingThrows: ['STR', 'DEX'],
+        profs: {
+            armor: [],
+            weapons: ['simple weapons', 'short swords']
+        },
+        armorType: [''],
+        choices: { skills: [2, { Acrobatics: '', Athletics: '', History:'', Insight: '', Religion: '', Stealth: ''}] },
+        equipment: ['shortsword', "dungeoneer's pack", '10 darts', "artisan's tools"],
+        features: ['Unarmored Defense'],
+        desc: '',
+        reverse: '',
+        img: ''
+    },
+    Paladin: {
+        classType: 'Paladin',
+        hitDie: 10,
+        savingThrows: ['WIS', 'CHA'],
+        profs: {
+            armor: ['all armor', 'shields'],
+            weapons: ['simple weapons', 'martial weapons']
+        },
+        armorType: ['chain mail'],
+        choices: { skills: [2, { Athletics: '', Insight: '', Intimidation:'', Medicine:'',Persuasion:'', Religion: ''}] },
+        equipment: ['longsword','5 Javelins', "priest's pack", 'holy symbol'],
+        features: ['Devine Sense', 'Lay on Hands'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'CHA'
+    },
+    Ranger: {
+        classType: 'Ranger',
+        hitDie: 10,
+        savingThrows: ['STR', 'DEX'],
+        profs: {
+            armor: ['light armor', 'medium armor', 'shields'],
+            weapons: ['simple weapons', 'martial weapons']
+        },
+        armorType: ['scale'],
+        choices: { skills: [3, { "Animal Handling": '', Athletics: '', Insight: '', Investigation: '', Nature: '', Perception: '', Stealth: '', Survival: '' }], "Natural Explorer": [1, ['Arctic', 'Coast', 'Desert', 'Forest', 'Grassland', 'Mountain', 'Swamp']], "Favored Enemy":[1,['Aberrations', 'Beasts', 'Celestials', 'Constructs', 'Dragons', 'Elementals', 'Fey', 'Fiends', 'Giants', 'Monstrosities', 'Oozes', 'Plants', 'Undead']] },
+        equipment: ['2 shortswords', "dungeoneer's pack", 'longbow'],
+        features: ['Favored Enemy', 'Natural Explorer'],
+        desc: '',
+        reverse: '',
+        img: ''
+    },
+    Rogue: {
+        classType: 'Rogue',
+        hitDie: 8,
+        savingThrows: ['INT', 'DEX'],
+        profs: {
+            armor: ['light armor'],
+            weapons: ['simple weapons', 'hand crossbows', 'longswords', 'rapiers', 'shortswords'],
+            tools:["Theive's Tools"]
+        },
+        armorType: ['scale'],
+        choices: { skills: [4, { Acrobatics: '', Athletics: '', Deception:'', Insight: '', Intimidation: '', Investigation: '', Perception: '', Persuasion:'', 'Sleight of Hand': '', Stealth: '', Survival: '' }]/*, Expertise: [1, userProgress[10]or whichever choosing class skills is]*/ },
+        equipment: ['2 shortswords', "dungeoneer's pack", 'longbow'],
+        features: ['Expertise', 'Sneak Attack', "Theives' Cant"],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'INT'
+    },
+    Sorcerer: {
+        classType: 'Sorcerer',
+        hitDie: 6,
+        savingThrows: ['CON', 'CHA'],
+        profs: {
+            armor: [''],
+            weapons: ['daggers','darts','slings','quarterstaffs', 'light crossbows'],
+        },
+        armorType: ['scale'],
+        choices: { skills: [2, { Arcana: '', Deception: '', Insight: '', Intimidation: '', Persuasion: '', Religion: '' }], cantrips: [4, spells], spells: [2, spells], "Sorcerous Origins": [1, ['Draconic Bloodline', 'Wild Magic']] },
+        equipment: ['light crossbow', 'arcane focus', "dungeongeer's Pack", '2 daggers'],
+        features: ['Sorcerous Origins'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'CHA'
+    },
+    Warlock: {
+        classType: 'Warlock',
+        hitDie: 8,
+        savingThrows: ['WIS', 'CHA'],
+        profs: {
+            armor: ['light armor'],
+            weapons: ['simple weapons'],
+        },
+        armorType: ['leather'],
+        choices: { skills: [2, { Arcana: '', Deception: '', History: '', Intimidation: '', Investigation: '', Nature: '', Religion: '' }], cantrips: [2, spells], spells: [2, spells], "Otherworldly Patrons": [1, ['The Archfey', 'The Fiend', 'The Great Old One']] },
+        equipment: ['light crossbow', 'arcane focus', "dungeongeer's Pack", '2 daggers'],
+        features: ['Otherworldly Patrons'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability':'CHA'
+    },
+    Wizard: {
+        classType: 'Wizard',
+        hitDie: 6,
+        savingThrows: ['INT', 'WIS'],
+        profs: {
+            armor: [''],
+            weapons: ['daggers', 'darts', 'slings', 'quarterstaffs', 'light crossbows'],
+        },
+        armorType: [''],
+        choices: { skills: [2, { Arcana: '', History: '', Insight: '', Investigation: '', Medicine: '', Religion: '' }], cantrips: [3, spells], spells: [2, spells]},
+        equipment: ['quarterstaff', 'arcane focus', "scholar's Pack", 'spellbook'],
+        features: ['Otherworldly Patrons'],
+        desc: '',
+        reverse: '',
+        img: '',
+        'spellcasting ability': 'INT'
+    },
 }
 
 module.exports = classes
-},{}],4:[function(require,module,exports){
+},{"../main":11,"./skills":7,"./spells":8}],4:[function(require,module,exports){
 const dragonbreath = {
-    dragonBreath1:'abc',
-    dragonBreath2: 'xyz',
-    dragonBreath3: 'ret'
+    "Black Dragon":"Spit acid in a 5' by 30' line",
+    "Blue Dragon": "Breathe lightning in a 5' by 30' line",
+    "Brass Dragon": "Breathe fire in a 5' by 30' line",
+    "Bronze Dragon": "Breathe lightning in a 5' by 30' line",
+    "Copper Dragon": "Spit acid in a 5' by 30' line",
+    "Gold Dragon": "Breathe fire in a 15' cone",
+    "Green Dragon": "Spit poison in a 15' cone",
+    "Red Dragon": "Breathe fire in a 15' cone",
+    "Silver Dragon": "Breathe cold air in a 15' cone",
+    "White Dragon": "Breathe cold air in a 15' cone"
 }
 
 module.exports = dragonbreath
@@ -95,7 +369,7 @@ const languages = require('./languages')
 const races = {
      Dwarf : {
           raceType:'Dwarf',
-          desc:'description',
+          desc:"They're short in stature, but <i>big</i> in personality. They're the curmudgeons of the DND universe",
           names: [['Adrik', 'Kildrak', 'Vondal'],['Amber', 'Vistra', 'Mardred']],
           stats: {
               CON: 2},
@@ -106,11 +380,12 @@ const races = {
             other: ["smith's tools", "brewer's supplies", "mason's tools"]},
           features: ['Darkvision'],
           languages: ['Common', 'Dwarvish'],
-          choices: {subrace: [1, subraces.Dwarf]}
+          choices: {subrace: [1, subraces.Dwarf]},
+          reverse:"Bold and hardy, dwarves are skilled warriors, miners and workers. They can live to e more than 400 years old and are known to hold a grudge."
       },
     Elf : {
         raceType: 'Elf',
-        desc:'description',
+        desc:"They're fanciful and elegant, but tend to be a little stuck up.",
         name: [['Adran', 'Heian', 'Thamior'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
         subrace: subraces.Elf,
@@ -123,11 +398,12 @@ const races = {
         HP: 0,
         spells:[],
         languages: ['Common', 'Elvish'],
-        choices: {subrace: [1, subraces.Elf]}
+        choices: {subrace: [1, subraces.Elf]},
+        reverse: "Elves are a little more slender than humans. They're hauntingly beautiful and can live to be 700 years old. They're often thouht to be aloof or detatched"
       },
     Halfling : {
         raceType: 'Halfling',
-        desc:'description',
+        desc:'About half the size of a person, Halflings are chill and down to earth',
         name: [['Alton', 'Milo', 'Wellby'],['Andry', 'Lidda', 'Verna']],
         speed: 25,
         subrace: subraces.Halfling,
@@ -139,11 +415,12 @@ const races = {
         HP: 0,
         spells:[],
         languages: ['Common', 'Halfling'],
-        choices: {subrace: [1, subraces.Halfling]}
+        choices: {subrace: [1, subraces.Halfling]},
+        reverse: "Halflings have kind hearts and are content to spend their days with good friends and good meals. They usually live around 150 years, spending their days in small communities"
     } ,
     Human : {
             raceType: 'Human',
-            desc:'description',
+            desc:'The tryhards of the DND world, Humans are much more adaptive and ambitious than other groups.',
             name: [['Bardeid', 'Randal', 'Chen'],['Zasheir', 'Kerri', 'Lei']],
             speed: 30,
             stats:{
@@ -159,11 +436,12 @@ const races = {
             HP: 0,
             spells:[],
             languages: ['Common'],
-            choices: {languages: [1, languages]}
+            choices: {languages: [1, languages]},
+            reverse: "Humans are a diverse bunch and their communities are usually welcoming of other races. Because of their short lives, other races often see them as living hectic and bustling lives"
     },   
     Dragonborn : {
-        raceType: 'Dragon Born',
-        desc:'description',
+        raceType: 'Dragonborn',
+        desc:'Basically a dragon that stands on two feet, Dragonborn are proud and clanish',
         name: [['Arjhan', 'Balsar', 'Torinn'],['Akra', 'Kava', 'Uadjit']],
         speed: 30,
         stats:{
@@ -176,12 +454,13 @@ const races = {
         weapons:[],
         spells:[],
         languages: ['Common', 'Draconic'],
-        choices: {weapons: [1, dragonbreath]}
-        /*=====Add something to specify dragon breath===== */
+        choices: {weapons: [1, dragonbreath]},
+        reverse: "Dragonborn are expert crafters and they are generally driven to be the best they possibly can be. They are undyingly devoted to their clan, topping out at well over 6 feet, weighing nearly 250 pounds, and living to about 80 years old."
+        
     },
      Gnome : {
         raceType: 'Gnome',
-        desc:'description',
+        desc:"They're tiny, eccentric tinkerers. Gnomes spend their time indulging their curiosity",
         name: [['Alston', 'Fonkin', 'Wrenn'],['Ella', 'Shamil', 'Orla']],
         speed: 25,
         subrace: subraces.Gnome,
@@ -193,11 +472,12 @@ const races = {
         HP: 0,
         spells:[],
         languages: ['Common', 'Gnomish'],
-        choices: {subrace: [1, subraces.Gnome]}
+        choices: {subrace: [1, subraces.Gnome]},
+        reverse: "Gnomes are equally devoted to the pleasures of life and studious endeavors. They live to be about 350 to 500 yeas old and spend much of that exploring and learning."
     },
     "Half Elf" : {
         raceType: 'Half Elf',
-        desc:'description',
+        desc:'Half human and half elf, they resemble a mix of both, but fit in with neither.',
         dndClass: {},
         name: [['Bardeid', 'Randal', 'Chen'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
@@ -213,13 +493,12 @@ const races = {
             languages: [1, languages],
             skills: [2, skills],
             stats: [2, {CON: 1, DEX: 1, STR: 1, INT: 1, WIS: 1}]
-        }
-        /*=====add feature for choosing two ability scores to increase by 1 */
-        /*====== ditto for +1 language and _2 skill proficiencies=====*/
+        },
+        reverse:"Half Elves often feel like they have no home of their own. They live to be about 180 years old, dying much sooner than their Elf parent, but much later than their human parent."
     },
     "Half Orc" : {
         raceType: 'Half Orc',
-        desc:'description',
+        desc:'Half Human and half Orc, they are often treated with prejudice and assumed to be violent brawlers',
         dndClass: {},
         name: [['Dench', 'Holg', 'Thokk'],['Baggi', 'Ovak', 'Yevelda']],
         speed: 30,
@@ -231,11 +510,12 @@ const races = {
         features: ['Darkvision:60ft', 'When reduced to 0HP, but not killed, you candrop to 1HP', 'When you get a cricial hit w/ a melee weapon, you can roll one damage dice again'],
         HP: 0,
         spells:[],
-        languages: ['Common', 'Orc']
+        languages: ['Common', 'Orc'],
+        reverse: "Standing 6 to 7 feet tall and weighing over 200 pounds, Half Orcs are intimidating. They are often scarred and prone to violent and emotional outbursts due to their Orc parents."
     },
      Tiefling : {
         raceType: 'Tiefling',
-        desc:'description',
+        desc:'A cross between a person and a demon, Tieflings are met with distrust and are suspicious of others',
         dndClass: {},
         name: [['Akmenos', 'Ekemon', 'Skamos'],['Akta', 'Kallista', 'Rieta']],
         speed: 30,
@@ -247,7 +527,8 @@ const races = {
         features: ['Darkvision:60ft', 'Resistant to fire damage'],
         HP: 0,
         spells:['Thaumaturgy'],
-        languages: ['Common', 'Infernal']
+        languages: ['Common', 'Infernal'],
+        reverse: "Tieflings are often the victims of prejudice. Their horns, tails, and fangs are fearsome, but they are not evil by nature. They generally live as long as Humans"
     }
     }
  
@@ -357,7 +638,7 @@ const subraces = {
     Dwarf:{
         'Hill Dwarf' : {
             subType: 'Hill Dwarf',
-            desc: '...',
+            desc: "Equal parts tough and wise, Hill Dwarves get a bonus Hit Point and higher Wisdom score",
             stats:{
                 WIS: 1},
             HP:1
@@ -365,19 +646,20 @@ const subraces = {
         
         'Mountain Dwarf' : {
             subType:'Mountain Dwarf',
-            desc: '...',
+            desc: "Taller than average, Mountain Dwarves have a considerably higher Strength score",
             stats:{
                 STR: 2
             },
             profs: {
             armor:['light armor', 'medium armor']
-            }
+            },
+            reverse:""
         }
     },
     Elf:{
         'High Elf' : {
         subType: 'High Elf',
-        desc: '...',
+        desc: "High Elves have considerable education and knowledge of magic. They have a higher Intelligence score know an additional language and spell",
         stats: {
             INT: 1},
         profs: {
@@ -391,7 +673,7 @@ const subraces = {
         
         'Wood Elf' : {
             subType: 'Wood Elf',
-            desc: '...',
+            desc: "Wood Elves have a higher Wisdom score, can move more swiftly, and can hide well in nature",
             stats: {
                 WIS: 1},
             profs: {
@@ -402,7 +684,7 @@ const subraces = {
         
         'Dark Elf' : {
             subType: 'Dark Elf',
-            desc: '...',
+            desc: 'Dark Elves have pitch black skin, can see exceptionally well in the dark, and know the spell <i>Dancing Lights</i>',
             stats:{
             CHA: 1},
             features: ['Darkvision:120ft', 'Disadvantage on attacks in direct sunlight'],
@@ -414,7 +696,7 @@ const subraces = {
     Halfling:{
         "Lightfoot Halfling" : {
             subType: 'Lightfoot Halfling',
-            desc: '...',
+            desc: 'These Halflings have a higher Charisma score and are naturally stealthy',
             stats:{
                 CHA:1},
             features:['Can attempt to hide behind a creature at least one size larger than you']
@@ -422,7 +704,7 @@ const subraces = {
         
         "Stout Halfling" : {
             subType: 'Stout Halfling',
-            desc: '...',
+            desc: 'Stout Halflings are sturdier, having a higher Constitution score, and a resistance to poison',
             stats:{
                 CON:1},
             features:['Advantage on saving throws against poison, resistance against poison damage']
@@ -431,7 +713,7 @@ const subraces = {
     Gnome: {
         "Forest Gnome" : {
             subType:'Forest Gnome',
-            desc: '...',
+            desc: "Forest Gnomes have a higher Dexterity score, can communicate with small animals, and know the spell <i>Minor Illusion</i>",
             stats:{
                 DEX: 1},
             features: ['You can communicate simple ideas with small beasts'],
@@ -440,7 +722,7 @@ const subraces = {
         
         "Rock Gnome" : {
             subType: 'Rock Gnome',
-            desc: '...',
+            desc: 'Rock Gnomes are sturdier than their cousins and are proficient tinkerers',
             stats:{
                 CON: 1},
             features:['When making a history cehck related to technology, magic, or alchemy, add twice your proficiency bonus'],
@@ -662,8 +944,7 @@ function createDNDCharacter(){
             break
         case 10:
             //choose skills
-            //This must be changed eventually!!!! bump this down
-            
+            display(classes[userProgress[8]].choices.skills, userProgress, createDNDCharacter)
             break
         case 11:
             //choose class specific traits

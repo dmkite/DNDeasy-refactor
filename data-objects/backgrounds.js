@@ -1,3 +1,5 @@
+const languages = require('./languages')
+
 const backgrounds = {
   Acolyte: {
     skills: ['Insight', 'Religion'], 

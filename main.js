@@ -109,8 +109,7 @@ function createDNDCharacter(){
             break
         case 10:
             //choose skills
-            //This must be changed eventually!!!! bump this down
-            
+            display(classes[userProgress[8]].choices.skills, userProgress, createDNDCharacter)
             break
         case 11:
             //choose class specific traits

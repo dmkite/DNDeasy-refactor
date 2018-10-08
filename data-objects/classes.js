@@ -1,4 +1,7 @@
 const skills = require('./skills')
+const spells= require('./spells')
+const { createDNDCharacter, userProgress } = require('../main')
+
 const classes = {
   Barbarian : {
       classType: 'Barbarian',
@@ -42,7 +45,7 @@ const classes = {
             weapons: ['all simple weapons']
         },
         armorType: ['scale'],
-        choices: { skills: [2, {History:'', Insight:'', Medicine:'', Persuasion:'', Religion:''}], cantrips: [3, spells.cantrips], spells: [2, spells.level1] },
+        choices: { skills: [2, {History:'', Insight:'', Medicine:'', Persuasion:'', Religion:''}], cantrips: [3, spells], spells: [2, spells] },
         equipment: ['Mace', "priest's pack", "light crossbow", 'shield', 'holy symbol'],
         features: [''],
         desc: '',
@@ -59,7 +62,7 @@ const classes = {
             weapons: ['clubs', 'daggers','darts', 'javelins', 'maces', 'quarterstaffs', 'scimitars', 'sickles', 'slings', 'spears']
         },
         armorType: ['leather'],
-        choices: { skills: [2, { Arcana: '', 'Animal Handling': '', Insight: '', Medicine: '', Perception: '', Religion: '', Survival: '' }], cantrips: [2, spells.cantrips] },
+        choices: { skills: [2, { Arcana: '', 'Animal Handling': '', Insight: '', Medicine: '', Perception: '', Religion: '', Survival: '' }], cantrips: [2, spells] },
         equipment: ['Wooden Shield', 'Scimitar', "explorer's pack", 'druidic focus'],
         features: ['You can speak Druidic, the language of the druids'],
         desc: '',
@@ -142,7 +145,7 @@ const classes = {
             tools:["Theive's Tools"]
         },
         armorType: ['scale'],
-        choices: { skills: [4, { Acrobatics: '', Athletics: '', Deception:'', Insight: '', Intimidation: '', Investigation: '', Perception: '', Persuasion:'', 'Sleight of Hand': '', Stealth: '', Survival: '' }], Expertise: [1, userProgress[10/*or whichever choosing class skills is*/]]},
+        choices: { skills: [4, { Acrobatics: '', Athletics: '', Deception:'', Insight: '', Intimidation: '', Investigation: '', Perception: '', Persuasion:'', 'Sleight of Hand': '', Stealth: '', Survival: '' }]/*, Expertise: [1, userProgress[10]or whichever choosing class skills is]*/ },
         equipment: ['2 shortswords', "dungeoneer's pack", 'longbow'],
         features: ['Expertise', 'Sneak Attack', "Theives' Cant"],
         desc: '',
@@ -159,7 +162,7 @@ const classes = {
             weapons: ['daggers','darts','slings','quarterstaffs', 'light crossbows'],
         },
         armorType: ['scale'],
-        choices: { skills: skills: [2, { Arcana: '', Deception: '', Insight: '', Intimidation: '', Persuasion: '', Religion: '' }], cantrips: [4, spells.cantrips], spells: [2, spells.level1], "Sorcerous Origins": [1, ['Draconic Bloodline', 'Wild Magic']] },
+        choices: { skills: [2, { Arcana: '', Deception: '', Insight: '', Intimidation: '', Persuasion: '', Religion: '' }], cantrips: [4, spells], spells: [2, spells], "Sorcerous Origins": [1, ['Draconic Bloodline', 'Wild Magic']] },
         equipment: ['light crossbow', 'arcane focus', "dungeongeer's Pack", '2 daggers'],
         features: ['Sorcerous Origins'],
         desc: '',
@@ -176,7 +179,7 @@ const classes = {
             weapons: ['simple weapons'],
         },
         armorType: ['leather'],
-        choices: { skills: [2, { Arcana: '', Deception: '', History: '', Intimidation: '', Investigation: '', Nature: '', Religion: '' }], cantrips: [2, spells.cantrips], spells: [2, spells.level1], "Otherworldly Patrons": [1, ['The Archfey', 'The Fiend', 'The Great Old One']] },
+        choices: { skills: [2, { Arcana: '', Deception: '', History: '', Intimidation: '', Investigation: '', Nature: '', Religion: '' }], cantrips: [2, spells], spells: [2, spells], "Otherworldly Patrons": [1, ['The Archfey', 'The Fiend', 'The Great Old One']] },
         equipment: ['light crossbow', 'arcane focus', "dungeongeer's Pack", '2 daggers'],
         features: ['Otherworldly Patrons'],
         desc: '',
@@ -193,7 +196,7 @@ const classes = {
             weapons: ['daggers', 'darts', 'slings', 'quarterstaffs', 'light crossbows'],
         },
         armorType: [''],
-        choices: { skills: [2, { Arcana: '', History: '', Insight: '', Investigation: '', Medicine: '', Religion: '' }], cantrips: [3, spells.cantrips], spells: [2, spells.level1], "Otherworldly Patrons": [1, ['The Archfey', 'The Fiend', 'The Great Old One']] },
+        choices: { skills: [2, { Arcana: '', History: '', Insight: '', Investigation: '', Medicine: '', Religion: '' }], cantrips: [3, spells], spells: [2, spells]},
         equipment: ['quarterstaff', 'arcane focus', "scholar's Pack", 'spellbook'],
         features: ['Otherworldly Patrons'],
         desc: '',

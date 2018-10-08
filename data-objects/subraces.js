@@ -5,7 +5,7 @@ const subraces = {
     Dwarf:{
         'Hill Dwarf' : {
             subType: 'Hill Dwarf',
-            desc: '...',
+            desc: "Equal parts tough and wise, Hill Dwarves get a bonus Hit Point and higher Wisdom score",
             stats:{
                 WIS: 1},
             HP:1
@@ -13,19 +13,20 @@ const subraces = {
         
         'Mountain Dwarf' : {
             subType:'Mountain Dwarf',
-            desc: '...',
+            desc: "Taller than average, Mountain Dwarves have a considerably higher Strength score",
             stats:{
                 STR: 2
             },
             profs: {
             armor:['light armor', 'medium armor']
-            }
+            },
+            reverse:""
         }
     },
     Elf:{
         'High Elf' : {
         subType: 'High Elf',
-        desc: '...',
+        desc: "High Elves have considerable education and knowledge of magic. They have a higher Intelligence score know an additional language and spell",
         stats: {
             INT: 1},
         profs: {
@@ -39,7 +40,7 @@ const subraces = {
         
         'Wood Elf' : {
             subType: 'Wood Elf',
-            desc: '...',
+            desc: "Wood Elves have a higher Wisdom score, can move more swiftly, and can hide well in nature",
             stats: {
                 WIS: 1},
             profs: {
@@ -50,7 +51,7 @@ const subraces = {
         
         'Dark Elf' : {
             subType: 'Dark Elf',
-            desc: '...',
+            desc: 'Dark Elves have pitch black skin, can see exceptionally well in the dark, and know the spell <i>Dancing Lights</i>',
             stats:{
             CHA: 1},
             features: ['Darkvision:120ft', 'Disadvantage on attacks in direct sunlight'],
@@ -62,7 +63,7 @@ const subraces = {
     Halfling:{
         "Lightfoot Halfling" : {
             subType: 'Lightfoot Halfling',
-            desc: '...',
+            desc: 'These Halflings have a higher Charisma score and are naturally stealthy',
             stats:{
                 CHA:1},
             features:['Can attempt to hide behind a creature at least one size larger than you']
@@ -70,7 +71,7 @@ const subraces = {
         
         "Stout Halfling" : {
             subType: 'Stout Halfling',
-            desc: '...',
+            desc: 'Stout Halflings are sturdier, having a higher Constitution score, and a resistance to poison',
             stats:{
                 CON:1},
             features:['Advantage on saving throws against poison, resistance against poison damage']
@@ -79,7 +80,7 @@ const subraces = {
     Gnome: {
         "Forest Gnome" : {
             subType:'Forest Gnome',
-            desc: '...',
+            desc: "Forest Gnomes have a higher Dexterity score, can communicate with small animals, and know the spell <i>Minor Illusion</i>",
             stats:{
                 DEX: 1},
             features: ['You can communicate simple ideas with small beasts'],
@@ -88,7 +89,7 @@ const subraces = {
         
         "Rock Gnome" : {
             subType: 'Rock Gnome',
-            desc: '...',
+            desc: 'Rock Gnomes are sturdier than their cousins and are proficient tinkerers',
             stats:{
                 CON: 1},
             features:['When making a history cehck related to technology, magic, or alchemy, add twice your proficiency bonus'],
