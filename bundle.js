@@ -29,6 +29,38 @@ function choiceNotPresent(progressLog, triggerFn){
 }
 module.exports = {backFn, choiceNotPresent}
 },{}],2:[function(require,module,exports){
+const classes = require('./data-objects/classes')
+const spelldisplay = require('./spellDisplay')
+const {display, select } = require('./display')
+const { backFn, choiceNotPresent } = require('./backFn')
+
+function classChoices(progressLog, number, triggerFn){
+    let classType = classes[progressLog[9][0]]
+    let choices = Object.keys(classType.choices)
+    let currentChoice = choices[number]
+    if (currentChoice === undefined) {
+        choiceNotPresent(progressLog, triggerFn)
+        return
+    }
+    let numOfChoices = classes[progressLog[9][0]].choices[currentChoice][0]
+    
+    if(currentChoice === 'cantrips'){
+        console.log(classType.classType, numOfChoices)
+        spelldisplay(0, classType.classType, numOfChoices, progressLog, triggerFn)
+
+    }
+    else if (currentChoice === 'spells') {
+        spelldisplay(1, classType.classType, numOfChoices, progressLog, triggerFn)
+    }
+    else{
+        display(classes[progressLog[9][0]].choices[currentChoice], progressLog, triggerFn)
+    }
+}
+
+module.exports = classChoices
+
+
+},{"./backFn":1,"./data-objects/classes":4,"./display":11,"./spellDisplay":14}],3:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = {
@@ -123,7 +155,7 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{"./languages":5}],3:[function(require,module,exports){
+},{"./languages":6}],4:[function(require,module,exports){
 const skills = require('./skills')
 const spells= require('./spells')
 const { createDNDCharacter, userProgress } = require('../main')
@@ -138,7 +170,7 @@ const classes = {
           weapons:['simple weapons', 'martial weapons']
       },
       armorType:[],
-      choices: {skills: [1, ['animalHandling', 'athletics', 'intimidation', 'nature', 'perception','survival']]},
+      choices: {skills: [2, {'Animal Handling':'', Athletics:'', Intimidation:'', Nature:'', Perception:'',Survival:''}]},
       equipment:['Great Axe', '2 Hand Axes', "explorer's pack",  '4 Javelins'],
       features:['Unarmored Defense'],
       desc: '',
@@ -154,7 +186,7 @@ const classes = {
             weapons: ['simple weapons', 'Hand crossbows', 'longswords', 'rapiers', 'shortswords']
         },
         armorType: ['leather'],
-        choices:  { skills: [3, skills], cantrips: [2, spells.cantrips], spells:[4, spells.level1] }, 
+        choices:  { skills: [3, skills], cantrips: [2, spells], spells:[4, spells] }, 
         equipment: ['Rapier', "diplomat's pack", "lute", 'dagger'],
         features: ['Bardic Inspiration'],
         desc: '',
@@ -333,7 +365,7 @@ const classes = {
 }
 
 module.exports = classes
-},{"../main":11,"./skills":7,"./spells":8}],4:[function(require,module,exports){
+},{"../main":12,"./skills":8,"./spells":9}],5:[function(require,module,exports){
 const dragonbreath = {
     "Black Dragon":"Spit acid in a 5' by 30' line",
     "Blue Dragon": "Breathe lightning in a 5' by 30' line",
@@ -348,7 +380,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const languages = {
     Common: {desc:'The language common to all races'},
     Elvish: {desc:'The language of the Elves'},
@@ -360,7 +392,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -533,7 +565,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":4,"./languages":5,"./skills":7,"./subraces":9}],7:[function(require,module,exports){
+},{"./dragonbreath":5,"./languages":6,"./skills":8,"./subraces":10}],8:[function(require,module,exports){
 const skills = {
    Acrobatics: { 
   name: 'Acrobatics',
@@ -627,10 +659,10 @@ Survival:{
 }}
 
 module.exports = skills
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const spells = {level1:null, cantrips:null}
 module.exports = spells
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const languages = require('./languages')
 const spells = require('./spells')
 
@@ -734,7 +766,7 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":5,"./spells":8}],10:[function(require,module,exports){
+},{"./languages":6,"./spells":9}],11:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 const races = require('./data-objects/races')
 
@@ -832,7 +864,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
 }
 
 module.exports = { display, select}
-},{"./data-objects/races":6,"./selectionComplete":12}],11:[function(require,module,exports){
+},{"./data-objects/races":7,"./selectionComplete":13}],12:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
@@ -841,13 +873,15 @@ const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 // const spells = require('./data-objects/spells')
-
+const classChoices = require('./classChoices')
 
 const { display, select } = require('./display')
 const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
 const {backFn, choiceNotPresent} = require('./backFn')
 const userInput = require('./userInput')
+
+
 
 const userProgress = []
 
@@ -944,19 +978,26 @@ function createDNDCharacter(){
             break
         case 10:
             //choose skills
-            display(classes[userProgress[8]].choices.skills, userProgress, createDNDCharacter)
+            // console.log(userProgress[9])
+            // display(classes[userProgress[9][0]].choices.skills, userProgress, createDNDCharacter)
+            classChoices(userProgress, 0, createDNDCharacter)
+            
             break
         case 11:
-            //choose class specific traits
+            //choose class choices 2
+            classChoices(userProgress, 1, createDNDCharacter)
             break
         case 12: 
-            //roll stats
+            //choose class choices 3
+            classChoices(userProgress, 2, createDNDCharacter)
             break
         case 13:
-            //roll hp
+            //choose class choices 4
+            classChoices(userProgress, 3, createDNDCharacter)
             break
         case 14: 
             //choose spells
+            console.log('made it fthrough')
             break
         case 15:
             //choose alignment
@@ -987,7 +1028,7 @@ createDNDCharacter()
 const expObj = {createDNDCharacter, userProgress}
 
 module.exports = expObj
-},{"./backFn":1,"./data-objects/backgrounds":2,"./data-objects/classes":3,"./data-objects/dragonbreath":4,"./data-objects/languages":5,"./data-objects/races":6,"./data-objects/skills":7,"./data-objects/subraces":9,"./display":10,"./spellDisplay":13,"./spellList":14,"./userInput":15}],12:[function(require,module,exports){
+},{"./backFn":1,"./classChoices":2,"./data-objects/backgrounds":3,"./data-objects/classes":4,"./data-objects/dragonbreath":5,"./data-objects/languages":6,"./data-objects/races":7,"./data-objects/skills":8,"./data-objects/subraces":10,"./display":11,"./spellDisplay":14,"./spellList":15,"./userInput":16}],13:[function(require,module,exports){
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
     let back = document.getElementById('back')
@@ -1001,7 +1042,7 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
 }
 //problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
 module.exports = selectionComplete
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 const spells = require('./spellList')
 const { createDNDCharacter, userProgress } = require('./main')
 const {display, select} = require('./display')
@@ -1013,14 +1054,18 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
     let options = []
 
     for(let spell of spells){
-        if(spell.level === level && !!className === true && className === spell.classes.name){
-            options.push(`<div class="card">
-                <img src="${placeholder}" alt="image of spell">
-                    <h3>${spell.name}</h3>
-                    <p>${spell.desc[0]}</p>
-                    <div class="reverse">
-                    </div>
-            </div>`)            
+        if(spell.level === level && !!className === true){
+            for(let i = 0; i < spell.classes.length; i++){
+                if (className === spell.classes[i].name){
+                    options.push(`<div class="card">
+                        <img src="${placeholder}" alt="image of spell">
+                            <h3>${spell.name}</h3>
+                            <p>${spell.desc[0]}</p>
+                            <div class="reverse">
+                            </div>
+                    </div>`)            
+                }
+            }
         }
         if(!!className === false){
             if(spell.level === 0){
@@ -1047,7 +1092,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
 
 module.exports = prepareSpellOptions
 
-},{"./display":10,"./main":11,"./spellList":14}],14:[function(require,module,exports){
+},{"./display":11,"./main":12,"./spellList":15}],15:[function(require,module,exports){
 let spellList = [
     {
         "index": 1,
@@ -14480,7 +14525,7 @@ spells = spells.reduce((acc, spell) => {
 
 
 module.exports = spells
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 //import dndcharacter function
 
 //classList.toggle
@@ -14526,4 +14571,4 @@ function inputComplete(triggerFn, progressLog){
 }
 
 module.exports = userInput
-},{}]},{},[11]);
+},{}]},{},[12]);

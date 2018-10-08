@@ -6,13 +6,15 @@ const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const dragonbreath = require('./data-objects/dragonbreath')
 // const spells = require('./data-objects/spells')
-
+const classChoices = require('./classChoices')
 
 const { display, select } = require('./display')
 const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
 const {backFn, choiceNotPresent} = require('./backFn')
 const userInput = require('./userInput')
+
+
 
 const userProgress = []
 
@@ -109,19 +111,26 @@ function createDNDCharacter(){
             break
         case 10:
             //choose skills
-            display(classes[userProgress[8]].choices.skills, userProgress, createDNDCharacter)
+            // console.log(userProgress[9])
+            // display(classes[userProgress[9][0]].choices.skills, userProgress, createDNDCharacter)
+            classChoices(userProgress, 0, createDNDCharacter)
+            
             break
         case 11:
-            //choose class specific traits
+            //choose class choices 2
+            classChoices(userProgress, 1, createDNDCharacter)
             break
         case 12: 
-            //roll stats
+            //choose class choices 3
+            classChoices(userProgress, 2, createDNDCharacter)
             break
         case 13:
-            //roll hp
+            //choose class choices 4
+            classChoices(userProgress, 3, createDNDCharacter)
             break
         case 14: 
             //choose spells
+            console.log('made it fthrough')
             break
         case 15:
             //choose alignment

@@ -9,14 +9,18 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
     let options = []
 
     for(let spell of spells){
-        if(spell.level === level && !!className === true && className === spell.classes.name){
-            options.push(`<div class="card">
-                <img src="${placeholder}" alt="image of spell">
-                    <h3>${spell.name}</h3>
-                    <p>${spell.desc[0]}</p>
-                    <div class="reverse">
-                    </div>
-            </div>`)            
+        if(spell.level === level && !!className === true){
+            for(let i = 0; i < spell.classes.length; i++){
+                if (className === spell.classes[i].name){
+                    options.push(`<div class="card">
+                        <img src="${placeholder}" alt="image of spell">
+                            <h3>${spell.name}</h3>
+                            <p>${spell.desc[0]}</p>
+                            <div class="reverse">
+                            </div>
+                    </div>`)            
+                }
+            }
         }
         if(!!className === false){
             if(spell.level === 0){

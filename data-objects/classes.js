@@ -12,7 +12,7 @@ const classes = {
           weapons:['simple weapons', 'martial weapons']
       },
       armorType:[],
-      choices: {skills: [1, ['animalHandling', 'athletics', 'intimidation', 'nature', 'perception','survival']]},
+      choices: {skills: [2, {'Animal Handling':'', Athletics:'', Intimidation:'', Nature:'', Perception:'',Survival:''}]},
       equipment:['Great Axe', '2 Hand Axes', "explorer's pack",  '4 Javelins'],
       features:['Unarmored Defense'],
       desc: '',
@@ -28,7 +28,7 @@ const classes = {
             weapons: ['simple weapons', 'Hand crossbows', 'longswords', 'rapiers', 'shortswords']
         },
         armorType: ['leather'],
-        choices:  { skills: [3, skills], cantrips: [2, spells.cantrips], spells:[4, spells.level1] }, 
+        choices:  { skills: [3, skills], cantrips: [2, spells], spells:[4, spells] }, 
         equipment: ['Rapier', "diplomat's pack", "lute", 'dagger'],
         features: ['Bardic Inspiration'],
         desc: '',
