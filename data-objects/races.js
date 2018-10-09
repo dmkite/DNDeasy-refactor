@@ -23,7 +23,7 @@ const races = {
     Elf : {
         raceType: 'Elf',
         desc:"They're fanciful and elegant, but tend to be a little stuck up.",
-        name: [['Adran', 'Heian', 'Thamior'],['Adrie', 'Lia', 'Nailo']],
+        names: [['Adran', 'Heian', 'Thamior'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
         subrace: subraces.Elf,
         stats:{
@@ -41,7 +41,7 @@ const races = {
     Halfling : {
         raceType: 'Halfling',
         desc:'About half the size of a person, Halflings are chill and down to earth',
-        name: [['Alton', 'Milo', 'Wellby'],['Andry', 'Lidda', 'Verna']],
+        names: [['Alton', 'Milo', 'Wellby'],['Andry', 'Lidda', 'Verna']],
         speed: 25,
         subrace: subraces.Halfling,
         stats:{
@@ -58,7 +58,7 @@ const races = {
     Human : {
             raceType: 'Human',
             desc:'The tryhards of the DND world, Humans are much more adaptive and ambitious than other groups.',
-            name: [['Bardeid', 'Randal', 'Chen'],['Zasheir', 'Kerri', 'Lei']],
+            names: [['Bardeid', 'Randal', 'Chen'],['Zasheir', 'Kerri', 'Lei']],
             speed: 30,
             stats:{
               STR: 1,
@@ -79,7 +79,7 @@ const races = {
     Dragonborn : {
         raceType: 'Dragonborn',
         desc:'Basically a dragon that stands on two feet, Dragonborn are proud and clanish',
-        name: [['Arjhan', 'Balsar', 'Torinn'],['Akra', 'Kava', 'Uadjit']],
+        names: [['Arjhan', 'Balsar', 'Torinn'],['Akra', 'Kava', 'Uadjit']],
         speed: 30,
         stats:{
           STR: 2,
@@ -98,7 +98,7 @@ const races = {
      Gnome : {
         raceType: 'Gnome',
         desc:"They're tiny, eccentric tinkerers. Gnomes spend their time indulging their curiosity",
-        name: [['Alston', 'Fonkin', 'Wrenn'],['Ella', 'Shamil', 'Orla']],
+        names: [['Alston', 'Fonkin', 'Wrenn'],['Ella', 'Shamil', 'Orla']],
         speed: 25,
         subrace: subraces.Gnome,
         stats:{
@@ -116,7 +116,7 @@ const races = {
         raceType: 'Half Elf',
         desc:'Half human and half elf, they resemble a mix of both, but fit in with neither.',
         dndClass: {},
-        name: [['Bardeid', 'Randal', 'Chen'],['Adrie', 'Lia', 'Nailo']],
+        names: [['Bardeid', 'Randal', 'Chen'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
         stats:{
           CHA: 2},
@@ -137,7 +137,7 @@ const races = {
         raceType: 'Half Orc',
         desc:'Half Human and half Orc, they are often treated with prejudice and assumed to be violent brawlers',
         dndClass: {},
-        name: [['Dench', 'Holg', 'Thokk'],['Baggi', 'Ovak', 'Yevelda']],
+        names: [['Dench', 'Holg', 'Thokk'],['Baggi', 'Ovak', 'Yevelda']],
         speed: 30,
         stats:{
           STR: 2,
@@ -154,7 +154,7 @@ const races = {
         raceType: 'Tiefling',
         desc:'A cross between a person and a demon, Tieflings are met with distrust and are suspicious of others',
         dndClass: {},
-        name: [['Akmenos', 'Ekemon', 'Skamos'],['Akta', 'Kallista', 'Rieta']],
+        names: [['Akmenos', 'Ekemon', 'Skamos'],['Akta', 'Kallista', 'Rieta']],
         speed: 30,
         stats:{
           INT: 1,

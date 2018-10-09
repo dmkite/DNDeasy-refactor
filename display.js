@@ -16,7 +16,7 @@ function display(choiceObj, progressLog, triggerFn, topic){
     let choiceArray = Object.keys(choiceObj)
     
     let options = []
-    let placeholder = 'https://cdn.tutsplus.com/net/uploads/legacy/958_placeholders/placehold.gif'
+
     for(let choices of choiceArray){
         if(progressLog.length > 0 && !!races[progressLog[0][0]][topic] === true ){
             if( races[progressLog[0][0]][topic].includes(choices) ){
@@ -31,12 +31,12 @@ function display(choiceObj, progressLog, triggerFn, topic){
                 <div class="card-front">
                     <h3>${choices}</h3>
                     <p>${choiceObj[choices].desc}</p>
-                    <button class="btn-turn-to-back">flip</button>
+                    <div class="btn-turn-to-back"></div>
                 </div>
 
                 <div class="card-back">
                     <p>Back</p>
-                    <button class="btn-turn-to-front">flip</button>
+                    <div class="btn-turn-to-front"></div>
                 </div>
 
             </div>
@@ -47,7 +47,9 @@ function display(choiceObj, progressLog, triggerFn, topic){
 
     let cards = document.querySelectorAll('.card')
     let finalChoice = []
+    document.querySelector('#choiceDisplay').textContent = choiceCountDisplay(choiceCount)
     let prepCardsForSelection = function(e){select(e, choiceCount, finalChoice, progressLog, triggerFn)}
+
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', prepCardsForSelection)
         document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
@@ -56,7 +58,6 @@ function display(choiceObj, progressLog, triggerFn, topic){
         document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
             event.stopPropagation();
             document.querySelectorAll('.card')[i].classList.toggle('do-flip')
-
         };
 
         document.querySelectorAll('.btn-turn-to-back')[i].onclick = function (event) {
@@ -65,37 +66,53 @@ function display(choiceObj, progressLog, triggerFn, topic){
             
         };
     }  
+
+    
 }
 
+function choiceCountDisplay(choicesLeft) {
+    if (choicesLeft === 1) {
+        return `you have 1 selection left to make`
+    }
+    else {
+        return `you have ${choicesLeft} selections left to make`
+    }
+}
 
 function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
-    let origLength = progressLog.length;
     let next = document.querySelector('#next')
+    let choiceDisplay = document.querySelector('#choiceDisplay')
     let choiceCount = numOfChoices - finalChoice.length
-    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)}
-
+    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)} 
+   
+    choiceDisplay.textContent = choiceCountDisplay(finalChoice.length)
+   
     if(choiceCount !== 0){ //have choices left
         if(event.currentTarget.classList.contains('selected')){
             event.currentTarget.classList.remove('selected')
             choiceCount++
-            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
-            // next.removeEventListener('click', logSelectionMoveOn)
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[0].children[0].innerHTML), 1)
+            
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
         else{
             event.currentTarget.classList.add('selected')
             choiceCount--
-            finalChoice.push(event.currentTarget.children[1].textContent)
+            finalChoice.push(event.currentTarget.children[0].children[0].textContent)
+
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
     }
     else{                   //have no choices left
         if(event.currentTarget.classList.contains('selected')){
             event.currentTarget.classList.remove('selected')
             choiceCount++
-            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
-            // next.removeEventListener('click', logSelectionMoveOn)
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[0].children[0].innerHTML), 1)
+            
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
         else{
-            console.log('nope')
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
             // return false;
         }
     }

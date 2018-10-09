@@ -710,7 +710,7 @@ const races = {
     Elf : {
         raceType: 'Elf',
         desc:"They're fanciful and elegant, but tend to be a little stuck up.",
-        name: [['Adran', 'Heian', 'Thamior'],['Adrie', 'Lia', 'Nailo']],
+        names: [['Adran', 'Heian', 'Thamior'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
         subrace: subraces.Elf,
         stats:{
@@ -728,7 +728,7 @@ const races = {
     Halfling : {
         raceType: 'Halfling',
         desc:'About half the size of a person, Halflings are chill and down to earth',
-        name: [['Alton', 'Milo', 'Wellby'],['Andry', 'Lidda', 'Verna']],
+        names: [['Alton', 'Milo', 'Wellby'],['Andry', 'Lidda', 'Verna']],
         speed: 25,
         subrace: subraces.Halfling,
         stats:{
@@ -745,7 +745,7 @@ const races = {
     Human : {
             raceType: 'Human',
             desc:'The tryhards of the DND world, Humans are much more adaptive and ambitious than other groups.',
-            name: [['Bardeid', 'Randal', 'Chen'],['Zasheir', 'Kerri', 'Lei']],
+            names: [['Bardeid', 'Randal', 'Chen'],['Zasheir', 'Kerri', 'Lei']],
             speed: 30,
             stats:{
               STR: 1,
@@ -766,7 +766,7 @@ const races = {
     Dragonborn : {
         raceType: 'Dragonborn',
         desc:'Basically a dragon that stands on two feet, Dragonborn are proud and clanish',
-        name: [['Arjhan', 'Balsar', 'Torinn'],['Akra', 'Kava', 'Uadjit']],
+        names: [['Arjhan', 'Balsar', 'Torinn'],['Akra', 'Kava', 'Uadjit']],
         speed: 30,
         stats:{
           STR: 2,
@@ -785,7 +785,7 @@ const races = {
      Gnome : {
         raceType: 'Gnome',
         desc:"They're tiny, eccentric tinkerers. Gnomes spend their time indulging their curiosity",
-        name: [['Alston', 'Fonkin', 'Wrenn'],['Ella', 'Shamil', 'Orla']],
+        names: [['Alston', 'Fonkin', 'Wrenn'],['Ella', 'Shamil', 'Orla']],
         speed: 25,
         subrace: subraces.Gnome,
         stats:{
@@ -803,7 +803,7 @@ const races = {
         raceType: 'Half Elf',
         desc:'Half human and half elf, they resemble a mix of both, but fit in with neither.',
         dndClass: {},
-        name: [['Bardeid', 'Randal', 'Chen'],['Adrie', 'Lia', 'Nailo']],
+        names: [['Bardeid', 'Randal', 'Chen'],['Adrie', 'Lia', 'Nailo']],
         speed: 30,
         stats:{
           CHA: 2},
@@ -824,7 +824,7 @@ const races = {
         raceType: 'Half Orc',
         desc:'Half Human and half Orc, they are often treated with prejudice and assumed to be violent brawlers',
         dndClass: {},
-        name: [['Dench', 'Holg', 'Thokk'],['Baggi', 'Ovak', 'Yevelda']],
+        names: [['Dench', 'Holg', 'Thokk'],['Baggi', 'Ovak', 'Yevelda']],
         speed: 30,
         stats:{
           STR: 2,
@@ -841,7 +841,7 @@ const races = {
         raceType: 'Tiefling',
         desc:'A cross between a person and a demon, Tieflings are met with distrust and are suspicious of others',
         dndClass: {},
-        name: [['Akmenos', 'Ekemon', 'Skamos'],['Akta', 'Kallista', 'Rieta']],
+        names: [['Akmenos', 'Ekemon', 'Skamos'],['Akta', 'Kallista', 'Rieta']],
         speed: 30,
         stats:{
           INT: 1,
@@ -1189,7 +1189,7 @@ function display(choiceObj, progressLog, triggerFn, topic){
     let choiceArray = Object.keys(choiceObj)
     
     let options = []
-    let placeholder = 'https://cdn.tutsplus.com/net/uploads/legacy/958_placeholders/placehold.gif'
+
     for(let choices of choiceArray){
         if(progressLog.length > 0 && !!races[progressLog[0][0]][topic] === true ){
             if( races[progressLog[0][0]][topic].includes(choices) ){
@@ -1204,12 +1204,12 @@ function display(choiceObj, progressLog, triggerFn, topic){
                 <div class="card-front">
                     <h3>${choices}</h3>
                     <p>${choiceObj[choices].desc}</p>
-                    <button class="btn-turn-to-back">flip</button>
+                    <div class="btn-turn-to-back"></div>
                 </div>
 
                 <div class="card-back">
                     <p>Back</p>
-                    <button class="btn-turn-to-front">flip</button>
+                    <div class="btn-turn-to-front"></div>
                 </div>
 
             </div>
@@ -1220,7 +1220,9 @@ function display(choiceObj, progressLog, triggerFn, topic){
 
     let cards = document.querySelectorAll('.card')
     let finalChoice = []
+    document.querySelector('#choiceDisplay').textContent = choiceCountDisplay(choiceCount)
     let prepCardsForSelection = function(e){select(e, choiceCount, finalChoice, progressLog, triggerFn)}
+
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', prepCardsForSelection)
         document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
@@ -1229,7 +1231,6 @@ function display(choiceObj, progressLog, triggerFn, topic){
         document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
             event.stopPropagation();
             document.querySelectorAll('.card')[i].classList.toggle('do-flip')
-
         };
 
         document.querySelectorAll('.btn-turn-to-back')[i].onclick = function (event) {
@@ -1238,37 +1239,53 @@ function display(choiceObj, progressLog, triggerFn, topic){
             
         };
     }  
+
+    
 }
 
+function choiceCountDisplay(choicesLeft) {
+    if (choicesLeft === 1) {
+        return `you have 1 selection left to make`
+    }
+    else {
+        return `you have ${choicesLeft} selections left to make`
+    }
+}
 
 function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
-    let origLength = progressLog.length;
     let next = document.querySelector('#next')
+    let choiceDisplay = document.querySelector('#choiceDisplay')
     let choiceCount = numOfChoices - finalChoice.length
-    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)}
-
+    let logSelectionMoveOn = function(e){selectionComplete(progressLog, finalChoice, triggerFn)} 
+   
+    choiceDisplay.textContent = choiceCountDisplay(finalChoice.length)
+   
     if(choiceCount !== 0){ //have choices left
         if(event.currentTarget.classList.contains('selected')){
             event.currentTarget.classList.remove('selected')
             choiceCount++
-            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
-            // next.removeEventListener('click', logSelectionMoveOn)
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[0].children[0].innerHTML), 1)
+            
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
         else{
             event.currentTarget.classList.add('selected')
             choiceCount--
-            finalChoice.push(event.currentTarget.children[1].textContent)
+            finalChoice.push(event.currentTarget.children[0].children[0].textContent)
+
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
     }
     else{                   //have no choices left
         if(event.currentTarget.classList.contains('selected')){
             event.currentTarget.classList.remove('selected')
             choiceCount++
-            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[1].innerHTML), 1)
-            // next.removeEventListener('click', logSelectionMoveOn)
+            finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[0].children[0].innerHTML), 1)
+            
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
         }
         else{
-            console.log('nope')
+            choiceDisplay.textContent = choiceCountDisplay(choiceCount)
             // return false;
         }
     }
@@ -1454,7 +1471,7 @@ const user = {
 const userProgress = []
 function createDNDCharacter(){
     
-    
+    const prompter = document.querySelector('#prompter')
     
 
     const back = document.getElementById('back')
@@ -1464,6 +1481,7 @@ function createDNDCharacter(){
     switch(userProgress.length){
         case 0:
             //function to display races
+            prompter.innerHTML = '<h2>Choose your race</h2><p>Humans are the most common people in the worlds of DND, but they live and work alongside dozens of fantastic species, each with their own strengths and weaknesses</p>'
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
@@ -1471,8 +1489,9 @@ function createDNDCharacter(){
             addRaceData(userObj, races[userProgress[0][0]])
             
             //funtion to choose name
+            prompter.innerHTML = "<h2>What's in a name?</h2> <p>No one wants to go on a quest with <i>Kyle</i>... The right name can make a big difference in the world of DND</p>"
             let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="" autofocus>'
-            userInput("what's in a name?", inputTag, createDNDCharacter, userProgress)
+            userInput(inputTag, createDNDCharacter, userProgress, 'names')
 
             break
 
@@ -1657,7 +1676,7 @@ function createDNDCharacter(){
 
             //traits
             let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
-            userInput('What are your traits?', inputTag2, createDNDCharacter, userProgress)
+            userInput(inputTag2, createDNDCharacter, userProgress)
 
             break
         case 20:
@@ -1666,7 +1685,7 @@ function createDNDCharacter(){
             
             //ideals
             let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
-            userInput("what do you believe in?", inputTag3, createDNDCharacter, userProgress)
+            userInput(inputTag3, createDNDCharacter, userProgress)
 
             break
         case 21:
@@ -1675,7 +1694,7 @@ function createDNDCharacter(){
 
             //bonds
             inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
-            userInput("what are you connected to?", inputTag4, createDNDCharacter, userProgress)
+            userInput(inputTag4, createDNDCharacter, userProgress)
 
             break
         case 22:
@@ -1684,7 +1703,7 @@ function createDNDCharacter(){
 
             // flaws
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
-            userInput("what's wrong with you?", inputTag5, createDNDCharacter, userProgress)
+            userInput(inputTag5, createDNDCharacter, userProgress)
             break
         default:
             //add bonds to user object 
@@ -1767,8 +1786,7 @@ length: 19
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
     let back = document.getElementById('back')
-    back.classList.remove('inactive')
-    back.classList.add('active')
+
     
     document.querySelector('#next').classList.toggle('hidden')
 
@@ -1785,32 +1803,53 @@ const {display, select} = require('./display')
 function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, triggerFn){
     let holder = document.getElementById('holder')
     holder.innerHTML = ''
-    let placeholder = 'https://cdn.tutsplus.com/net/uploads/legacy/958_placeholders/placehold.gif'
     let options = []
 
     for(let spell of spells){
         if(spell.level === level && !!className === true){
             for(let i = 0; i < spell.classes.length; i++){
                 if (className === spell.classes[i].name){
-                    options.push(`<div class="card">
-                        <img src="${placeholder}" alt="image of spell">
-                            <h3>${spell.name}</h3>
-                            <p>${spell.desc[0]}</p>
-                            <div class="reverse">
+                    options.push(`
+                        <div class="card-wrapper">
+                        
+                            <div class="card">
+                                <div class="card-front">
+                                    <h3>${spell.name}</h3>
+                                    <p>${spell.desc[0]}</p>
+                                    <div class="btn-turn-to-back"></div>
+                                </div>
+
+                                <div class="card-back">
+                                    <p>Back</p>
+                                    <div class="btn-turn-to-front"></div>
+                                </div>
+
                             </div>
-                    </div>`)            
+
+                        </div>`)            
                 }
             }
         }
         if(!!className === false){
             if(spell.level === 0){
-                options.push(`<div class="card">
-                    <img src="${placeholder}" alt="image of spell">
-                        <h3>${spell.name}</h3>
-                        <p>${spell.desc[0]}</p>
-                        <div class="reverse">
-                        </div>
-                </div>`)
+                options.push(`
+                        <div class="card-wrapper">
+                        
+                            <div class="card">
+                                <div class="card-front">
+                                    <h3>${spell.name}</h3>
+                                    <p>${spell.desc[0]}</p>
+                                    <div class="btn-turn-to-back"></div>
+                                </div>
+
+                                <div class="card-back">
+                                    <p>Back</p>
+                                    <div class="btn-turn-to-front"></div>
+                                </div>
+
+                            </div>
+
+                        </div>`)
             }
         }
     }
@@ -1821,6 +1860,19 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
     let prepCardsForSelection = function (e) { select(e, numOfChoices, finalChoice, progressLog, triggerFn) }
     for (let i = 0; i < cards.length; i++) {
         cards[i].addEventListener('click', prepCardsForSelection)
+        document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
+        document.querySelectorAll('.btn-turn-to-back')[i].style.visibility = 'visible';
+
+        document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
+            event.stopPropagation();
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip')
+        };
+
+        document.querySelectorAll('.btn-turn-to-back')[i].onclick = function (event) {
+            event.stopPropagation()
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip');
+
+        };
     }
 }
 
@@ -15265,15 +15317,33 @@ module.exports = spells
 
 //classList.toggle
 //event.target.inputName.value (use instead of queryselector().value)
-
-function userInput(title, inputTag, triggerFn, progressLog){
-
-    document.getElementById('holder').innerHTML = ''
-
-    let content  = `<h2>${title}</h2>
-    ${inputTag}`
-    document.getElementById('holder').innerHTML = content
-
+const races = require('./data-objects/races')
+function userInput(inputTag, triggerFn, progressLog, topic){
+    const holder = document.getElementById('holder')
+    document.querySelector('#choiceDisplay').textContent = ''
+    holder.innerHTML = `<div id="inputScreen">${inputTag}</div>`
+    
+    switch(topic){
+        case 'names':
+            holder.children[0].innerHTML += `<h3>Having trouble thinking of ${topic}?</h3><br>
+            <ul>
+                <li><b>Male ${progressLog[0][0]} Names:</b></li>
+                <li>${races[progressLog[0][0]].names[0].join('</li><li>')}</li>
+            </ul>
+            <ul>
+                <li><b>Female ${progressLog[0][0]} Names:</b></li>
+                <li>${races[progressLog[0][0]].names[1].join('</li><li>')}</li>
+            </ul>`
+            break
+        case 'traits':
+            break
+        case 'ideals':
+            break
+        case 'bonds':
+            break
+        default:
+            break            
+    }
     // let next = document.getElementById('next')
 
     //validation
@@ -15306,4 +15376,4 @@ function inputComplete(triggerFn, progressLog){
 }
 
 module.exports = userInput
-},{}]},{},[17]);
+},{"./data-objects/races":10}]},{},[17]);

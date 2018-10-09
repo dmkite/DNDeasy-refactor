@@ -108,7 +108,7 @@ const user = {
 const userProgress = []
 function createDNDCharacter(){
     
-    
+    const prompter = document.querySelector('#prompter')
     
 
     const back = document.getElementById('back')
@@ -118,6 +118,7 @@ function createDNDCharacter(){
     switch(userProgress.length){
         case 0:
             //function to display races
+            prompter.innerHTML = '<h2>Choose your race</h2><p>Humans are the most common people in the worlds of DND, but they live and work alongside dozens of fantastic species, each with their own strengths and weaknesses</p>'
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
@@ -125,8 +126,9 @@ function createDNDCharacter(){
             addRaceData(userObj, races[userProgress[0][0]])
             
             //funtion to choose name
+            prompter.innerHTML = "<h2>What's in a name?</h2> <p>No one wants to go on a quest with <i>Kyle</i>... The right name can make a big difference in the world of DND</p>"
             let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="" autofocus>'
-            userInput("what's in a name?", inputTag, createDNDCharacter, userProgress)
+            userInput(inputTag, createDNDCharacter, userProgress, 'names')
 
             break
 
@@ -311,7 +313,7 @@ function createDNDCharacter(){
 
             //traits
             let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
-            userInput('What are your traits?', inputTag2, createDNDCharacter, userProgress)
+            userInput(inputTag2, createDNDCharacter, userProgress)
 
             break
         case 20:
@@ -320,7 +322,7 @@ function createDNDCharacter(){
             
             //ideals
             let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
-            userInput("what do you believe in?", inputTag3, createDNDCharacter, userProgress)
+            userInput(inputTag3, createDNDCharacter, userProgress)
 
             break
         case 21:
@@ -329,7 +331,7 @@ function createDNDCharacter(){
 
             //bonds
             inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
-            userInput("what are you connected to?", inputTag4, createDNDCharacter, userProgress)
+            userInput(inputTag4, createDNDCharacter, userProgress)
 
             break
         case 22:
@@ -338,7 +340,7 @@ function createDNDCharacter(){
 
             // flaws
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
-            userInput("what's wrong with you?", inputTag5, createDNDCharacter, userProgress)
+            userInput(inputTag5, createDNDCharacter, userProgress)
             break
         default:
             //add bonds to user object 
