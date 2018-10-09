@@ -10,7 +10,13 @@ const classes = {
       profs:{
           armor:['light armor','medium armor','shields'],
           weapons:['simple weapons', 'martial weapons']
-      },
+      },stats:{
+              STR: 1,
+              DEX: 1,
+              CON: 1,
+              INT: 1,
+              WIS: 1,
+              CHA: 1},
       armorType:[],
       choices: {skills: [2, {'Animal Handling':'', Athletics:'', Intimidation:'', Nature:'', Perception:'',Survival:''}]},
       equipment:['Great Axe', '2 Hand Axes', "explorer's pack",  '4 Javelins'],
