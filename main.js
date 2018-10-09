@@ -18,8 +18,8 @@ const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 
 const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData} = require('./createCharSheet')
-
+const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData} = require('./createUserObj')
+const createCharSheet = require('./createCharSheet')
 let userObj = {
     race: '',
     name: '',
@@ -52,11 +52,60 @@ let userObj = {
         other:[],
         shield:[]
     },
-    skills:[]
+    skills:[],
+    background:'',
+    traits:'',
+    bonds:'',
+    ideals:'',
+    flaws:'',
+    classType: '',
+    savingThrow: []
+
+}
+
+const user = {
+    race: 'Human',
+    name: 'Kyle',
+    stats: {
+        STR: 15,
+        DEX: 16,
+        CON: 18,
+        INT: 2,
+        WIS: 9,
+        CHA: 10
+    },
+    speed: 30,
+    profs: {
+        weapons: ['slings', 'bows'],
+        armor: ['light'],
+        tools: ['game set'],
+        other: [],
+    },
+    features: ['Sorcerous Origins'],
+    languages: ['Common', 'Orc'],
+    spells: {
+        cantrips: ['cold touch', 'mage hand'],
+        level1: ['mending', 'healing word']
+    },
+    HP: 6,
+    AC: 0,
+    DC: 0,
+    equipment: {
+        weapons: ['dagger'],
+        other: ['common clothes', '15gp'],
+        shield: []
+    },
+    skills: ['animal handling', 'arcana'],
+    background: 'Criminal',
+    traits: 'blach',
+    bonds: 'agljweg ',
+    ideals: 'sdfeed',
+    flaws: ' fewwed ',
+    classType: 'Sorcerer',
+    savingThrow: ['WIS', 'CON']
 }
 
 const userProgress = []
-
 function createDNDCharacter(){
     
     
@@ -184,6 +233,7 @@ function createDNDCharacter(){
         case 10:
             //add class data to user object
             addClassData(userObj, classes[userProgress[9][0]])
+            userObj.classType = userProgress[9][0]
 
             //choose skills
             // console.log(userProgress[9])
@@ -230,7 +280,7 @@ function createDNDCharacter(){
         case 16:
             //add background to user object
             addBackgroundData(userObj, backgrounds[userProgress[15][0]])
-
+            userObj.background = userProgress[15][0]
             //choose background choices 
             if(!!backgrounds[userProgress[15][0]].choices === false){
                 choiceNotPresent(userProgress, createDNDCharacter)
@@ -247,39 +297,60 @@ function createDNDCharacter(){
             displayStats(userProgress, createDNDCharacter)
             break
         case 18:
+            //add stats to user object
+            for(let stat in userProgress[17]){
+                userObj.stats[stat] += userProgress[17][stat]
+            }
+
             //roll HP
             hpRoll(userProgress, createDNDCharacter)
             break
         case 19:
+            //add HP to user object
+            userObj.HP += userProgress[18]
+
             //traits
             let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
             userInput('What are your traits?', inputTag2, createDNDCharacter, userProgress)
 
             break
         case 20:
+            //add traits to user object
+            userObj.traits = userProgress[19]
+            
             //ideals
             let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
             userInput("what do you believe in?", inputTag3, createDNDCharacter, userProgress)
 
             break
         case 21:
+            //add ideals to user object
+            userObj.ideals = userProgress[20]
+
             //bonds
             inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
             userInput("what are you connected to?", inputTag4, createDNDCharacter, userProgress)
 
             break
         case 22:
+            //add bonds to user object 
+            userObj.bonds = userProgress[21]
+
             // flaws
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
             userInput("what's wrong with you?", inputTag5, createDNDCharacter, userProgress)
             break
         default:
-
-            console.log('8888888888888888', userProgress)
+            //add bonds to user object 
+            userObj.flaws = userProgress[22]
+            console.log(userObj)
+            createCharSheet(userObj)
             return
     }
     
 }
+
+
 
 createDNDCharacter()
 

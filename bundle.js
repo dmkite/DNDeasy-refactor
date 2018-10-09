@@ -60,7 +60,158 @@ function progressChoices(progressPoint, progressLog, number, triggerFn){
 module.exports = progressChoices
 
 
-},{"./backFn":1,"./data-objects/classes":6,"./display":14,"./spellDisplay":18}],3:[function(require,module,exports){
+},{"./backFn":1,"./data-objects/classes":7,"./display":15,"./spellDisplay":19}],3:[function(require,module,exports){
+const classes = require('./data-objects/classes')
+function calcMod(raw){
+    return Math.floor((raw - 10) / 2)
+}
+
+function calcAC(user){
+    const dexMod = calcMod(user.stats.DEX)
+    const armorType = classes[user.classType].armorType
+    let AC
+    switch(armorType){
+        case 'leather':
+            AC = 11 + dexMod
+            break
+        case 'scale':
+            AC = 11 + dexMod
+            break
+        case 'chain':
+            AC = 11 + dexMod
+            break  
+        case '':
+            if(classes[user.classType].features.incldues('Uarmored Defense') && user.classType === 'Barbarian'){
+                AC = 10 + calcMod(user.stats.CON) + dexMod
+            } 
+            else if (classes[user.classType].features.incldues('Uarmored Defense') && user.classType === 'Monk'){
+                AC = 10 + calcMod(user.stats.WIS) + dexMod
+            }
+            else{
+                AC = 10
+            }
+    }
+    return AC
+}
+
+function createCharSheet(user){
+    let holder = document.querySelector('#holder')
+    holder.classList.add('charsheet')
+    holder.classList.remove('flex')
+    let charsheetHTML = `
+            <article id="baseInfo">
+                <img id="logo" src="https://d30y9cdsu7xlg0.cloudfront.net/png/407535-200.png" alt="dndEASY logo">
+                <article id="name">${user.name}</article>
+                <article id="class">${user.classType}</article>
+                <article id="background">${user.background}</article>
+                <article id="race">${user.race}</article>
+                <article id="alignment">${user.alignment}</article>
+                <article id="dc">${10 + user.stats.INT}</article>
+            </article>
+            <article id="stats">
+                <div class="mod">
+                    <div class="raw">${user.stats.STR}</div>
+                    <div class="modifier">${calcMod(user.stats.STR)}</div>
+                    <h4>Strength</h4>
+                </div>
+                <div class="mod">
+                    <div class="raw">${user.stats.DEX}</div>
+                    <div class="modifier">${calcMod(user.stats.DEX)}</div>
+                    <h4>Dexterity</h4>
+                </div>
+                <div class="mod">
+                    <div class="raw">${user.stats.CON}</div>
+                    <div class="modifier">${calcMod(user.stats.CON)}</div>
+                    <h4>Constitution</h4>
+                </div>
+                <div class="mod">
+                    <div class="raw">${user.stats.INT}</div>
+                    <div class="modifier">${calcMod(user.stats.INT)}</div>
+                    <h4>Intelligence</h4>
+                </div>
+                <div class="mod">
+                    <div class="raw">${user.stats.WIS}</div>
+                    <div class="modifier">${calcMod(user.stats.WIS)}</div>
+                    <h4>Wisdom</h4>
+                </div>
+                <div class="mod">
+                    <div class="raw">${user.stats.CHA}</div>
+                    <div class="modifier">${calcMod(user.stats.CHA)}</div>
+                    <h4>Charisma</h4>
+                </div>
+            </article>
+            <article id="savingThrows">
+                <h4>Saving Throws</h4>
+                <p>+2 ${user.savingThrow[0]}</p>
+                <p>+2 ${user.savingThrow[1]}</p>
+            </article>
+            <article id="skills">
+                <p>${user.skills.join('</p><p>+2 ')}</p>
+            </article>
+            <article id="profAndLang">
+                <h4>Other Proficiencies and Langauges</h4>
+                <h5>Proficiencies</h5>
+                <p>${user.profs.other.join('</p><p>')}</p>
+                <p>${user.profs.tools.join('</p><p>')}</p>
+                <h5>Languages</h5>
+                <p>${user.languages.join('</p><p>')}</p>
+            </article>
+            <article id="hp">
+                <div>
+                    <h4>Armor Class</h4>
+                    <h5>${calcAC(user)}</h5>
+                </div>
+                <div>
+                    <h4>Speed</h4>
+                    <h5>${user.speed}</h5>
+                </div>
+                <div>
+                    <h4>Hit Points</h4>
+                    <h5>${user.HP}</h5>
+                </div>
+            </article>
+            <article id="attacks">
+                <h4>Attacks and Spells</h4>
+                <h5>Attacks</h5>
+                <p>${user.equipment.weapons.join('</p><p>')}</p>
+                <h5>Spells</h5>
+                <p>${user.spells.cantrips.join('</p><p>')}</p>
+                <h6>Cantrips</h6>
+                <h6>Level 1 Spells</h6>
+                <p>${user.spells.level1.join('</p><p>')}</p>
+            </article>
+            <article id="equipment">
+                <h4>Equipment</h4>
+                <p>${user.equipment.other.join('</p><p>')}</p>
+                <p>${user.equipment.shield.join('</p><p>')}</p>
+            </article>
+            <article id="charInfo">
+                <div>
+                    <h4>Personality Traits</h4>
+                    <p>${user.traits}</p>
+                </div>
+                <div>
+                    <h4>Ideals</h4>
+                    <p>${user.ideals}</p>
+                </div>
+                <div>
+                    <h4>Bonds</h4>
+                    <p>${user.bonds}</p>
+                </div>
+                <div>
+                    <h4>Flaws</h4>
+                    <p>${user.flaws}</p>
+                </div>
+            </article>
+            <article id="features">
+                <h4>Features</h4>
+                <p>${user.features.join('</p><p>')}</p>
+            </article>`
+    holder.innerHTML = charsheetHTML
+}
+
+module.exports = createCharSheet
+},{"./data-objects/classes":7}],4:[function(require,module,exports){
 function addRaceData(user, race){
     let {raceType, speed, stats, profs = null, features = null, languages} = race
     user.race = raceType
@@ -139,6 +290,7 @@ function addClassChoices(user, progressLogEntry, className, num){
 }
 
 function addBackgroundData(user, backgroundName){
+    
     for(let skill of backgroundName.skills){
         if(user.skills.includes(skill)){
             continue
@@ -153,7 +305,7 @@ function addBackgroundData(user, backgroundName){
 }
 
 module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData }
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const alignment = {
     "Lawful Good":{
         name:"Lawful Good",
@@ -194,7 +346,7 @@ const alignment = {
 }
 
 module.exports = alignment
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = {
@@ -289,7 +441,7 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{"./languages":8}],6:[function(require,module,exports){
+},{"./languages":9}],7:[function(require,module,exports){
 const skills = require('./skills')
 const spells= require('./spells')
 const { createDNDCharacter, userProgress } = require('../main')
@@ -408,7 +560,7 @@ const classes = {
             armor: ['all armor', 'shields'],
             weapons: ['simple weapons', 'martial weapons']
         },
-        armorType: ['chain mail'],
+        armorType: ['chain'],
         choices: { skills: [2, { Athletics: '', Insight: '', Intimidation:'', Medicine:'',Persuasion:'', Religion: ''}] },
         equipment: ['longsword','5 Javelins', "priest's pack", 'holy symbol'],
         features: ['Devine Sense', 'Lay on Hands'],
@@ -496,7 +648,7 @@ const classes = {
         armorType: [''],
         choices: { skills: [2, { Arcana: '', History: '', Insight: '', Investigation: '', Medicine: '', Religion: '' }], cantrips: [3, spells], spells: [2, spells]},
         equipment: ['quarterstaff', 'arcane focus', "scholar's Pack", 'spellbook'],
-        features: ['Otherworldly Patrons'],
+        features: [],
         desc: '',
         reverse: '',
         img: '',
@@ -505,7 +657,7 @@ const classes = {
 }
 
 module.exports = classes
-},{"../main":16,"./skills":10,"./spells":11}],7:[function(require,module,exports){
+},{"../main":17,"./skills":11,"./spells":12}],8:[function(require,module,exports){
 const dragonbreath = {
     "Black Dragon":"Spit acid in a 5' by 30' line",
     "Blue Dragon": "Breathe lightning in a 5' by 30' line",
@@ -520,7 +672,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const languages = {
     Common: {desc:'The language common to all races'},
     Elvish: {desc:'The language of the Elves'},
@@ -532,7 +684,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -705,7 +857,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":7,"./languages":8,"./skills":10,"./subraces":12}],10:[function(require,module,exports){
+},{"./dragonbreath":8,"./languages":9,"./skills":11,"./subraces":13}],11:[function(require,module,exports){
 const skills = {
    Acrobatics: { 
   name: 'Acrobatics',
@@ -799,10 +951,10 @@ Survival:{
 }}
 
 module.exports = skills
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 const spells = {level1:null, cantrips:null}
 module.exports = spells
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const languages = require('./languages')
 const spells = require('./spells')
 
@@ -906,7 +1058,7 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":8,"./spells":11}],13:[function(require,module,exports){
+},{"./languages":9,"./spells":12}],14:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 const {userProgress, createDNDcharacter } = require('./main')
 
@@ -1018,7 +1170,7 @@ function statComplete(progressLog, triggerFn){
 }
 module.exports = displayStats
 
-},{"./data-objects/classes":6,"./main":16}],14:[function(require,module,exports){
+},{"./data-objects/classes":7,"./main":17}],15:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 const races = require('./data-objects/races')
 
@@ -1046,12 +1198,22 @@ function display(choiceObj, progressLog, triggerFn, topic){
 
         }
         options.push(`
-        <div class="card">
-            <img src="${placeholder}" alt="image of ${choices}">
-            <h3>${choices}</h3>
-            <p>${choiceObj[choices].desc}</p>
-            <div class="reverse">
+        <div class="card-wrapper">
+        
+            <div class="card">
+                <div class="card-front">
+                    <h3>${choices}</h3>
+                    <p>${choiceObj[choices].desc}</p>
+                    <button class="btn-turn-to-back">flip</button>
+                </div>
+
+                <div class="card-back">
+                    <p>Back</p>
+                    <button class="btn-turn-to-front">flip</button>
+                </div>
+
             </div>
+
         </div>`)
     }
     holder.innerHTML = options.join('\n')
@@ -1061,6 +1223,20 @@ function display(choiceObj, progressLog, triggerFn, topic){
     let prepCardsForSelection = function(e){select(e, choiceCount, finalChoice, progressLog, triggerFn)}
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', prepCardsForSelection)
+        document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
+        document.querySelectorAll('.btn-turn-to-back')[i].style.visibility = 'visible';
+
+        document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
+            event.stopPropagation();
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip')
+
+        };
+
+        document.querySelectorAll('.btn-turn-to-back')[i].onclick = function (event) {
+            event.stopPropagation()
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip');
+            
+        };
     }  
 }
 
@@ -1116,7 +1292,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
 }
 
 module.exports = { display, select}
-},{"./data-objects/races":9,"./selectionComplete":17}],15:[function(require,module,exports){
+},{"./data-objects/races":10,"./selectionComplete":18}],16:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 
 function diceRoll(numDice, numSides) {
@@ -1167,7 +1343,7 @@ function hpRoll(progressLog, triggerFn){
 
 module.exports = hpRoll
 
-},{"./data-objects/classes":6}],16:[function(require,module,exports){
+},{"./data-objects/classes":7}],17:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
@@ -1188,8 +1364,8 @@ const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 
 const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData} = require('./createCharSheet')
-
+const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData} = require('./createUserObj')
+const createCharSheet = require('./createCharSheet')
 let userObj = {
     race: '',
     name: '',
@@ -1222,11 +1398,60 @@ let userObj = {
         other:[],
         shield:[]
     },
-    skills:[]
+    skills:[],
+    background:'',
+    traits:'',
+    bonds:'',
+    ideals:'',
+    flaws:'',
+    classType: '',
+    savingThrow: []
+
+}
+
+const user = {
+    race: 'Human',
+    name: 'Kyle',
+    stats: {
+        STR: 15,
+        DEX: 16,
+        CON: 18,
+        INT: 2,
+        WIS: 9,
+        CHA: 10
+    },
+    speed: 30,
+    profs: {
+        weapons: ['slings', 'bows'],
+        armor: ['light'],
+        tools: ['game set'],
+        other: [],
+    },
+    features: ['Sorcerous Origins'],
+    languages: ['Common', 'Orc'],
+    spells: {
+        cantrips: ['cold touch', 'mage hand'],
+        level1: ['mending', 'healing word']
+    },
+    HP: 6,
+    AC: 0,
+    DC: 0,
+    equipment: {
+        weapons: ['dagger'],
+        other: ['common clothes', '15gp'],
+        shield: []
+    },
+    skills: ['animal handling', 'arcana'],
+    background: 'Criminal',
+    traits: 'blach',
+    bonds: 'agljweg ',
+    ideals: 'sdfeed',
+    flaws: ' fewwed ',
+    classType: 'Sorcerer',
+    savingThrow: ['WIS', 'CON']
 }
 
 const userProgress = []
-
 function createDNDCharacter(){
     
     
@@ -1354,6 +1579,7 @@ function createDNDCharacter(){
         case 10:
             //add class data to user object
             addClassData(userObj, classes[userProgress[9][0]])
+            userObj.classType = userProgress[9][0]
 
             //choose skills
             // console.log(userProgress[9])
@@ -1400,7 +1626,7 @@ function createDNDCharacter(){
         case 16:
             //add background to user object
             addBackgroundData(userObj, backgrounds[userProgress[15][0]])
-
+            userObj.background = userProgress[15][0]
             //choose background choices 
             if(!!backgrounds[userProgress[15][0]].choices === false){
                 choiceNotPresent(userProgress, createDNDCharacter)
@@ -1417,39 +1643,60 @@ function createDNDCharacter(){
             displayStats(userProgress, createDNDCharacter)
             break
         case 18:
+            //add stats to user object
+            for(let stat in userProgress[17]){
+                userObj.stats[stat] += userProgress[17][stat]
+            }
+
             //roll HP
             hpRoll(userProgress, createDNDCharacter)
             break
         case 19:
+            //add HP to user object
+            userObj.HP += userProgress[18]
+
             //traits
             let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
             userInput('What are your traits?', inputTag2, createDNDCharacter, userProgress)
 
             break
         case 20:
+            //add traits to user object
+            userObj.traits = userProgress[19]
+            
             //ideals
             let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
             userInput("what do you believe in?", inputTag3, createDNDCharacter, userProgress)
 
             break
         case 21:
+            //add ideals to user object
+            userObj.ideals = userProgress[20]
+
             //bonds
             inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
             userInput("what are you connected to?", inputTag4, createDNDCharacter, userProgress)
 
             break
         case 22:
+            //add bonds to user object 
+            userObj.bonds = userProgress[21]
+
             // flaws
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
             userInput("what's wrong with you?", inputTag5, createDNDCharacter, userProgress)
             break
         default:
-
-            console.log('8888888888888888', userProgress)
+            //add bonds to user object 
+            userObj.flaws = userProgress[22]
+            console.log(userObj)
+            createCharSheet(userObj)
             return
     }
     
 }
+
+
 
 createDNDCharacter()
 
@@ -1516,7 +1763,7 @@ length: 1
 __proto__: Array(0)
 length: 19
 */
-},{"./backFn":1,"./classChoices":2,"./createCharSheet":3,"./data-objects/alignment":4,"./data-objects/backgrounds":5,"./data-objects/classes":6,"./data-objects/dragonbreath":7,"./data-objects/languages":8,"./data-objects/races":9,"./data-objects/skills":10,"./data-objects/subraces":12,"./diceStats":13,"./display":14,"./hpRoll":15,"./spellDisplay":18,"./spellList":19,"./userInput":20}],17:[function(require,module,exports){
+},{"./backFn":1,"./classChoices":2,"./createCharSheet":3,"./createUserObj":4,"./data-objects/alignment":5,"./data-objects/backgrounds":6,"./data-objects/classes":7,"./data-objects/dragonbreath":8,"./data-objects/languages":9,"./data-objects/races":10,"./data-objects/skills":11,"./data-objects/subraces":13,"./diceStats":14,"./display":15,"./hpRoll":16,"./spellDisplay":19,"./spellList":20,"./userInput":21}],18:[function(require,module,exports){
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
     let back = document.getElementById('back')
@@ -1530,7 +1777,7 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
 }
 //problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
 module.exports = selectionComplete
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 const spells = require('./spellList')
 const { createDNDCharacter, userProgress } = require('./main')
 const {display, select} = require('./display')
@@ -1580,7 +1827,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
 
 module.exports = prepareSpellOptions
 
-},{"./display":14,"./main":16,"./spellList":19}],19:[function(require,module,exports){
+},{"./display":15,"./main":17,"./spellList":20}],20:[function(require,module,exports){
 let spellList = [
     {
         "index": 1,
@@ -15013,7 +15260,7 @@ spells = spells.reduce((acc, spell) => {
 
 
 module.exports = spells
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 //import dndcharacter function
 
 //classList.toggle
@@ -15059,4 +15306,4 @@ function inputComplete(triggerFn, progressLog){
 }
 
 module.exports = userInput
-},{}]},{},[16]);
+},{}]},{},[17]);

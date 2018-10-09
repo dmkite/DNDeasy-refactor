@@ -9,12 +9,23 @@
     <script defer src="bundle.js"></script>
 </head>
 <body>
-    <main id="holder">
-        
-    </main>
-    <aside id="charProg"></aside>
-    <input type="button" id="back" value="back" class="hidden">
-    <input type="button" id="next" value="next" class="hidden">
+    <div id="masterContainer">
+        <aside id="aside">
+            <header id="prompter">example text goes here just to test how far it will spread</header>
+            <section id="charProg">
+            </section>
+            
+            <footer id="controls">
+                <input type="button" id="back" value="&lt;" class="hidden">
+                <input type="button" id="next" value="&gt;" class="hidden">
+            </footer>
+        </aside>
+
+        <main id="holder" class="flex">
+            
+        </main>
+
+    </div>
     <script>
             function allowDrop(ev) {
                     ev.preventDefault()

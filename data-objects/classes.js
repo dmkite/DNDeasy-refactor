@@ -116,7 +116,7 @@ const classes = {
             armor: ['all armor', 'shields'],
             weapons: ['simple weapons', 'martial weapons']
         },
-        armorType: ['chain mail'],
+        armorType: ['chain'],
         choices: { skills: [2, { Athletics: '', Insight: '', Intimidation:'', Medicine:'',Persuasion:'', Religion: ''}] },
         equipment: ['longsword','5 Javelins', "priest's pack", 'holy symbol'],
         features: ['Devine Sense', 'Lay on Hands'],
@@ -204,7 +204,7 @@ const classes = {
         armorType: [''],
         choices: { skills: [2, { Arcana: '', History: '', Insight: '', Investigation: '', Medicine: '', Religion: '' }], cantrips: [3, spells], spells: [2, spells]},
         equipment: ['quarterstaff', 'arcane focus', "scholar's Pack", 'spellbook'],
-        features: ['Otherworldly Patrons'],
+        features: [],
         desc: '',
         reverse: '',
         img: '',

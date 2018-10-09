@@ -25,12 +25,22 @@ function display(choiceObj, progressLog, triggerFn, topic){
 
         }
         options.push(`
-        <div class="card">
-            <img src="${placeholder}" alt="image of ${choices}">
-            <h3>${choices}</h3>
-            <p>${choiceObj[choices].desc}</p>
-            <div class="reverse">
+        <div class="card-wrapper">
+        
+            <div class="card">
+                <div class="card-front">
+                    <h3>${choices}</h3>
+                    <p>${choiceObj[choices].desc}</p>
+                    <button class="btn-turn-to-back">flip</button>
+                </div>
+
+                <div class="card-back">
+                    <p>Back</p>
+                    <button class="btn-turn-to-front">flip</button>
+                </div>
+
             </div>
+
         </div>`)
     }
     holder.innerHTML = options.join('\n')
@@ -40,6 +50,20 @@ function display(choiceObj, progressLog, triggerFn, topic){
     let prepCardsForSelection = function(e){select(e, choiceCount, finalChoice, progressLog, triggerFn)}
     for(let i = 0; i < cards.length; i++){
         cards[i].addEventListener('click', prepCardsForSelection)
+        document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
+        document.querySelectorAll('.btn-turn-to-back')[i].style.visibility = 'visible';
+
+        document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
+            event.stopPropagation();
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip')
+
+        };
+
+        document.querySelectorAll('.btn-turn-to-back')[i].onclick = function (event) {
+            event.stopPropagation()
+            document.querySelectorAll('.card')[i].classList.toggle('do-flip');
+            
+        };
     }  
 }
 
