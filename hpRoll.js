@@ -11,6 +11,7 @@ function diceRoll(numDice, numSides) {
 
 
 function hpRoll(progressLog, triggerFn){
+    document.querySelector('#choiceDisplay').textContent = ''
     let hitDie = classes[progressLog[9][0]].hitDie
     document.querySelector('main').innerHTML = '<div class="dice"></div>'
     

@@ -65,10 +65,17 @@ function addClassData(user, className){
 function addClassChoices(user, progressLogEntry, className, num){
     let classChoiceList = Object.keys(className.choices)
     if(classChoiceList[num] === 'cantrips'){
-        user.spells.cantrips.push(progressLogEntry)
+        for (let items of progressLogEntry){
+            user.spells.cantrips.push(items)
+            //changed this
+        }
+        
     }
     else if(classChoiceList[num] === 'spells'){
-        user.spells.level1.push(progressLogEntry)
+        for (let items of progressLogEntry) {
+            user.spells.level1.push(items)
+            //changed this
+        }
     }
     else{
         user.features.push(progressLogEntry)
@@ -90,4 +97,10 @@ function addBackgroundData(user, backgroundName){
     if(backgroundName.profs){user.profs.tools.push(backgroundName.profs.tools)}
 }
 
-module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData }
+function addStatData(user, statObj){
+        for(let stat in statObj){
+            user.stats[stat] += statObj[stat]
+        }   
+}
+
+module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData }

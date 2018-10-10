@@ -45,6 +45,7 @@ let statTypes = ['STR', 'CON', 'INT', 'WIS', 'CHA', 'DEX']
 
 
 function displayStats(progressLog, triggerFn){
+    document.querySelector('#choiceDisplay').textContent = ''
     render(stats)
 
     for (let i = 0; i < statTypes.length; i++) {

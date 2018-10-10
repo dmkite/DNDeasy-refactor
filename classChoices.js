@@ -12,6 +12,7 @@ function progressChoices(progressPoint, progressLog, number, triggerFn){
         return
     }
     let numOfChoices = progressPoint[progressLog[9][0]].choices[currentChoice][0]
+    document.querySelector('#prompter').innerHTML = progressPoint[progressLog[9][0]].choices[currentChoice][2]
     
     if(currentChoice === 'cantrips'){
         console.log(type.classType, numOfChoices)

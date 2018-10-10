@@ -18,6 +18,7 @@ const races = {
           features: ['Darkvision'],
           languages: ['Common', 'Dwarvish'],
           choices: {subrace: [1, subraces.Dwarf]},
+          img:'img/dwarf.jpg',
           reverse:"Bold and hardy, dwarves are skilled warriors, miners and workers. They can live to e more than 400 years old and are known to hold a grudge."
       },
     Elf : {
@@ -36,6 +37,7 @@ const races = {
         spells:[],
         languages: ['Common', 'Elvish'],
         choices: {subrace: [1, subraces.Elf]},
+        img: 'img/elf.jpg',
         reverse: "Elves are a little more slender than humans. They're hauntingly beautiful and can live to be 700 years old. They're often thouht to be aloof or detatched"
       },
     Halfling : {
@@ -53,6 +55,7 @@ const races = {
         spells:[],
         languages: ['Common', 'Halfling'],
         choices: {subrace: [1, subraces.Halfling]},
+        img: 'img/halfling.jpg',
         reverse: "Halflings have kind hearts and are content to spend their days with good friends and good meals. They usually live around 150 years, spending their days in small communities"
     } ,
     Human : {
@@ -74,6 +77,7 @@ const races = {
             spells:[],
             languages: ['Common'],
             choices: {languages: [1, languages]},
+            img: 'img/human.jpg',
             reverse: "Humans are a diverse bunch and their communities are usually welcoming of other races. Because of their short lives, other races often see them as living hectic and bustling lives"
     },   
     Dragonborn : {
@@ -92,6 +96,7 @@ const races = {
         spells:[],
         languages: ['Common', 'Draconic'],
         choices: {weapons: [1, dragonbreath]},
+        img: 'img/dragonborn.jpg',
         reverse: "Dragonborn are expert crafters and they are generally driven to be the best they possibly can be. They are undyingly devoted to their clan, topping out at well over 6 feet, weighing nearly 250 pounds, and living to about 80 years old."
         
     },
@@ -110,6 +115,7 @@ const races = {
         spells:[],
         languages: ['Common', 'Gnomish'],
         choices: {subrace: [1, subraces.Gnome]},
+        img: 'img/gnome.jpg',
         reverse: "Gnomes are equally devoted to the pleasures of life and studious endeavors. They live to be about 350 to 500 yeas old and spend much of that exploring and learning."
     },
     "Half Elf" : {
@@ -131,6 +137,7 @@ const races = {
             skills: [2, skills],
             stats: [2, {CON: 1, DEX: 1, STR: 1, INT: 1, WIS: 1}]
         },
+        img: 'img/halfElf.jpg',
         reverse:"Half Elves often feel like they have no home of their own. They live to be about 180 years old, dying much sooner than their Elf parent, but much later than their human parent."
     },
     "Half Orc" : {
@@ -148,6 +155,7 @@ const races = {
         HP: 0,
         spells:[],
         languages: ['Common', 'Orc'],
+        img: 'img/halfOrc.jpg',
         reverse: "Standing 6 to 7 feet tall and weighing over 200 pounds, Half Orcs are intimidating. They are often scarred and prone to violent and emotional outbursts due to their Orc parents."
     },
      Tiefling : {
@@ -165,6 +173,7 @@ const races = {
         HP: 0,
         spells:['Thaumaturgy'],
         languages: ['Common', 'Infernal'],
+        img: 'img/tiefling.jpg',
         reverse: "Tieflings are often the victims of prejudice. Their horns, tails, and fangs are fearsome, but they are not evil by nature. They generally live as long as Humans"
     }
     }

@@ -28,14 +28,14 @@ function display(choiceObj, progressLog, triggerFn, topic){
         <div class="card-wrapper">
         
             <div class="card">
-                <div class="card-front">
+                <div class="card-front" style="background-image:url('${choiceObj[choices].img}')">
                     <h3>${choices}</h3>
                     <p>${choiceObj[choices].desc}</p>
                     <div class="btn-turn-to-back"></div>
                 </div>
 
                 <div class="card-back">
-                    <p>Back</p>
+                    <p>${choiceObj[choices].reverse}</p>
                     <div class="btn-turn-to-front"></div>
                 </div>
 
@@ -80,6 +80,7 @@ function choiceCountDisplay(choicesLeft) {
 }
 
 function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
+    
     let next = document.querySelector('#next')
     let choiceDisplay = document.querySelector('#choiceDisplay')
     let choiceCount = numOfChoices - finalChoice.length
@@ -97,6 +98,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
         }
         else{
             event.currentTarget.classList.add('selected')
+            event.currentTarget.children[0].children[2].style.visibility = 'hidden'
             choiceCount--
             finalChoice.push(event.currentTarget.children[0].children[0].textContent)
 
@@ -106,6 +108,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
     else{                   //have no choices left
         if(event.currentTarget.classList.contains('selected')){
             event.currentTarget.classList.remove('selected')
+            event.currentTarget.children[0].children[2].style.visibility = 'visible'
             choiceCount++
             finalChoice.splice(finalChoice.indexOf(event.currentTarget.children[0].children[0].innerHTML), 1)
             

@@ -11,16 +11,24 @@
 </head>
 <body>
     <div id="masterContainer">
+
         <aside id="aside">
+            <div id="progressBar">
+                <div id="progress" class="zero"></div>
+            </div>
             <h1>DND<span>easy</span></h1>
             <header id="prompter"></header>
-            <p id="choiceDisplay">/</p>
             <section id="charProg">
             </section>
             
             <footer id="controls">
-                <input type="button" id="back" value="&lt;" class="hidden">
-                <input type="button" id="next" value="&gt;" class="hidden">
+                <h2>What next?</h2>
+                <p id="choiceDisplay">/</p>
+                <div id="buttonBlock">
+                    <input type="button" id="back" value="&lt;" class="hidden">
+                    <input type="button" id="save" value="save" class="hidden">
+                    <input type="button" id="next" value="&gt;" class="hidden">
+                </div>
             </footer>
         </aside>
 

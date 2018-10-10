@@ -144,7 +144,7 @@ function createCharSheet(user){
                 <h4>Features</h4>
                 <p>${user.features.join('</p><p>')}</p>
             </article>`
-    holder.innerHTML = charsheetHTML
+    document.querySelector('#masterContainer').innerHTML = charsheetHTML
 }
 
 module.exports = createCharSheet
