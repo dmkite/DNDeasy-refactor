@@ -52,9 +52,6 @@ function inputComplete(triggerFn, progressLog){
     let finalInput = [document.getElementById('userInput').value]
     progressLog.push(finalInput)
     
-    //vv back button stuff
-    let back = document.getElementById('back')
-    back.classList.toggle('hidden')
 
     document.querySelector('#next').classList.toggle('hidden')
     triggerFn()

@@ -1,25 +1,58 @@
+const { createDNDCharacter, userProgress, userObj } = require('./main')
+
 function storeProgress(user, progressLog){
-    let num = progressLog.length
-    let toStore = {user, progressLog, num}
-    toStore = JSON.stringify(toStore)
-    if(progressLog[progressLog.length - 1] !== null){
-     localStorage.setItem(num, toStore)
-    }
+    let storageString = localStorage.getItem('storedProgress')
+    let storage = JSON.parse(storageString)
+    let toStore = { user, progressLog}
+    storage.push(toStore)
+    storageString = JSON.stringify(storage)
+
+    localStorage.setItem('storedProgress', storageString)
 }
 
-function revertProgress(user, progressLog, key, triggerFn){
+function revertProgress(){
+    //use while loop
     
-    let stringProgress = localStorage.getItem(key)
-    let progress = JSON.parse(stringProgress)
-    if(progress.userProgress[key] === null){
-        key--
-        revertProgress(user, progressLog, key)
-    } 
+    let storageString = localStorage.getItem('storedProgress')
+    let storage = JSON.parse(storageString)
+    storage.pop()
+
+    let mostRecentlyStored = storage[storage.length - 1]
+    //returns object w/ user and progressLog keys
+
+    let lastLog = mostRecentlyStored.progressLog
+    //returns array
+    
+    let lastDecision = lastLog[lastLog.length - 1]
+    //returns last item of array
+    
+    if(lastDecision !== null){
+        return storage[storage.length - 1] 
+    }
     else{
-        progressLog = progress.userProgress
-        user = progress.userObj    
-        triggerFn()
+        while (lastDecision === null) {
+            storage.pop()
+
+            mostRecentlyStored = storage[storage.length - 1]
+            lastLog = mostRecentlyStored.progressLog
+            lastDecision = lastLog[lastLog.length - 1]
+
+            console.log(lastDecision, 'in while loop')
+        }
+            console.log(lastDecision, 'outside of while loop')
+        storageString = JSON.stringify(storage)
+
+        localStorage.setItem('storedProgress', storageString)
+
+        return storage[storage.length - 1]
     }
 }
 
-module.exports = { storeProgress, revertProgress }
+
+function choiceNotPresent(progressLog, triggerFn) {
+    console.log('--no choice to make--')
+    progressLog.push(null)
+    triggerFn()
+}
+
+module.exports = { storeProgress, revertProgress, choiceNotPresent }

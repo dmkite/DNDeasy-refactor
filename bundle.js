@@ -1,34 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-function backFn(progressLog, triggerFn){
-    console.log(progressLog[progressLog.length - 1],'xxxxxxxxxxxxx')
-    if(progressLog[progressLog.length - 1] === null){
-        for(let i = progressLog.length - 1; i >= 0; i--){
-            console.log(progressLog[i], i)
-            if(progressLog[i] === null){
-                progressLog.pop()
-            }
-            else{
-                progressLog.pop()
-                console.log(progressLog.length, '----------------------------')
-                break
-            }
-        }
-        console.log('broke out because of ', progressLog[progressLog.length - 1])
-    }
-    else{
-        progressLog.pop()
-    }
-    console.log('======about to enter dnd function again=========')
-    triggerFn(progressLog)
-}
-
-function choiceNotPresent(progressLog, triggerFn){
-    console.log('--no choice to make--')
-    progressLog.push(null)
-    triggerFn()
-}
-module.exports = {backFn, choiceNotPresent}
-},{}],2:[function(require,module,exports){
 function charProg(user){
     const charProg = document.querySelector('#charProg')
     const { STR, DEX, CON, INT, WIS, CHA } = user.stats
@@ -70,11 +40,11 @@ function charProg(user){
 }
 
 module.exports = charProg
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 const spelldisplay = require('./spellDisplay')
 const {display, select } = require('./display')
-const { backFn, choiceNotPresent } = require('./backFn')
+const { choiceNotPresent } = require('./storeProgress')
 
 function progressChoices(progressPoint, progressLog, number, triggerFn){
     let type = progressPoint[progressLog[9][0]]
@@ -103,7 +73,7 @@ function progressChoices(progressPoint, progressLog, number, triggerFn){
 module.exports = progressChoices
 
 
-},{"./backFn":1,"./data-objects/classes":8,"./display":16,"./spellDisplay":20}],4:[function(require,module,exports){
+},{"./data-objects/classes":7,"./display":15,"./spellDisplay":19,"./storeProgress":21}],3:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 function calcMod(raw){
     return Math.floor((raw - 10) / 2)
@@ -254,7 +224,7 @@ function createCharSheet(user){
 }
 
 module.exports = createCharSheet
-},{"./data-objects/classes":8}],5:[function(require,module,exports){
+},{"./data-objects/classes":7}],4:[function(require,module,exports){
 function addRaceData(user, race){
     let {raceType, speed, stats, profs = null, features = null, languages} = race
     user.race = raceType
@@ -361,7 +331,7 @@ function addStatData(user, statObj){
 }
 
 module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData }
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const alignment = {
     "Lawful Good":{
         name:"Lawful Good",
@@ -402,7 +372,7 @@ const alignment = {
 }
 
 module.exports = alignment
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = {
@@ -497,7 +467,7 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{"./languages":10}],8:[function(require,module,exports){
+},{"./languages":9}],7:[function(require,module,exports){
 const skills = require('./skills')
 const spells= require('./spells')
 const { createDNDCharacter, userProgress } = require('../main')
@@ -707,7 +677,7 @@ const classes = {
 }
 
 module.exports = classes
-},{"../main":18,"./skills":12,"./spells":13}],9:[function(require,module,exports){
+},{"../main":17,"./skills":11,"./spells":12}],8:[function(require,module,exports){
 const dragonbreath = {
     "Black Dragon":"Spit acid in a 5' by 30' line",
     "Blue Dragon": "Breathe lightning in a 5' by 30' line",
@@ -722,7 +692,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const languages = {
     Common: {desc:'The language common to all races'},
     Elvish: {desc:'The language of the Elves'},
@@ -734,7 +704,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -916,7 +886,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":9,"./languages":10,"./skills":12,"./subraces":14}],12:[function(require,module,exports){
+},{"./dragonbreath":8,"./languages":9,"./skills":11,"./subraces":13}],11:[function(require,module,exports){
 const skills = {
    Acrobatics: { 
   name: 'Acrobatics',
@@ -1010,10 +980,10 @@ Survival:{
 }}
 
 module.exports = skills
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 const spells = {level1:null, cantrips:null}
 module.exports = spells
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const languages = require('./languages')
 const spells = require('./spells')
 
@@ -1117,7 +1087,7 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":10,"./spells":13}],15:[function(require,module,exports){
+},{"./languages":9,"./spells":12}],14:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 const {userProgress, createDNDcharacter } = require('./main')
 
@@ -1230,7 +1200,7 @@ function statComplete(progressLog, triggerFn){
 }
 module.exports = displayStats
 
-},{"./data-objects/classes":8,"./main":18}],16:[function(require,module,exports){
+},{"./data-objects/classes":7,"./main":17}],15:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 const races = require('./data-objects/races')
 
@@ -1372,7 +1342,7 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
 }
 
 module.exports = { display, select}
-},{"./data-objects/races":11,"./selectionComplete":19}],17:[function(require,module,exports){
+},{"./data-objects/races":10,"./selectionComplete":18}],16:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 
 function diceRoll(numDice, numSides) {
@@ -1424,7 +1394,7 @@ function hpRoll(progressLog, triggerFn){
 
 module.exports = hpRoll
 
-},{"./data-objects/classes":8}],18:[function(require,module,exports){
+},{"./data-objects/classes":7}],17:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
@@ -1440,7 +1410,7 @@ const diceStats = require('./diceStats')
 const { display, select } = require('./display')
 const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
-const {backFn, choiceNotPresent} = require('./backFn')
+
 const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 
@@ -1449,7 +1419,7 @@ const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroun
 const createCharSheet = require('./createCharSheet')
 const characterProg = require('./charProg')
 const progressbar = document.querySelector('#progress')
-const { storeProgress, revertProgress } = require('./storeProgress')
+const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
 
 
 let userObj = {
@@ -1492,30 +1462,38 @@ let userObj = {
     flaws:'',
     classType: '',
     savingThrow: []
-
 }
 
 
-const userProgress = []
+let userProgress = []
+
 
 function createDNDCharacter(){
-    console.log(userObj)
-    
     const prompter = document.querySelector('#prompter')
     const charProg = document.querySelector('#charProg')
-
     
+    document.querySelector('#back').onclick = function(){
+        let position = revertProgress()
+        userObj = position.user
+        userProgress = position.progressLog
+        
+        createDNDCharacter()
+    }
+
+    document.querySelector('#next').classList.add('hidden')
 
     switch(userProgress.length){
         case 0:
+            let storedProgress = []
+            let stringStoredProgress = JSON.stringify(storedProgress)
+            localStorage.setItem('storedProgress', stringStoredProgress)
             //function to display races
             prompter.innerHTML = '<h2>Choose your race</h2><p>Humans are the most common people in the worlds of DND, but they live and work alongside dozens of fantastic species, each with their own strengths and weaknesses</p>'
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
-            document.querySelector('#back').classList.toggle('hidden')
-            document.querySelector('#save').classList.toggle('hidden')
-    
+            document.querySelector('#back').classList.remove('hidden')
+            // document.querySelector('#save').classList.remove('hidden')
             //add race data to user object
             addRaceData(userObj, races[userProgress[0][0]])
             
@@ -1717,7 +1695,7 @@ function createDNDCharacter(){
         case 17:
             //add bonus background languages 
             if(userProgress[15] !== null){userObj.languages.push(userProgress[15][0])}
-            console.log('added bonus background languages', userObj)
+            
             //attribute stats
             prompter.innnerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
             displayStats(userProgress, createDNDCharacter)
@@ -1802,7 +1780,7 @@ function createDNDCharacter(){
 
 createDNDCharacter()
 
-const expObj = {createDNDCharacter, userProgress}
+const expObj = {createDNDCharacter, userProgress, userObj}
 
 module.exports = expObj
 
@@ -1865,12 +1843,10 @@ length: 1
 __proto__: Array(0)
 length: 19
 */
-},{"./backFn":1,"./charProg":2,"./classChoices":3,"./createCharSheet":4,"./createUserObj":5,"./data-objects/alignment":6,"./data-objects/backgrounds":7,"./data-objects/classes":8,"./data-objects/dragonbreath":9,"./data-objects/languages":10,"./data-objects/races":11,"./data-objects/skills":12,"./data-objects/subraces":14,"./diceStats":15,"./display":16,"./hpRoll":17,"./spellDisplay":20,"./spellList":21,"./storeProgress":22,"./userInput":23}],19:[function(require,module,exports){
+},{"./charProg":1,"./classChoices":2,"./createCharSheet":3,"./createUserObj":4,"./data-objects/alignment":5,"./data-objects/backgrounds":6,"./data-objects/classes":7,"./data-objects/dragonbreath":8,"./data-objects/languages":9,"./data-objects/races":10,"./data-objects/skills":11,"./data-objects/subraces":13,"./diceStats":14,"./display":15,"./hpRoll":16,"./spellDisplay":19,"./spellList":20,"./storeProgress":21,"./userInput":22}],18:[function(require,module,exports){
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
-    let back = document.getElementById('back')
 
-    
     document.querySelector('#next').classList.toggle('hidden')
 
     triggerFn()
@@ -1878,7 +1854,7 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
 }
 //problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
 module.exports = selectionComplete
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 const spells = require('./spellList')
 const { createDNDCharacter, userProgress } = require('./main')
 const {display, select} = require('./display')
@@ -1962,7 +1938,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
 
 module.exports = prepareSpellOptions
 
-},{"./display":16,"./main":18,"./spellList":21}],21:[function(require,module,exports){
+},{"./display":15,"./main":17,"./spellList":20}],20:[function(require,module,exports){
 let spellList = [
     {
         "index": 1,
@@ -15395,34 +15371,67 @@ spells = spells.reduce((acc, spell) => {
 
 
 module.exports = spells
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+const { createDNDCharacter, userProgress, userObj } = require('./main')
+
 function storeProgress(user, progressLog){
-    let num = progressLog.length
-    let toStore = {user, progressLog, num}
-    toStore = JSON.stringify(toStore)
-    if(progressLog[progressLog.length - 1] !== null){
-     localStorage.setItem(num, toStore)
-    }
+    let storageString = localStorage.getItem('storedProgress')
+    let storage = JSON.parse(storageString)
+    let toStore = { user, progressLog}
+    storage.push(toStore)
+    storageString = JSON.stringify(storage)
+
+    localStorage.setItem('storedProgress', storageString)
 }
 
-function revertProgress(user, progressLog, key, triggerFn){
+function revertProgress(){
+    //use while loop
     
-    let stringProgress = localStorage.getItem(key)
-    let progress = JSON.parse(stringProgress)
-    if(progress.userProgress[key] === null){
-        key--
-        revertProgress(user, progressLog, key)
-    } 
+    let storageString = localStorage.getItem('storedProgress')
+    let storage = JSON.parse(storageString)
+    storage.pop()
+
+    let mostRecentlyStored = storage[storage.length - 1]
+    //returns object w/ user and progressLog keys
+
+    let lastLog = mostRecentlyStored.progressLog
+    //returns array
+    
+    let lastDecision = lastLog[lastLog.length - 1]
+    //returns last item of array
+    
+    if(lastDecision !== null){
+        return storage[storage.length - 1] 
+    }
     else{
-        progressLog = progress.userProgress
-        user = progress.userObj    
-        triggerFn()
+        while (lastDecision === null) {
+            storage.pop()
+
+            mostRecentlyStored = storage[storage.length - 1]
+            lastLog = mostRecentlyStored.progressLog
+            lastDecision = lastLog[lastLog.length - 1]
+
+            console.log(lastDecision, 'in while loop')
+        }
+            console.log(lastDecision, 'outside of while loop')
+        storageString = JSON.stringify(storage)
+
+        localStorage.setItem('storedProgress', storageString)
+
+        return storage[storage.length - 1]
     }
 }
 
-module.exports = { storeProgress, revertProgress }
 
-},{}],23:[function(require,module,exports){
+function choiceNotPresent(progressLog, triggerFn) {
+    console.log('--no choice to make--')
+    progressLog.push(null)
+    triggerFn()
+}
+
+module.exports = { storeProgress, revertProgress, choiceNotPresent }
+
+},{"./main":17}],22:[function(require,module,exports){
 //import dndcharacter function
 
 //classList.toggle
@@ -15477,13 +15486,10 @@ function inputComplete(triggerFn, progressLog){
     let finalInput = [document.getElementById('userInput').value]
     progressLog.push(finalInput)
     
-    //vv back button stuff
-    let back = document.getElementById('back')
-    back.classList.toggle('hidden')
 
     document.querySelector('#next').classList.toggle('hidden')
     triggerFn()
 }
 
 module.exports = userInput
-},{"./data-objects/races":11}]},{},[18]);
+},{"./data-objects/races":10}]},{},[17]);

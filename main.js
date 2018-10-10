@@ -13,7 +13,7 @@ const diceStats = require('./diceStats')
 const { display, select } = require('./display')
 const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
-const {backFn, choiceNotPresent} = require('./backFn')
+
 const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 
@@ -22,7 +22,7 @@ const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroun
 const createCharSheet = require('./createCharSheet')
 const characterProg = require('./charProg')
 const progressbar = document.querySelector('#progress')
-const { storeProgress, revertProgress } = require('./storeProgress')
+const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
 
 
 let userObj = {
@@ -65,30 +65,38 @@ let userObj = {
     flaws:'',
     classType: '',
     savingThrow: []
-
 }
 
 
-const userProgress = []
+let userProgress = []
+
 
 function createDNDCharacter(){
-    console.log(userObj)
-    
     const prompter = document.querySelector('#prompter')
     const charProg = document.querySelector('#charProg')
-
     
+    document.querySelector('#back').onclick = function(){
+        let position = revertProgress()
+        userObj = position.user
+        userProgress = position.progressLog
+        
+        createDNDCharacter()
+    }
+
+    document.querySelector('#next').classList.add('hidden')
 
     switch(userProgress.length){
         case 0:
+            let storedProgress = []
+            let stringStoredProgress = JSON.stringify(storedProgress)
+            localStorage.setItem('storedProgress', stringStoredProgress)
             //function to display races
             prompter.innerHTML = '<h2>Choose your race</h2><p>Humans are the most common people in the worlds of DND, but they live and work alongside dozens of fantastic species, each with their own strengths and weaknesses</p>'
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
-            document.querySelector('#back').classList.toggle('hidden')
-            document.querySelector('#save').classList.toggle('hidden')
-    
+            document.querySelector('#back').classList.remove('hidden')
+            // document.querySelector('#save').classList.remove('hidden')
             //add race data to user object
             addRaceData(userObj, races[userProgress[0][0]])
             
@@ -290,7 +298,7 @@ function createDNDCharacter(){
         case 17:
             //add bonus background languages 
             if(userProgress[15] !== null){userObj.languages.push(userProgress[15][0])}
-            console.log('added bonus background languages', userObj)
+            
             //attribute stats
             prompter.innnerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
             displayStats(userProgress, createDNDCharacter)
@@ -375,7 +383,7 @@ function createDNDCharacter(){
 
 createDNDCharacter()
 
-const expObj = {createDNDCharacter, userProgress}
+const expObj = {createDNDCharacter, userProgress, userObj}
 
 module.exports = expObj
 

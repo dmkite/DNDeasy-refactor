@@ -1,7 +1,7 @@
 const classes = require('./data-objects/classes')
 const spelldisplay = require('./spellDisplay')
 const {display, select } = require('./display')
-const { backFn, choiceNotPresent } = require('./backFn')
+const { choiceNotPresent } = require('./storeProgress')
 
 function progressChoices(progressPoint, progressLog, number, triggerFn){
     let type = progressPoint[progressLog[9][0]]

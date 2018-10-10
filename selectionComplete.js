@@ -1,8 +1,6 @@
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
-    let back = document.getElementById('back')
 
-    
     document.querySelector('#next').classList.toggle('hidden')
 
     triggerFn()
