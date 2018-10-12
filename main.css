@@ -5,6 +5,7 @@
     font-family: 'Roboto', sans-serif;
     line-height:24px;
     background-repeat: no-repeat;
+    background-size:cover;
 }
 body{
     margin:0; 
