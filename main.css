@@ -663,19 +663,31 @@ ul:nth-of-type(2){margin-left:20px;}
 /*===== Media Queries =====*/
 @media screen and (max-width: 1040px){
     #charsheet{
-        width:800px
+        grid-template-areas:
+        "baseInfo baseInfo baseInfo"
+        "stats stats stats"
+        "savingThrows HP charInfo"
+        " skills attacks features"
+        "profAndLang equipment features";
+        width:90%
     }
-    #charsheet h4{
-        font-size:24px;
+    #logo{
+        display:none;
     }
-    #charsheet h5{
-        font-size:20px;
+    #stats{display:flex;
+        flex-wrap:wrap;
+        justify-content: space-around;
     }
-    #charsheet h6{
-        font-size:16px;
+
+    .mod{
+        margin:20px 20px 0px;
+        width: 25%;
+        
     }
-    #charsheet p{
-        font-size:16px;
+    #stats h4{
+        margin:0;
+        display:block;
+        width:100%;
     }
 }
 
@@ -774,36 +786,7 @@ ul:nth-of-type(2){margin-left:20px;}
     }
 }
 
-@media screen and (max-width:840px){
-    #charsheet{
-        grid-template-areas:
-        "baseInfo baseInfo baseInfo"
-        "stats stats stats"
-        "savingThrows HP charInfo"
-        " skills attacks features"
-        "profAndLang equipment features";
-        width:90%
-    }
-    #logo{
-        display:none;
-    }
-    #stats{display:flex;
-        flex-wrap:wrap;
-        justify-content: space-around;
-    }
 
-    .mod{
-        margin:20px 20px 0px;
-        width: 25%;
-        
-    }
-    #stats h4{
-        margin:0;
-        display:block;
-        width:100%;
-    }
-
-}
 
 @media screen and (max-width: 800px){
     #aside h1{
@@ -976,7 +959,6 @@ ul:nth-of-type(2){margin-left:20px;}
     }
 
     .mod{
-        outline:1px dotted green;
         width:100px;
         padding:0px
     }

@@ -94,7 +94,7 @@ function createCharSheet(user){
                 <p>+2 ${user.skills.join('</p><p>+2 ')}</p>
             </article>
             <article id="profAndLang">
-                <h4>Other Proficiencies and Langauges</h4>
+                <h4>Other Profs &amp; Langauges</h4>
                 <h5>Proficiencies</h5>
                 <p>${user.profs.tools.join('</p><p>')}</p>
                 <h5>Languages</h5>
