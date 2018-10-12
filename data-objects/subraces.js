@@ -8,7 +8,9 @@ const subraces = {
             desc: "Equal parts tough and wise, Hill Dwarves get a bonus Hit Point and higher Wisdom score",
             stats:{
                 WIS: 1},
-            HP:1
+            HP:1,
+            img: 'img/hillDwarf.jpg',
+            reverse: '+1 WIS, +1HP'
         },
         
         'Mountain Dwarf' : {
@@ -20,7 +22,8 @@ const subraces = {
             profs: {
             armor:['light armor', 'medium armor']
             },
-            reverse:""
+            reverse: "+2 STR <br> Proficient in light & medium armor",
+            img: 'img/mountainDwarf.jpg'
         }
     },
     Elf:{
@@ -35,7 +38,9 @@ const subraces = {
         language:['+1 language'],
         choices: {languages: [1, languages],
                     spells: [1, 'spells'],
-                }
+            },
+        reverse:'+1 INT, +1 Cantrip, +1 Language',
+        img: 'img/highElf.jpg'
         },
         
         'Wood Elf' : {
@@ -46,7 +51,9 @@ const subraces = {
             profs: {
                 weapons:['longsword', 'shortsword', 'longbow', 'shortbow']},
             speed: 35,
-            features: ['can attempt to hide even when lightly obscured by foliage, rain, snow, mist, or other natural phenomena']
+            features: ['can attempt to hide even when lightly obscured by foliage, rain, snow, mist, or other natural phenomena'],
+            reverse: '+1 WIS, 35 speed, Hide in natural phenomena',
+            img: 'img/woodElf.jpg'
         },
         
         'Dark Elf' : {
@@ -57,7 +64,10 @@ const subraces = {
             features: ['Darkvision:120ft', 'Disadvantage on attacks in direct sunlight'],
             spells: ['Dancing Lights'],
             profs: {
-                weapons:['rapiers','shortswords', 'hand crossbows']}
+                weapons: ['rapiers', 'shortswords', 'hand crossbows']
+            },
+            reverse:'+Superior Darkvision, +<i>Dancing Lights</i>',
+            img: 'img/darkElf.jpg'
         }
     },
     Halfling:{
@@ -66,7 +76,9 @@ const subraces = {
             desc: 'These Halflings have a higher Charisma score and are naturally stealthy',
             stats:{
                 CHA:1},
-            features:['Can attempt to hide behind a creature at least one size larger than you']
+            features: ['Can attempt to hide behind a creature at least one size larger than you'],
+            reverse: '+1 CHA, Hide behind creatures',
+            img: 'img/lightfootHalfling.jpg'
         },
         
         "Stout Halfling" : {
@@ -74,7 +86,9 @@ const subraces = {
             desc: 'Stout Halflings are sturdier, having a higher Constitution score, and a resistance to poison',
             stats:{
                 CON:1},
-            features:['Advantage on saving throws against poison, resistance against poison damage']
+            features: ['Advantage on saving throws against poison, resistance against poison damage'],
+            reverse: '+1 CON, Poison resistant',
+            img: 'img/stoutHalfling.jpg'
         }
     },
     Gnome: {
@@ -84,7 +98,9 @@ const subraces = {
             stats:{
                 DEX: 1},
             features: ['You can communicate simple ideas with small beasts'],
-            spells: ['Minor Illusion']
+            spells: ['Minor Illusion'],
+            reverse: '+1 DEX, +<i>Minor Illusion</i>, Can Communicate with small beasts',
+            img: 'img/forestGnome.jpg'
         },
         
         "Rock Gnome" : {
@@ -94,7 +110,10 @@ const subraces = {
                 CON: 1},
             features:['When making a history cehck related to technology, magic, or alchemy, add twice your proficiency bonus'],
             profs: {
-                other:["artisan's tools"]}
+                other: ["artisan's tools"]
+            },
+            reverse: '+1 CON, Advantage on checks, Proficient in artisan tools',
+            img: 'img/rockGnome.jpg'
         }
     }
 }  

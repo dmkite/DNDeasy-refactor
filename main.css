@@ -2,11 +2,15 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
+    font-family: 'Roboto', sans-serif;
+    line-height:24px;
 }
 body{
     margin:0; 
     padding:0;
-    background-image:url('https://i.pinimg.com/originals/35/56/4c/35564ce06f28fbc42de3e9c94c5056ee.jpg')
+    background-image:url('https://i.pinimg.com/originals/35/56/4c/35564ce06f28fbc42de3e9c94c5056ee.jpg');
+    background-attachment: fixed;
+    
 }
 
 #masterContainer{
@@ -26,7 +30,6 @@ body{
     min-height:100vh;
     width:250px;
     color:white;
-    border-left:10px solid #001d32
 }
 
 #aside h1{
@@ -42,6 +45,7 @@ body{
 }
 
 #aside h2{
+    margin-top:20px;
     padding:10px;
     background-color:#001d32
 }
@@ -50,14 +54,15 @@ body{
     padding:10px;
 }
 #holder{
-    min-width:700px;
+    width:700px;
     position:absolute;
-    left:270px;
+    top:-20px;
+    left:250px;
     margin-top:50px;
     /* outline:1px solid blue; */
     overflow-y:scroll;
-    height:90vh;
-    background-color:white;
+    height:97vh;
+    background-color:rgba(255,255,255,0.8);
   }
 
 #holder::-webkit-scrollbar {
@@ -104,8 +109,8 @@ body{
 }
 
 .minimize{
-    height:0;
     overflow:hidden;
+    height:0;
 }
 
 
@@ -125,14 +130,12 @@ body{
 }
 #buttonBlock{
     display:flex;
-    outline:1px dotted white;
     justify-content: space-between;
 }
 
 input[type="button"]{
     height:50px;
     width:50px;    
-    outline:1px dotted white;
     border-radius:50%;
     font:900 24px/46px sans;
     color: #002E43;
@@ -219,9 +222,12 @@ ul:nth-of-type(2){margin-left:20px;}
   -webkit-perspective: 900px;
   -ms-perspective: 900px;
   perspective: 900px;
-  margin: 0 auto 20px;
+  margin: 20px auto ;
   border-radius:10px;
-  
+}
+
+.card-wrapper:last-of-type{
+    margin-bottom:50px;
 }
 
 .card {
@@ -247,16 +253,20 @@ ul:nth-of-type(2){margin-left:20px;}
 
 .btn-turn-to-back, .btn-turn-to-front {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0;
+  right: 0;
   width: 40px;
   height: 40px;
   cursor: pointer;
   visibility: hidden;
+  background-color:#001d32;
+  border-bottom-left-radius:50%;
   padding: 0;
   z-index:999;
-  background-image:url('https://cdn.dribbble.com/users/4155/screenshots/255603/flip.png');
-  background-size:100%;
+  background-image:url('img/rotate.png');
+  background-size:80%;
+  background-position-x:5px;
+  background-repeat: no-repeat
 }
 .card .card-front, .card .card-back{
   width: 100%;
@@ -268,7 +278,7 @@ ul:nth-of-type(2){margin-left:20px;}
   backface-visibility: hidden;
   z-index: 2;
   border-radius:10px;
-  border:1px solid #002E43
+  border:2px solid #001d32
 }
 
 .card .card-front {
@@ -315,6 +325,10 @@ ul:nth-of-type(2){margin-left:20px;}
 
 .card-back:hover{
     filter:brightness(1) !important;
+}
+
+#holder .spell-card h3{
+    margin-top:30px;
 }
 /*====End of Cards====*/
 
@@ -382,6 +396,10 @@ ul:nth-of-type(2){margin-left:20px;}
 
 
 /*Stat attribution*/
+
+.col2{
+    width: 50%;
+}
 .numContainer{
     height:35px;
     width:35px;
@@ -390,7 +408,7 @@ ul:nth-of-type(2){margin-left:20px;}
     font:500 18px/35px sans;
     border-radius:50%;
     text-align:center;
-    margin:20px auto;
+    margin:20px auto 40px;
 }
 .numContainer:hover{
     cursor:pointer;
@@ -399,9 +417,9 @@ ul:nth-of-type(2){margin-left:20px;}
 .statDropContainer{
     border-radius:32px;
     background-color: #002E43;
-    width:200%;
+    width:70%;
     padding:0;
-    margin:0 auto 20px;
+    margin:20px auto 20px;
     display:flex;
     justify-content:space-around;
     
@@ -413,12 +431,13 @@ ul:nth-of-type(2){margin-left:20px;}
     color:white;
     padding:0 10px;
     line-height:75px;
+    margin-left:10px;
 
 }
 
 
 .col1{
-    outline:1px solid blue;
+    outline:4px solid #001d32;
     min-width:80px;
 }
 
@@ -443,7 +462,7 @@ ul:nth-of-type(2){margin-left:20px;}
     height: 60px;
     background:#002E43;
     position: relative;
-    margin: 50px 0 0 50px;
+    margin: 10vh 0 0 50px;
 }
 .dice:before {
 	content: "";
@@ -479,19 +498,18 @@ ul:nth-of-type(2){margin-left:20px;}
 }
 
 /*Character Sheet CSS*/
-main#holder.charsheet{
+#charsheet{
     width:1000px;
-    margin:0 auto;
+    margin:20px auto;
     display:grid;
     grid-template-areas:
     "baseInfo baseInfo baseInfo baseInfo"
     "stats savingThrows HP charInfo"
     "stats skills attacks features"
     "profAndLang profAndLang equipment features";
-    background-image:url('https://mythcreants.com/wp-content/uploads/2015/06/5E-Cover.jpg');  
     grid-gap:20px;
     padding:20px;
-    border:5px solid black;
+    border:5px solid #001d32;
     border-radius:20px;
 }
 
@@ -543,6 +561,12 @@ main#holder.charsheet{
     grid-area: savingThrows;
 }
 
+#savingThrows div {margin-top:50px;}
+
+#hp div{
+    margin-bottom:50px;
+}
+
 #hp{
     grid-area: HP;
 }
@@ -578,19 +602,22 @@ main#holder.charsheet{
 
 #stats{
     padding:20px;
-    border:5px solid black;
+    border:5px solid #001d32;
+}
+#charsheet #stats h5{
+    margin:-10px auto 20px;
 }
 
 .mod{
     text-align:center;
-    font: 300 24px/24px sans;
+    font: 600 18px/24px sans;
 }
 
 .raw{
-    border:2px solid black;
-    width:100px;
-    height:100px;
-    font: 300 50px/70px sans;
+    border:2px solid #001d32;
+    width:80px;
+    height:80px;
+    font: 300 36px/70px sans;
     border-radius:50%;
     margin:0 auto;
     background-color:white;
@@ -601,34 +628,367 @@ main#holder.charsheet{
     width:150px;
     height:30px;
     margin:-20px auto 20px;
-    border:2px solid black;
+    border:2px solid #001d32;
     background-color:white;
     border-radius:20px;
-    font: 500 20px/10px sans;
+    font: 500 18px/30px sans;
     text-align:center;
 }
-.charsheet > article{
-    border:5px solid black;
+#charsheet > article{
+    border:5px solid #001d32;
     border-radius:20px;
     padding:10px;
     background-color:rgba(255,255,255,0.9)
 }
 
-.charsheet h4{
+#charsheet h4{
     font: 600 28px/28px sans;
     margin:0 0 30px;
 }
 
-.charsheet h5{
+#charsheet h5{
     font: 600 24px/24px sans;
     margin:0 0 10px;
 }
-.charsheet h6{
+#charsheet h6{
     font: 600 18px/18px sans;
     margin:0 0 10px;
 }
 
-.charsheet p{
+#charsheet p{
     margin:10px 0;
     font:500 18px/18px sans;
 }
+
+/*===== Media Queries =====*/
+@media screen and (max-width: 1040px){
+    #charsheet{
+        width:800px
+    }
+    #charsheet h4{
+        font-size:24px;
+    }
+    #charsheet h5{
+        font-size:20px;
+    }
+    #charsheet h6{
+        font-size:16px;
+    }
+    #charsheet p{
+        font-size:16px;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    #aside h1{
+        position:fixed;
+        top:0;
+        width:25%;
+        font-size:48px;
+        height:100px;
+        z-index:0;
+    }
+
+    #aside h1 span{
+        font-size:24px;
+    }
+    #aside h2{
+        margin-top:0;
+        font-size:20px;
+    }
+    #prompter{
+        position:fixed;
+        top:0;
+        left:25%;
+        width:75%;
+        background-color: #002E43;
+        height:100px;
+    }
+
+    #prompter p{
+        margin-top:-10px;
+        
+    }
+
+    #holder{
+        position:fixed;
+        margin-top:100px;
+        width:100%;
+        left:0;
+        padding:20px 20px 140px;
+
+    }
+
+    #controls{
+        position:fixed;
+        bottom:0;
+        width:67%;
+        right:0;
+        background-color:#002E43;
+        height:100px;
+    }
+    #controls p, #controls h2{
+        padding-left: 100px;
+    }
+
+    #next, #back{
+        position:absolute;
+        right:10px;
+        bottom:10px;
+    }
+    #back{
+    left:10px;
+    }
+
+    #charProg{
+        position:fixed;
+        bottom:0;
+        width:33%;
+        background-color:#002E43
+    }
+    #charProg h2{
+        height:100px;
+    }
+
+    #aside{
+        position:static;
+        width:0px;
+    }
+    #progressBar{
+        position:absolute;
+        top:100px;
+        left:0;
+        
+        border-radius:0px;
+        width:100%;
+    }
+    
+    .statDropContainer{
+        height:50px;
+    }
+    .statDropContainer span{
+        line-height:50px;
+    }
+    .statHolder{
+        margin-top:-12.5px;
+    }
+}
+
+@media screen and (max-width:840px){
+    #charsheet{
+        grid-template-areas:
+        "baseInfo baseInfo baseInfo"
+        "stats stats stats"
+        "savingThrows HP charInfo"
+        " skills attacks features"
+        "profAndLang equipment features";
+        width:90%
+    }
+    #logo{
+        display:none;
+    }
+    #stats{display:flex;
+        flex-wrap:wrap;
+        justify-content: space-around;
+    }
+
+    .mod{
+        margin:20px 20px 0px;
+        width: 25%;
+        
+    }
+    #stats h4{
+        margin:0;
+        display:block;
+        width:100%;
+    }
+
+}
+
+@media screen and (max-width: 800px){
+    #aside h1{
+        font-size:24px;
+        width:150px;
+        text-align:center;
+        margin-bottom:0;
+        line-height:24px;
+        height:75px;
+        padding-top:20px;
+        width:75px;
+        border-radius:50%;
+        left:10px;
+        top:10px;
+        z-index:999;
+        display:none;
+    }
+
+    #aside h1 span{
+        font-size:18px;
+        line-height:20px;
+        margin:0 auto;
+        display:block;
+    }
+    
+    #prompter{
+        width: 100%;
+        left:0;
+        height:125px;
+    }
+    #prompter h2{
+        font-size:18px;
+          
+        line-height:30px;
+    }
+
+    #prompter p{
+        font-size:16px;
+    }
+
+    #controls h2, #charProg h2{
+        font-size:18px;
+    }
+}
+
+@media screen and (max-width: 675px){
+    .card-wrapper{
+        width:400px;
+        height:200px;
+    }
+
+    #holder .card h3{
+        font-size:18px;
+        margin-top:0px;
+    }
+
+    #holder{
+        padding:35px 10px 200px ;
+
+    }
+
+    #inputScreen ul{
+        margin:0 0 20px 
+    }
+    #inputScreen input{
+        margin-top:50px
+    }
+
+    #controls h2, #controls p{
+        text-align:center;
+        width:100%;
+        margin:0;
+        padding:10px 0;
+    }
+
+    #controls{
+        bottom:50px;
+        left:0; 
+        width:100%;
+    }
+    
+    input[type="button"]{
+        height:30px;
+        width: 30px;
+        line-height:25px;
+    }
+
+    #charProg{
+        height:50px;
+        width:100%;
+
+    }
+
+    .col1{
+        width:100%;
+        display:flex;
+        justify-content: space-around;
+    }
+    .col2{
+        
+        padding:0;
+        width:100%;
+        display:flex;
+        justify-content:space-between;
+    }
+    .statDropContainer{
+        width:50px;
+        flex-direction: column;
+        height:100px;
+        border-radius:0;
+    }
+    .statDropContainer span{
+        padding:0; 
+        margin:0;
+        display:inline-block;
+        width:100%;
+        text-align: center;
+    }
+
+    .statHolder{
+        width:50px;
+        height:80px;
+        border-radius:0;
+        border:2px solid #001d32
+    }
+    #inputScreen{
+        width:100%;
+    }
+
+    textarea{
+        width:100%;
+    }
+
+    #charsheet{
+     grid-template-areas:
+        "baseInfo"
+        "HP"
+        "stats"
+        "savingThrows "
+        "charInfo"
+        " skills"
+        "attacks" 
+        "features"
+        "profAndLang" "equipment";
+
+    }
+
+    #baseInfo{
+        grid-template-areas:
+            "name race"
+            "class dc"
+            "alignment bkgrd";
+    }
+    #baseInfo article{
+        padding-bottom:20px;
+    }
+
+    .raw{
+        font-size:24px;
+        width:50px;
+        height:50px;
+        line-height:50px;
+    }
+    .modifier{
+        width:75px;
+        height:20px;
+        line-height:20px;
+        font-size:16px;
+        margin-top:-10px;
+    }
+
+    .mod{
+        outline:1px dotted green;
+        width:100px;
+        padding:0px
+    }
+
+    .mod h5{font-size:20px !important;}
+}
+
+@media print{
+    *{
+        background-image: none;
+    }
+    img{
+        display:none;
+    }
+} 

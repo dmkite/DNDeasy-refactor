@@ -1,7 +1,4 @@
-//import dndcharacter function
 
-//classList.toggle
-//event.target.inputName.value (use instead of queryselector().value)
 const races = require('./data-objects/races')
 function userInput(inputTag, triggerFn, progressLog, topic){
     const holder = document.getElementById('holder')
@@ -26,10 +23,10 @@ function userInput(inputTag, triggerFn, progressLog, topic){
             break
         case 'bonds':
             break
-        default:
+        case 'flaws':
             break            
     }
-    // let next = document.getElementById('next')
+
 
     //validation
 
@@ -49,7 +46,7 @@ function userInput(inputTag, triggerFn, progressLog, topic){
 } 
 
 function inputComplete(triggerFn, progressLog){
-    let finalInput = [document.getElementById('userInput').value]
+    let finalInput = document.getElementById('userInput').value
     progressLog.push(finalInput)
     
 

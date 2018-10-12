@@ -55,6 +55,10 @@ function display(choiceObj, progressLog, triggerFn, topic){
         document.querySelectorAll('.btn-turn-to-front')[i].style.visibility = 'visible';
         document.querySelectorAll('.btn-turn-to-back')[i].style.visibility = 'visible';
 
+        document.querySelectorAll('.card-back')[i].onclick = function (event) {
+            event.stopPropagation();
+        }
+        
         document.querySelectorAll('.btn-turn-to-front')[i].onclick = function (event) {
             event.stopPropagation();
             document.querySelectorAll('.card')[i].classList.toggle('do-flip')
@@ -72,10 +76,10 @@ function display(choiceObj, progressLog, triggerFn, topic){
 
 function choiceCountDisplay(choicesLeft) {
     if (choicesLeft === 1) {
-        return `you have 1 selection left to make`
+        return `You have 1 selection left`
     }
     else {
-        return `you have ${choicesLeft} selections left to make`
+        return `You have ${choicesLeft} selections left`
     }
 }
 

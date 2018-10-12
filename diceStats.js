@@ -62,7 +62,7 @@ function displayStats(progressLog, triggerFn){
         }
         
     }
-    document.querySelector('main').innerHTML += `As a ${progressLog[9][0]}, ${classes[progressLog[9][0]].savingThrows.join(' and ')} are important`
+    document.querySelector('#prompter').innerHTML += `<p>As a ${progressLog[9][0]}, ${classes[progressLog[9][0]].savingThrows.join(' and ')} are important</p>`
 
 
 
@@ -105,7 +105,7 @@ function statComplete(progressLog, triggerFn){
     }
 
     progressLog.push([userStats])
-    console.log(progressLog, 'right after attributing stats')
+    
     triggerFn()
 }
 module.exports = displayStats

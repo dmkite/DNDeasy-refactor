@@ -37,9 +37,9 @@ function revertProgress(){
             lastLog = mostRecentlyStored.progressLog
             lastDecision = lastLog[lastLog.length - 1]
 
-            console.log(lastDecision, 'in while loop')
+           
         }
-            console.log(lastDecision, 'outside of while loop')
+           
         storageString = JSON.stringify(storage)
 
         localStorage.setItem('storedProgress', storageString)
@@ -50,7 +50,7 @@ function revertProgress(){
 
 
 function choiceNotPresent(progressLog, triggerFn) {
-    console.log('--no choice to make--')
+    
     progressLog.push(null)
     triggerFn()
 }

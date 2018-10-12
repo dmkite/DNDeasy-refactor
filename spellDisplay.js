@@ -1,4 +1,5 @@
-const spells = require('./spellList')
+// const spells = require('./spellList')
+const spells = require('./test')
 const { createDNDCharacter, userProgress } = require('./main')
 const {display, select} = require('./display')
 
@@ -12,7 +13,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
             for(let i = 0; i < spell.classes.length; i++){
                 if (className === spell.classes[i].name){
                     options.push(`
-                        <div class="card-wrapper">
+                        <div class="card-wrapper spell-card">
                         
                             <div class="card">
                                 <div class="card-front">
@@ -22,7 +23,9 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
                                 </div>
 
                                 <div class="card-back">
-                                    <p>Back</p>
+                                    <p>Range: ${spell.range}</p>
+                                    <p>Duration: ${spell.duration}</p>
+                                    <p>Casting Time: ${spell.casting_time}</p>
                                     <div class="btn-turn-to-front"></div>
                                 </div>
 

@@ -37,13 +37,16 @@ function addSubraceData(user, subrace){
             user.speed = subrace.speed
             break
         case 'features':
-            user.features.push(subrace.features)
+            for(let feature of subrace.features){
+                user.features.push(feature)
+            }
+            
             break
         case 'HP':
-            user.HP += subrace.HP
+            user.HP += Number(subrace.HP)
             break
         default:
-            console.log(`forgot to account for ${attributes}`)
+            
         }
     }
 } 

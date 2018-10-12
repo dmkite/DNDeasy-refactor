@@ -1,6 +1,6 @@
 const classes = require('./data-objects/classes')
 function calcMod(raw){
-    return Math.floor((raw - 10) / 2)
+    return Number(Math.floor((raw - 10) / 2))
 }
 
 function calcAC(user){
@@ -27,6 +27,8 @@ function calcAC(user){
             else{
                 AC = 10
             }
+        default:
+            AC = 10
     }
     return AC
 }
@@ -37,58 +39,63 @@ function createCharSheet(user){
     holder.classList.remove('flex')
     let charsheetHTML = `
             <article id="baseInfo">
-                <img id="logo" src="https://d30y9cdsu7xlg0.cloudfront.net/png/407535-200.png" alt="dndEASY logo">
+                <img id="logo" src="https://mbtskoudsalg.com/images/20-sided-dice-png-5.png" alt="dndEASY logo">
                 <article id="name">${user.name}</article>
                 <article id="class">${user.classType}</article>
                 <article id="background">${user.background}</article>
                 <article id="race">${user.race}</article>
                 <article id="alignment">${user.alignment}</article>
-                <article id="dc">${10 + user.stats.INT}</article>
+                <article id="dc">${10 + calcMod(user.stats.INT)}</article>
             </article>
             <article id="stats">
+                <h4>Stats</h4>
                 <div class="mod">
                     <div class="raw">${user.stats.STR}</div>
                     <div class="modifier">${calcMod(user.stats.STR)}</div>
-                    <h4>Strength</h4>
+                    <h5>Strength</h5>
                 </div>
                 <div class="mod">
                     <div class="raw">${user.stats.DEX}</div>
                     <div class="modifier">${calcMod(user.stats.DEX)}</div>
-                    <h4>Dexterity</h4>
+                    <h5>Dexterity</h5>
                 </div>
                 <div class="mod">
                     <div class="raw">${user.stats.CON}</div>
                     <div class="modifier">${calcMod(user.stats.CON)}</div>
-                    <h4>Constitution</h4>
+                    <h5>Constitution</h5>
                 </div>
                 <div class="mod">
                     <div class="raw">${user.stats.INT}</div>
                     <div class="modifier">${calcMod(user.stats.INT)}</div>
-                    <h4>Intelligence</h4>
+                    <h5>Intelligence</h5>
                 </div>
                 <div class="mod">
                     <div class="raw">${user.stats.WIS}</div>
                     <div class="modifier">${calcMod(user.stats.WIS)}</div>
-                    <h4>Wisdom</h4>
+                    <h5>Wisdom</h5>
                 </div>
                 <div class="mod">
                     <div class="raw">${user.stats.CHA}</div>
                     <div class="modifier">${calcMod(user.stats.CHA)}</div>
-                    <h4>Charisma</h4>
+                    <h5>Charisma</h5>
                 </div>
             </article>
             <article id="savingThrows">
                 <h4>Saving Throws</h4>
-                <p>+2 ${user.savingThrow[0]}</p>
-                <p>+2 ${user.savingThrow[1]}</p>
+                <p>+2 ${user.savingThrows[0]}</p>
+                <p>+2 ${user.savingThrows[1]}</p>
+                <div>
+                    <h4>Speed</h4>
+                    <h5>${user.speed}</h5>
+                </div>
             </article>
             <article id="skills">
-                <p>${user.skills.join('</p><p>+2 ')}</p>
+                <h4>Skills</h4>
+                <p>+2 ${user.skills.join('</p><p>+2 ')}</p>
             </article>
             <article id="profAndLang">
                 <h4>Other Proficiencies and Langauges</h4>
                 <h5>Proficiencies</h5>
-                <p>${user.profs.other.join('</p><p>')}</p>
                 <p>${user.profs.tools.join('</p><p>')}</p>
                 <h5>Languages</h5>
                 <p>${user.languages.join('</p><p>')}</p>
@@ -98,10 +105,7 @@ function createCharSheet(user){
                     <h4>Armor Class</h4>
                     <h5>${calcAC(user)}</h5>
                 </div>
-                <div>
-                    <h4>Speed</h4>
-                    <h5>${user.speed}</h5>
-                </div>
+                
                 <div>
                     <h4>Hit Points</h4>
                     <h5>${user.HP}</h5>
@@ -112,8 +116,9 @@ function createCharSheet(user){
                 <h5>Attacks</h5>
                 <p>${user.equipment.weapons.join('</p><p>')}</p>
                 <h5>Spells</h5>
-                <p>${user.spells.cantrips.join('</p><p>')}</p>
                 <h6>Cantrips</h6>
+                <p>${user.spells.cantrips.join('</p><p>')}</p>
+                
                 <h6>Level 1 Spells</h6>
                 <p>${user.spells.level1.join('</p><p>')}</p>
             </article>
@@ -124,7 +129,7 @@ function createCharSheet(user){
             </article>
             <article id="charInfo">
                 <div>
-                    <h4>Personality Traits</h4>
+                    <h4>Traits</h4>
                     <p>${user.traits}</p>
                 </div>
                 <div>
@@ -144,7 +149,11 @@ function createCharSheet(user){
                 <h4>Features</h4>
                 <p>${user.features.join('</p><p>')}</p>
             </article>`
+
     document.querySelector('#masterContainer').innerHTML = charsheetHTML
+    document.querySelector('#masterContainer').id = 'charsheet'
+
+
 }
 
 module.exports = createCharSheet

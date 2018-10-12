@@ -1,34 +1,24 @@
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
-const skills = require('./data-objects/skills')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
-const dragonbreath = require('./data-objects/dragonbreath')
-const alignment = require('./data-objects/alignment')
-// const spells = require('./data-objects/spells')
 const progressChoices = require('./classChoices')
-const diceStats = require('./diceStats')
-
 const { display, select } = require('./display')
-const spellList = require('./spellList')
 const prepareSpellOptions = require('./spellDisplay')
-
 const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
-
 const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData} = require('./createUserObj')
+const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData } = require('./createUserObj')
 const createCharSheet = require('./createCharSheet')
 const characterProg = require('./charProg')
 const progressbar = document.querySelector('#progress')
 const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
 
-
 let userObj = {
     race: '',
     name: '',
-    stats:{
+    stats: {
         STR: 0,
         DEX: 0,
         CON: 0,
@@ -37,49 +27,46 @@ let userObj = {
         CHA: 0
     },
     speed: 0,
-    profs:{
-        weapons:[],
-        armor:[],
-        tools:[],
-        other:[],
+    profs: {
+        weapons: [],
+        armor: [],
+        tools: [],
+        other: [],
     },
-    features:[],
-    languages:[],
-    spells:{
-        cantrips:[],
-        level1:[]
+    features: [],
+    languages: [],
+    spells: {
+        cantrips: [],
+        level1: []
     },
-    HP:0,
-    AC:0,
-    DC:0,
-    equipment:{
-        weapons:[],
-        other:[],
-        shield:[]
+    HP: 0,
+    AC: 0,
+    DC: 0,
+    equipment: {
+        weapons: [],
+        other: [],
+        shield: []
     },
-    skills:[],
-    background:'',
-    traits:'',
-    bonds:'',
-    ideals:'',
-    flaws:'',
+    skills: [],
+    background: '',
+    traits: '',
+    bonds: '',
+    ideals: '',
+    flaws: '',
     classType: '',
     savingThrow: []
 }
 
-
 let userProgress = []
 
-
 function createDNDCharacter(){
+    
     const prompter = document.querySelector('#prompter')
-    const charProg = document.querySelector('#charProg')
     
     document.querySelector('#back').onclick = function(){
         let position = revertProgress()
         userObj = position.user
         userProgress = position.progressLog
-        
         createDNDCharacter()
     }
 
@@ -91,12 +78,12 @@ function createDNDCharacter(){
             let stringStoredProgress = JSON.stringify(storedProgress)
             localStorage.setItem('storedProgress', stringStoredProgress)
             //function to display races
-            prompter.innerHTML = '<h2>Choose your race</h2><p>Humans are the most common people in the worlds of DND, but they live and work alongside dozens of fantastic species, each with their own strengths and weaknesses</p>'
+            prompter.innerHTML = '<h2>Choose your race</h2><p>What kind of adventurer will you be?</p>'
             display(races, userProgress, createDNDCharacter)
             break
         case 1:
             document.querySelector('#back').classList.remove('hidden')
-            // document.querySelector('#save').classList.remove('hidden')
+    
             //add race data to user object
             addRaceData(userObj, races[userProgress[0][0]])
             
@@ -113,7 +100,7 @@ function createDNDCharacter(){
 
         case 2:
             //add name to user object
-            userObj.name = userProgress[1][0]
+            userObj.name = userProgress[1]
             
             //change progressbar
             progressbar.className = 'twenty'
@@ -143,7 +130,9 @@ function createDNDCharacter(){
             break
         case 4:
             //add bonus skills if user is half elf
-            if (userProgress[3] !== null) { userObj.skills.push(userProgress[3]) }
+            if (userProgress[3] !== null) { for (let skill of userProgress[3]) { userObj.skills.push(skill) } }
+
+            
             
             prompter.innerHTML = "<h2>Choose your stats</h2> <p>Another benefit of being a Half Elf is deciding where your strengths lay. Pick 2 stats to receive a +1 boost.</p>"
             //choose stats if applicable
@@ -231,14 +220,13 @@ function createDNDCharacter(){
 
             //choose skills
             prompter.innerHTML = `<h2>Choose your skills</h2> <p>As a ${userProgress[9][0]}, you're proficient in different skills. Choose your strong suits</p>`
-            // console.log(userProgress[9])
-            // display(classes[userProgress[9][0]].choices.skills, userProgress, createDNDCharacter)
+            
             progressChoices(classes, userProgress, 0, createDNDCharacter)
             
             break
         case 11:
             // add class skills to user object
-            userObj.skills.push(userProgress[10])
+            for (let skill of userProgress[10]) { userObj.skills.push(skill) }
 
             //choose class choices 2
             
@@ -269,13 +257,13 @@ function createDNDCharacter(){
             break
         case 15:
             //add alignment to user object
-            userObj.alignment = userProgress[14]
+            userObj.alignment = userProgress[14][0]
 
             //change progressbar
             progressbar.className = 'forty'
 
             //choose background
-            prompter.innerHMTL = '<h2>Pick a background</h2> <p>What were you doing before your adventure?</p>'
+            prompter.innerHTML = '<h2>Pick a background</h2> <p>What were you doing before your adventure?</p>'
             display(backgrounds, userProgress, createDNDCharacter)
             break
         case 16:
@@ -297,10 +285,10 @@ function createDNDCharacter(){
             break
         case 17:
             //add bonus background languages 
-            if(userProgress[15] !== null){userObj.languages.push(userProgress[15][0])}
+            if (userProgress[15] !== null) { userObj.languages.push(userProgress[16]) } 
             
             //attribute stats
-            prompter.innnerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
+            prompter.innerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
             displayStats(userProgress, createDNDCharacter)
             break
         case 18:
@@ -318,14 +306,14 @@ function createDNDCharacter(){
             break
         case 19:
             //add HP to user object
-            userObj.HP += userProgress[18]
+            userObj.HP += Number(userProgress[18][0])
 
             //change progressbar
             progressbar.className = 'seventy'
 
             //traits
             prompter.innerHTML = '<h2>What are your personality traits?</h2><p>Spend some time thinking about this, it makes the role playing experience much easier!</p>'
-            let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1][0]}?" value="" autofocus></textarea>`
+            let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1]}?" value="" autofocus></textarea>`
             userInput(inputTag2, createDNDCharacter, userProgress)
 
             break
@@ -339,7 +327,7 @@ function createDNDCharacter(){
             //ideals
             prompter.innerHTML = '<h2>What are your ideals?</h2><p>What is important to your character?</p>'
 
-            let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1][0]} stand for?" value="" autofocus></textarea>`
+            let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1]} stand for?" value="" autofocus></textarea>`
             userInput(inputTag3, createDNDCharacter, userProgress)
 
             break
@@ -352,7 +340,7 @@ function createDNDCharacter(){
 
             //bonds
             prompter.innerHTML = '<h2>What are your bonds?</h2><p>Who or what does your character value?</p>'
-            inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1][0]} connected to?" value="" autofocus></textarea>`
+            inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1]} connected to?" value="" autofocus></textarea>`
             userInput(inputTag4, createDNDCharacter, userProgress)
 
             break
@@ -364,14 +352,16 @@ function createDNDCharacter(){
             progressbar.className = 'hundred'
 
             // flaws
-            prompter.innerHTML = "<h2>What's wrong with you'?</h2><p>Everybody's got them, what are your character's weaknesses?</p>"
-            inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1][0]}'s flaws?" value="" autofocus></textarea>`
+            prompter.innerHTML = "<h2>What's wrong with you?</h2><p>Everybody's got them, what are your character's weaknesses?</p>"
+            inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1]}'s flaws?" value="" autofocus></textarea>`
+
             userInput(inputTag5, createDNDCharacter, userProgress)
+            
             break
         default:
             //add bonds to user object 
             userObj.flaws = userProgress[22]
-            console.log(userObj)
+
             createCharSheet(userObj)
             return
     }
@@ -386,63 +376,3 @@ createDNDCharacter()
 const expObj = {createDNDCharacter, userProgress, userObj}
 
 module.exports = expObj
-
-/*
-REFERENCE
-
-0: Array(1)
-0: "Dwarf"
-length: 1
-__proto__: Array(0)
-1: Array(1)
-0: "jkjjkj"
-length: 1
-__proto__: Array(0)
-2: null
-3: null
-4: null
-5: null
-6: Array(1)
-0: "Hill Dwarf"
-length: 1
-__proto__: Array(0)
-7: null
-8: null
-9: Array(1)
-0: "Ranger"
-length: 1
-__proto__: Array(0)
-10: Array(3)
-0: "Nature"
-1: "Investigation"
-2: "Stealth"
-length: 3
-__proto__: Array(0)
-11: Array(1)
-0: "3"
-length: 1
-__proto__: Array(0)
-12: Array(1)
-0: "12"
-length: 1
-__proto__: Array(0)
-13: null
-14: Array(1)
-0: "True Neutral"
-length: 1
-__proto__: Array(0)
-15: Array(1)
-0: "Charlatan"
-length: 1
-__proto__: Array(0)
-16: null
-17: Array(1)
-0: {STR: "13", CON: "14", INT: "15", WIS: "12", CHA: "16", …}
-length: 1
-__proto__: Array(0)
-18: Array(1)
-0: 8
-length: 1
-__proto__: Array(0)
-length: 19
-*/

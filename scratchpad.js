@@ -13411,4 +13411,4 @@ let spells = [
 	}
 ]
 
-console.log(spells.filter((spell) => spell.level <= 1))
+

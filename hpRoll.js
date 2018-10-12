@@ -25,9 +25,8 @@ function hpRoll(progressLog, triggerFn){
                 clearInterval(rollingDie)
                 setTimeout(function () { document.querySelector('.dice').classList.add('animatedNum') }, 0)
                 let rolledNum = document.querySelector('.dice').textContent
-                const HP = Math.floor((progressLog[17][0].CON - 10) / 2) + Number(rolledNum)
-                //surface message: `Based on your consitution score, you have ${HP} hitpoints`
-                console.log(HP)
+                const HP = Number(Math.floor((progressLog[17][0].CON - 10) / 2)) + Number(rolledNum)
+                
                 //make next appear, and add event listener
                 document.querySelector('#next').classList.remove('hidden')
                 document.querySelector('#next').onclick = function () {
