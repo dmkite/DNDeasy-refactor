@@ -27,7 +27,6 @@ function hpRoll(progressLog, triggerFn){
                 let rolledNum = document.querySelector('.dice').textContent
                 const HP = Number(Math.floor((progressLog[17][0].CON - 10) / 2)) + Number(rolledNum)
                 
-                //make next appear, and add event listener
                 document.querySelector('#next').classList.remove('hidden')
                 document.querySelector('#next').onclick = function () {
                     progressLog.push([HP])

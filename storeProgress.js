@@ -1,4 +1,3 @@
-const { createDNDCharacter, userProgress, userObj } = require('./main')
 
 function storeProgress(user, progressLog){
     let storageString = localStorage.getItem('storedProgress')
@@ -6,13 +5,10 @@ function storeProgress(user, progressLog){
     let toStore = { user, progressLog}
     storage.push(toStore)
     storageString = JSON.stringify(storage)
-
     localStorage.setItem('storedProgress', storageString)
 }
 
 function revertProgress(){
-    //use while loop
-    
     let storageString = localStorage.getItem('storedProgress')
     let storage = JSON.parse(storageString)
     storage.pop()
@@ -32,12 +28,9 @@ function revertProgress(){
     else{
         while (lastDecision === null) {
             storage.pop()
-
             mostRecentlyStored = storage[storage.length - 1]
             lastLog = mostRecentlyStored.progressLog
             lastDecision = lastLog[lastLog.length - 1]
-
-           
         }
            
         storageString = JSON.stringify(storage)
@@ -50,7 +43,6 @@ function revertProgress(){
 
 
 function choiceNotPresent(progressLog, triggerFn) {
-    
     progressLog.push(null)
     triggerFn()
 }

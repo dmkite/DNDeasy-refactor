@@ -6,5 +6,5 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
     triggerFn()
 
 }
-//problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
+
 module.exports = selectionComplete

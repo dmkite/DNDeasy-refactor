@@ -70,14 +70,12 @@ function addClassChoices(user, progressLogEntry, className, num){
     if(classChoiceList[num] === 'cantrips'){
         for (let items of progressLogEntry){
             user.spells.cantrips.push(items)
-            //changed this
         }
         
     }
     else if(classChoiceList[num] === 'spells'){
         for (let items of progressLogEntry) {
             user.spells.level1.push(items)
-            //changed this
         }
     }
     else{
@@ -100,10 +98,6 @@ function addBackgroundData(user, backgroundName){
     if(backgroundName.profs){user.profs.tools.push(backgroundName.profs.tools)}
 }
 
-function addStatData(user, statObj){
-        for(let stat in statObj){
-            user.stats[stat] += statObj[stat]
-        }   
-}
 
-module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData }
+
+module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData }

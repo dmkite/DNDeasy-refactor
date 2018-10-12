@@ -1,5 +1,4 @@
 const classes = require('./data-objects/classes')
-const {userProgress, createDNDcharacter } = require('./main')
 
 function diceRoll(numDice, numSides) {
     let statNums = []
@@ -9,8 +8,6 @@ function diceRoll(numDice, numSides) {
     }
     return statNums
 }
-
-
 
 function statGen(rollFn, numDice, numSides, numTimes) {
     let stats = []
@@ -22,7 +19,6 @@ function statGen(rollFn, numDice, numSides, numTimes) {
     }
     return stats
 }
-
 
 let stats = statGen(diceRoll, 4, 6, 6)
 
@@ -41,8 +37,6 @@ ondragstart="drag(event)">${statArr[i]}</div>`
 
 
 let statTypes = ['STR', 'CON', 'INT', 'WIS', 'CHA', 'DEX']
-
-
 
 function displayStats(progressLog, triggerFn){
     document.querySelector('#choiceDisplay').textContent = ''
@@ -63,8 +57,6 @@ function displayStats(progressLog, triggerFn){
         
     }
     document.querySelector('#prompter').innerHTML += `<p>As a ${progressLog[9][0]}, ${classes[progressLog[9][0]].savingThrows.join(' and ')} are important</p>`
-
-
 
     function allowDrop(ev) {
         ev.preventDefault();
@@ -92,7 +84,6 @@ function displayStats(progressLog, triggerFn){
 }
 
 function statComplete(progressLog, triggerFn){
-    // document.querySelector('#next')
     const userStats = {}
 
     let statDropContainer = document.querySelectorAll('.statDropContainer')

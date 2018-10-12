@@ -120,25 +120,15 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
         }
         else{
             choiceDisplay.textContent = choiceCountDisplay(choiceCount)
-            // return false;
         }
     }
     
     if(choiceCount === 0 && finalChoice.length === numOfChoices){
         next.classList.remove('hidden')
-        // next.addEventListener('click', logSelectionMoveOn, {once:true})
         next.onclick = logSelectionMoveOn
     }else if(choiceCount !== 0){
         next.classList.add('hidden')
-        // next.removeEventListener('click', logSelectionMoveOn)
     }
-    // if(progressLog.length === origLength){
-    //     progressLog.push(finalChoice)
-    // }
-    // else if(progressLog.length > origLength){
-    //     progressLog.pop()
-    //     progressLog.push(finalChoice)
-    // }
     
 }
 

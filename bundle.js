@@ -41,9 +41,8 @@ function charProg(user){
 
 module.exports = charProg
 },{}],2:[function(require,module,exports){
-const classes = require('./data-objects/classes')
 const spelldisplay = require('./spellDisplay')
-const {display, select } = require('./display')
+const {display } = require('./display')
 const { choiceNotPresent } = require('./storeProgress')
 
 function progressChoices(progressPoint, progressLog, number, triggerFn){
@@ -75,7 +74,7 @@ function progressChoices(progressPoint, progressLog, number, triggerFn){
 module.exports = progressChoices
 
 
-},{"./data-objects/classes":6,"./display":14,"./spellDisplay":18,"./storeProgress":19}],3:[function(require,module,exports){
+},{"./display":15,"./spellDisplay":19,"./storeProgress":20}],3:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 function calcMod(raw){
     return Number(Math.floor((raw - 10) / 2))
@@ -235,7 +234,7 @@ function createCharSheet(user){
 }
 
 module.exports = createCharSheet
-},{"./data-objects/classes":6}],4:[function(require,module,exports){
+},{"./data-objects/classes":7}],4:[function(require,module,exports){
 function addRaceData(user, race){
     let {raceType, speed, stats, profs = null, features = null, languages} = race
     user.race = raceType
@@ -308,14 +307,12 @@ function addClassChoices(user, progressLogEntry, className, num){
     if(classChoiceList[num] === 'cantrips'){
         for (let items of progressLogEntry){
             user.spells.cantrips.push(items)
-            //changed this
         }
         
     }
     else if(classChoiceList[num] === 'spells'){
         for (let items of progressLogEntry) {
             user.spells.level1.push(items)
-            //changed this
         }
     }
     else{
@@ -338,14 +335,69 @@ function addBackgroundData(user, backgroundName){
     if(backgroundName.profs){user.profs.tools.push(backgroundName.profs.tools)}
 }
 
-function addStatData(user, statObj){
-        for(let stat in statObj){
-            user.stats[stat] += statObj[stat]
-        }   
+
+
+module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData }
+},{}],5:[function(require,module,exports){
+const alignment = {
+    "Lawful Good":{
+        name:"Lawful Good",
+        reverse:'Combining honor and compassion',
+        img:'img/lawfulGood.jpg',
+        desc:''
+    },
+    "Neutral Good":{
+        name: "Neutral Good",
+        desc: 'Doing what is good without bias for or against order',
+        img: 'img/neutralGood.jpg',
+        desc: ''
+    },
+    "Chaotic Good": {
+        name:'Chaotic Good',
+        reverse: 'Combinng a good heart with a free spirit',
+        img: 'img/chaoticGood.jpg',
+        desc: ''
+    },
+    "Lawful Neutral":{
+        name: 'Lawful Neutral',
+        reverse: 'Reliable and honorable without being a zealot',
+        img: 'img/lawfulNeutral.jpg',
+        desc: ''
+    },
+    "True Neutral": {
+        name:"True Neutral",
+        reverse: 'Acting naturally wihout prejudice or compulsion',
+        img: 'img/trueNeutral.jpg',
+        desc: ''
+    },
+    "Chaotic Neutral": {
+        name: "Chaotic Neutral",
+        desc: "Freedom from societal restrictions and a do-gooder's mentality",
+        img: 'img/chaoticNeutral.jpg',
+        desc: ''
+    },
+    "Lawful Evil": {
+        name:"Chaotic Neutral",
+        desc: "A combination of honor and dedicated self-interest",
+        img: 'img/lawfulEvil.jpg',
+        desc: ''
+    },
+    "Neutral Evil": {
+        name:"Neutral Evil",
+        desc: 'An ability to advance oneself without regard for others',
+        img: 'img/neutralEvil.jpg',
+        desc: ''
+    },
+    "Chaotic Evil": {
+        name:"Chaotic Evil",
+        desc: 'A combination of self interest and complete freedom',
+        img: 'img/chaoticEvil.jpg',
+        desc: ''
+    }
 }
 
-module.exports = { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData }
-},{}],5:[function(require,module,exports){
+module.exports = alignment
+},{}],6:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = {
@@ -448,12 +500,10 @@ const backgrounds = {
 }
 
 module.exports = backgrounds
-},{"./languages":8}],6:[function(require,module,exports){
+},{"./languages":9}],7:[function(require,module,exports){
 const skills = require('./skills')
-// const spells= require('./spells') just trying this 
-// const spells = require('./../spellList')
-const spells = require('./../test')
-const { createDNDCharacter, userProgress } = require('../main')
+const spells = require('./spells')
+
 
 const { Acrobatics, 'Animal Handling': animalHandling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, 'Sleight of Hand': sleightOfHand, Stealth, Survival } = skills
 const classes = {
@@ -599,7 +649,7 @@ const classes = {
             tools:["Theive's Tools"]
         },
         armorType: ['scale'],
-        choices: { skills: [4, { Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Persuasion, sleightOfHand, Stealth, Survival }]/*, Expertise: [1, userProgress[10]or whichever choosing class skills is]*/ },
+        choices: { skills: [4, { Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Persuasion, sleightOfHand, Stealth, Survival }] },
         equipment: ['2 shortswords', "dungeoneer's pack", 'longbow'],
         features: ['Expertise', 'Sneak Attack', "Theives' Cant"],
         desc: 'The Dastardly Infiltrator',
@@ -661,7 +711,7 @@ const classes = {
 }
 
 module.exports = classes
-},{"../main":16,"./../test":20,"./skills":10}],7:[function(require,module,exports){
+},{"./skills":11,"./spells":12}],8:[function(require,module,exports){
 const dragonbreath = {
     "Black Dragon":{
         reverse:"Spit acid in a 5' by 30' line",
@@ -716,7 +766,7 @@ const dragonbreath = {
 }
 
 module.exports = dragonbreath
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const languages = {
     Common: {desc: 'The language common to all races', img: 'img/ranger.jpg', reverse: "Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues."},
     Elvish: { desc: 'The language of Elves', img: 'img/bard.jpg', reverse: "Elvish is fluid, with subtle intonations and intricate grammar.Elven literature is rich and varied, and their songs and poems are famous among other races."},
@@ -729,7 +779,7 @@ const languages = {
 }
 
 module.exports = languages
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const subraces = require('./subraces')
 const dragonbreath = require('./dragonbreath')
 const skills = require('./skills')
@@ -911,7 +961,7 @@ const races = {
     }
  
 module.exports = races
-},{"./dragonbreath":7,"./languages":8,"./skills":10,"./subraces":12}],10:[function(require,module,exports){
+},{"./dragonbreath":8,"./languages":9,"./skills":11,"./subraces":13}],11:[function(require,module,exports){
 const skills = {
    Acrobatics: { 
   name: 'Acrobatics',
@@ -1039,12 +1089,12 @@ Survival:{
 }}
 
 module.exports = skills
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 const spells = {level1:null, cantrips:null}
 module.exports = spells
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const languages = require('./languages')
-const spells = require('./spells')
+
 
 const subraces = {
     Dwarf:{
@@ -1165,9 +1215,8 @@ const subraces = {
 
 
 module.exports = subraces
-},{"./languages":8,"./spells":11}],13:[function(require,module,exports){
+},{"./languages":9}],14:[function(require,module,exports){
 const classes = require('./data-objects/classes')
-const {userProgress, createDNDcharacter } = require('./main')
 
 function diceRoll(numDice, numSides) {
     let statNums = []
@@ -1177,8 +1226,6 @@ function diceRoll(numDice, numSides) {
     }
     return statNums
 }
-
-
 
 function statGen(rollFn, numDice, numSides, numTimes) {
     let stats = []
@@ -1190,7 +1237,6 @@ function statGen(rollFn, numDice, numSides, numTimes) {
     }
     return stats
 }
-
 
 let stats = statGen(diceRoll, 4, 6, 6)
 
@@ -1209,8 +1255,6 @@ ondragstart="drag(event)">${statArr[i]}</div>`
 
 
 let statTypes = ['STR', 'CON', 'INT', 'WIS', 'CHA', 'DEX']
-
-
 
 function displayStats(progressLog, triggerFn){
     document.querySelector('#choiceDisplay').textContent = ''
@@ -1231,8 +1275,6 @@ function displayStats(progressLog, triggerFn){
         
     }
     document.querySelector('#prompter').innerHTML += `<p>As a ${progressLog[9][0]}, ${classes[progressLog[9][0]].savingThrows.join(' and ')} are important</p>`
-
-
 
     function allowDrop(ev) {
         ev.preventDefault();
@@ -1260,7 +1302,6 @@ function displayStats(progressLog, triggerFn){
 }
 
 function statComplete(progressLog, triggerFn){
-    // document.querySelector('#next')
     const userStats = {}
 
     let statDropContainer = document.querySelectorAll('.statDropContainer')
@@ -1278,7 +1319,7 @@ function statComplete(progressLog, triggerFn){
 }
 module.exports = displayStats
 
-},{"./data-objects/classes":6,"./main":16}],14:[function(require,module,exports){
+},{"./data-objects/classes":7}],15:[function(require,module,exports){
 const selectionComplete = require('./selectionComplete')
 const races = require('./data-objects/races')
 
@@ -1401,30 +1442,20 @@ function select(event, numOfChoices,finalChoice, progressLog, triggerFn){
         }
         else{
             choiceDisplay.textContent = choiceCountDisplay(choiceCount)
-            // return false;
         }
     }
     
     if(choiceCount === 0 && finalChoice.length === numOfChoices){
         next.classList.remove('hidden')
-        // next.addEventListener('click', logSelectionMoveOn, {once:true})
         next.onclick = logSelectionMoveOn
     }else if(choiceCount !== 0){
         next.classList.add('hidden')
-        // next.removeEventListener('click', logSelectionMoveOn)
     }
-    // if(progressLog.length === origLength){
-    //     progressLog.push(finalChoice)
-    // }
-    // else if(progressLog.length > origLength){
-    //     progressLog.pop()
-    //     progressLog.push(finalChoice)
-    // }
     
 }
 
 module.exports = { display, select}
-},{"./data-objects/races":9,"./selectionComplete":17}],15:[function(require,module,exports){
+},{"./data-objects/races":10,"./selectionComplete":18}],16:[function(require,module,exports){
 const classes = require('./data-objects/classes')
 
 function diceRoll(numDice, numSides) {
@@ -1454,7 +1485,6 @@ function hpRoll(progressLog, triggerFn){
                 let rolledNum = document.querySelector('.dice').textContent
                 const HP = Number(Math.floor((progressLog[17][0].CON - 10) / 2)) + Number(rolledNum)
                 
-                //make next appear, and add event listener
                 document.querySelector('#next').classList.remove('hidden')
                 document.querySelector('#next').onclick = function () {
                     progressLog.push([HP])
@@ -1475,23 +1505,24 @@ function hpRoll(progressLog, triggerFn){
 
 module.exports = hpRoll
 
-},{"./data-objects/classes":6}],16:[function(require,module,exports){
+},{"./data-objects/classes":7}],17:[function(require,module,exports){
 const languages = require('./data-objects/languages')
 const races = require('./data-objects/races')
 const subraces = require('./data-objects/subraces')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const progressChoices = require('./classChoices')
-const { display, select } = require('./display')
+const { display } = require('./display')
 const prepareSpellOptions = require('./spellDisplay')
 const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData } = require('./createUserObj')
+const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData } = require('./createUserObj')
 const createCharSheet = require('./createCharSheet')
 const characterProg = require('./charProg')
 const progressbar = document.querySelector('#progress')
 const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
+const alignment = require('./data-objects/alignment')
 
 let userObj = {
     race: '',
@@ -1555,16 +1586,17 @@ function createDNDCharacter(){
             let storedProgress = []
             let stringStoredProgress = JSON.stringify(storedProgress)
             localStorage.setItem('storedProgress', stringStoredProgress)
+           
             //function to display races
             prompter.innerHTML = '<h2>Choose your race</h2><p>What kind of adventurer will you be?</p>'
             display(races, userProgress, createDNDCharacter)
+
             break
         case 1:
             document.querySelector('#back').classList.remove('hidden')
     
             //add race data to user object
             addRaceData(userObj, races[userProgress[0][0]])
-            
             
             //change progressbar
             progressbar.className = 'ten'
@@ -1575,7 +1607,6 @@ function createDNDCharacter(){
             userInput(inputTag, createDNDCharacter, userProgress, 'names')
 
             break
-
         case 2:
             //add name to user object
             userObj.name = userProgress[1]
@@ -1592,6 +1623,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
             }
+
             break
         case 3:
             //add bonus languages if user is half elf
@@ -1605,14 +1637,14 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.skills, userProgress, createDNDCharacter)
             }
+
             break
         case 4:
             //add bonus skills if user is half elf
             if (userProgress[3] !== null) { for (let skill of userProgress[3]) { userObj.skills.push(skill) } }
 
-            
-            
             prompter.innerHTML = "<h2>Choose your stats</h2> <p>Another benefit of being a Half Elf is deciding where your strengths lay. Pick 2 stats to receive a +1 boost.</p>"
+            
             //choose stats if applicable
             if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.stats){
                 choiceNotPresent(userProgress, createDNDCharacter)
@@ -1620,6 +1652,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.stats, userProgress, createDNDCharacter)
             }
+           
             break
         case 5: 
             //add bonus stats if user is half elf
@@ -1628,6 +1661,7 @@ function createDNDCharacter(){
                     userObj.stats[stat]++
                 }
             }
+            
             //choose dragon breath if applicable
             prompter.innerHTML = "<h2>Who's your dad?</h2> <p>Dragonborn are direct descendants of <i>real</i> dragons. Pick your heritage and your bonus dragon breath weapon.</p>"
             if(userProgress[0][0] !== 'Dragonborn'){
@@ -1636,6 +1670,7 @@ function createDNDCharacter(){
             else{
                 display(races.Dragonborn.choices.weapons, userProgress, createDNDCharacter)
             }
+           
             break
         case 6:
             //add dragonbreath if user is dragonborn
@@ -1651,6 +1686,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.subrace, userProgress, createDNDCharacter)
             }
+            
             break
         case 7: 
             //add subrace to user object
@@ -1666,6 +1702,7 @@ function createDNDCharacter(){
             else{
                 prepareSpellOptions(0, null, 1, userProgress, createDNDCharacter)
             }
+           
             break
         case 8:
             //add bonus spell if user is high elf
@@ -1679,6 +1716,7 @@ function createDNDCharacter(){
             else {
                 display(subraces.Elf[userProgress[6][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
             }
+           
             break
         case 9:
             //add bonus language if user is high elf
@@ -1687,6 +1725,7 @@ function createDNDCharacter(){
             //choose class
             prompter.innerHTML = "<h2>Choose a class</h2> <p>There are lots of different kinds of adventurers, each with their own special abilities. What kind are you?</p>"
             display(classes, userProgress, createDNDCharacter)
+            
             break
         case 10:
             //add class data to user object
@@ -1707,8 +1746,8 @@ function createDNDCharacter(){
             for (let skill of userProgress[10]) { userObj.skills.push(skill) }
 
             //choose class choices 2
-            
             progressChoices(classes, userProgress, 1, createDNDCharacter)
+            
             break
         case 12: 
             //add class choice 2 to user object
@@ -1716,6 +1755,7 @@ function createDNDCharacter(){
 
             //choose class choices 3
             progressChoices(classes, userProgress, 2, createDNDCharacter)
+            
             break
         case 13:
             //add class choice 3 user object
@@ -1723,6 +1763,7 @@ function createDNDCharacter(){
 
             //choose class choices 4
             progressChoices(classes, userProgress, 3, createDNDCharacter)
+            
             break
         case 14: 
             //add class choice 4 to user object
@@ -1743,6 +1784,7 @@ function createDNDCharacter(){
             //choose background
             prompter.innerHTML = '<h2>Pick a background</h2> <p>What were you doing before your adventure?</p>'
             display(backgrounds, userProgress, createDNDCharacter)
+            
             break
         case 16:
             //add background to user object
@@ -1760,6 +1802,7 @@ function createDNDCharacter(){
                 prompter.innerHTML = `<h2>Pick your languages</h2> <p>As a ${userObj.background} you can pick an additional language.</p>`
                 display(languages, userProgress, createDNDCharacter, 'languages')
             }
+           
             break
         case 17:
             //add bonus background languages 
@@ -1768,6 +1811,7 @@ function createDNDCharacter(){
             //attribute stats
             prompter.innerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
             displayStats(userProgress, createDNDCharacter)
+           
             break
         case 18:
             //add stats to user object
@@ -1781,6 +1825,7 @@ function createDNDCharacter(){
             //roll HP
             prompter.innerHTML = `<h2>How tough are you?</h2> <p>Roll the dice to see how many hit points your character has. Hit points are equal to this roll plue your constitution modifier (${Math.floor((userObj.stats.CON - 10) / 2)})</p>`
             hpRoll(userProgress, createDNDCharacter)
+           
             break
         case 19:
             //add HP to user object
@@ -1832,7 +1877,6 @@ function createDNDCharacter(){
             // flaws
             prompter.innerHTML = "<h2>What's wrong with you?</h2><p>Everybody's got them, what are your character's weaknesses?</p>"
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1]}'s flaws?" value="" autofocus></textarea>`
-
             userInput(inputTag5, createDNDCharacter, userProgress)
             
             break
@@ -1855,7 +1899,7 @@ const expObj = {createDNDCharacter, userProgress, userObj}
 
 module.exports = expObj
 
-},{"./charProg":1,"./classChoices":2,"./createCharSheet":3,"./createUserObj":4,"./data-objects/backgrounds":5,"./data-objects/classes":6,"./data-objects/languages":8,"./data-objects/races":9,"./data-objects/subraces":12,"./diceStats":13,"./display":14,"./hpRoll":15,"./spellDisplay":18,"./storeProgress":19,"./userInput":21}],17:[function(require,module,exports){
+},{"./charProg":1,"./classChoices":2,"./createCharSheet":3,"./createUserObj":4,"./data-objects/alignment":5,"./data-objects/backgrounds":6,"./data-objects/classes":7,"./data-objects/languages":9,"./data-objects/races":10,"./data-objects/subraces":13,"./diceStats":14,"./display":15,"./hpRoll":16,"./spellDisplay":19,"./storeProgress":20,"./userInput":21}],18:[function(require,module,exports){
 function selectionComplete(progressLog, finalChoice, triggerFn){
     progressLog.push(finalChoice)
 
@@ -1864,13 +1908,13 @@ function selectionComplete(progressLog, finalChoice, triggerFn){
     triggerFn()
 
 }
-//problem: if you click items multiple times and then hit next, there are multiple appends to userprogress
+
 module.exports = selectionComplete
-},{}],18:[function(require,module,exports){
-// const spells = require('./spellList')
-const spells = require('./test')
-const { createDNDCharacter, userProgress } = require('./main')
-const {display, select} = require('./display')
+},{}],19:[function(require,module,exports){
+
+const spells = require('./data-objects/spells')
+
+const {select} = require('./display')
 
 function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, triggerFn){
     let holder = document.getElementById('holder')
@@ -1953,8 +1997,7 @@ function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, tr
 
 module.exports = prepareSpellOptions
 
-},{"./display":14,"./main":16,"./test":20}],19:[function(require,module,exports){
-const { createDNDCharacter, userProgress, userObj } = require('./main')
+},{"./data-objects/spells":12,"./display":15}],20:[function(require,module,exports){
 
 function storeProgress(user, progressLog){
     let storageString = localStorage.getItem('storedProgress')
@@ -1962,13 +2005,10 @@ function storeProgress(user, progressLog){
     let toStore = { user, progressLog}
     storage.push(toStore)
     storageString = JSON.stringify(storage)
-
     localStorage.setItem('storedProgress', storageString)
 }
 
 function revertProgress(){
-    //use while loop
-    
     let storageString = localStorage.getItem('storedProgress')
     let storage = JSON.parse(storageString)
     storage.pop()
@@ -1988,12 +2028,9 @@ function revertProgress(){
     else{
         while (lastDecision === null) {
             storage.pop()
-
             mostRecentlyStored = storage[storage.length - 1]
             lastLog = mostRecentlyStored.progressLog
             lastDecision = lastLog[lastLog.length - 1]
-
-           
         }
            
         storageString = JSON.stringify(storage)
@@ -2006,25 +2043,22 @@ function revertProgress(){
 
 
 function choiceNotPresent(progressLog, triggerFn) {
-    
     progressLog.push(null)
     triggerFn()
 }
 
 module.exports = { storeProgress, revertProgress, choiceNotPresent }
 
-},{"./main":16}],20:[function(require,module,exports){
-module.exports = [{"name":"Acid Splash","desc":["You hurl a bubble of acid. Choose one creature within range, or choose two creatures within range that are within 5 feet of each other. A target must succeed on a dexterity saving throw or take 1d6 acid damage.","This spell's damage increases by 1d6 when you reach 5th level (2d6), 11th level (3d6), and 17th level (4d6)."],"range":"60 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Alarm","desc":["You set an alarm against unwanted intrusion. Choose a door, a window, or an area within range that is no larger than a 20-foot cube. Until the spell ends, an alarm alerts you whenever a Tiny or larger creature touches or enters the warded area. When you cast the spell, you can designate creatures that won't set off the alarm. You also choose whether the alarm is mental or audible.","A mental alarm alerts you with a ping in your mind if you are within 1 mile of the warded area. This ping awakens you if you are sleeping.","An audible alarm produces the sound of a hand bell for 10 seconds within 60 feet."],"range":"30 feet","duration":"8 hours","concentration":"no","casting_time":"1 minute","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Bane","desc":["Up to three creatures of your choice that you can see within range must make charisma saving throws. Whenever a target that fails this saving throw makes an attack roll or a saving throw before the spell ends, the target must roll a d4 and subtract the number rolled from the attack roll or saving throw."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st."],"range":"30 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Bless","desc":["You bless up to three creatures of your choice within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target can roll a d4 and add the number rolled to the attack roll or saving throw."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st."],"range":"30 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Burning Hands","desc":["As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one.","The fire ignites any flammable objects in the area that aren't being worn or carried."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st."],"range":"Self","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Charm Person","desc":["You attempt to charm a humanoid you can see within range. It must make a wisdom saving throw, and does so with advantage if you or your companions are fighting it. If it fails the saving throw, it is charmed by you until the spell ends or until you or your companions do anything harmful to it. The charmed creature regards you as a friendly acquaintance. When the spell ends, the creature knows it was charmed by you."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them."],"range":"30 feet","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Chill Touch","desc":["You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack against the creature to assail it with the chill of the grave. On a hit, the target takes 1d8 necrotic damage, and it can't regain hit points until the start of your next turn. Until then, the hand clings to the target.","If you hit an undead target, it also has disadvantage on attack rolls against you until the end of your next turn.","This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."],"range":"120 feet","duration":"1 round","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Color Spray","desc":["A dazzling array of flashing, colored light springs from your hand. Roll 6d10; the total is how many hit points of creatures this spell can effect. Creatures in a 15-foot cone originating from you are affected in ascending order of their current hit points (ignoring unconscious creatures and creatures that can't see).","Starting with the creature that has the lowest current hit points, each creature affected by this spell is blinded until the spell ends. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d10 for each slot level above 1st."],"range":"Self","duration":"1 round","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Command","desc":["You speak a one-word command to a creature you can see within range. The target must succeed on a wisdom saving throw or follow the command on its next turn. The spell has no effect if the target is undead, if it doesn't understand your language, or if your command is directly harmful to it.","Some typical commands and their effects follow. You might issue a command other than one described here. If you do so, the DM determines how the target behaves. If the target can't follow your command, the spell ends.","Approach."," The target moves toward you by the shortest and most direct route, ending its turn if it moves within 5 feet of you.","Drop"," The target drops whatever it is holding and then ends its turn.","Flee."," The target spends its turn moving away from you by the fastest available means.","Grovel."," The target falls prone and then ends its turn.","Halt."," The target doesn't move and takes no actions. A flying creature stays aloft, provided that it is able to do so. If it must move to stay aloft, it flies the minimum distance needed to remain in the air."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you can affect one additional creature for each slot level above 1st. The creatures must be within 30 feet of each other when you target them."],"range":"60 feet","duration":"1 round","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Comprehend Languages","desc":["For the duration, you understand the literal meaning of any spoken language that you hear. You also understand any written language that you see, but you must be touching the surface on which the words are written. It takes about 1 minute to read one page of text.","This spell doesn't decode secret messages in a text or a glyph, such as an arcane sigil, that isn't part of a written language."],"range":"Self","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Create or Destroy Water","desc":["You either create or destroy water.","Create Water."," You create up to 10 gallons of clean water within range in an open container. Alternatively, the water falls as rain in a 30-foot cube within range.","Destroy Water."," You destroy up to 10 gallons of water in an open container within range. Alternatively, you destroy fog in a 30-foot cube within range."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you create or destroy 10 additional gallons of water, or the size of the cube increases by 5 feet, for each slot level above 1st."],"range":"30 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Cure Wounds","desc":["A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st."],"range":"Touch","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"}]},{"name":"Dancing Lights","desc":["You create up to four torch-sized lights within range, making them appear as torches, lanterns, or glowing orbs that hover in the air for the duration. You can also combine the four lights into one glowing vaguely humanoid form of Medium size. Whichever form you choose, each light sheds dim light in a 10-foot radius.","As a bonus action on your turn, you can move the lights up to 60 feet to a new spot within range. A light must be within 20 feet of another light created by this spell, and a light winks out if it exceeds the spell's range."],"range":"120 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Detect Evil and Good","desc":["For the duration, you know if there is an aberration, celestial, elemental, fey, fiend, or undead within 30 feet of you, as well as where the creature is located. Similarly, you know if there is a place or object within 30 feet of you that has been magically consecrated or desecrated.","The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt."],"range":"Self","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Detect Magic","desc":["For the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any.","The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt."],"range":"Self","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Detect Poison and Disease","desc":["For the duration, you can sense the presence and location of poisons, poisonous creatures, and diseases within 30 feet of you. You also identify the kind of poison, poisonous creature, or disease in each case.","The spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt."],"range":"Self","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"}]},{"name":"Disguise Self","desc":["You make yourself â€“ including your clothing, armor, weapons, and other belongings on your person â€“ look different until the spell ends or until you use your action to dismiss it. You can seem 1 foot shorter or taller and can appear thin, fat, or in between. You can't change your body type, so you must adopt a form that has the same basic arrangement of limbs. Otherwise, the extent of the illusion is up to you.","The changes wrought by this spell fail to hold up to physical inspection. For example, if you use this spell to add a hat to your outfit, objects pass through the hat, and anyone who touches it would feel nothing or would feel your head and hair. If you use this spell to appear thinner than you are, the hand of someone who reaches out to touch you would bump into you while it was seemingly still in midair.","To discern that you are disguised, a creature can use its action to inspect your apperance and must succeed on an Intelligence (Investigation) check against your spell save DC."],"range":"Self","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Divine Favor","desc":["Your prayer empowers you with divine radiance. Until the spell ends, your weapon attacks deal an extra 1d4 radiant damage on a hit."],"range":"Self","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 bonus action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Eldritch Blast","desc":["A beam of crackling energy streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 force damage."],"higher_level":["The spell creates more than one beam when you reach higher levels: two beams at 5th level, three beams at 11th level, and four beams at 17th level. You can direct the beams at the same target or at different ones. Make a separate attack roll for each beam."],"range":"120 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"}]},{"name":"Entangle","desc":["Grasping weeds and vines sprout from the ground in a 20-foot square starting form a point within range. For the duration, these plants turn the ground in the area into difficult terrain.","A creature in the area when you cast the spell must succeed on a strength saving throw or be restrained by the entangling plants until the spell ends. A creature restrained by the plants can use its action to make a Strength check against your spell save DC. On a success, it frees itself.","When the spell ends, the conjured plants wilt away."],"range":"90 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Expeditious Retreat","desc":["This spell allows you to move at an incredible pace. When you cast this spell, and then as a bonus action on each of your turns until the spell ends, you can take the Dash action."],"range":"Self","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 bonus action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Faerie Fire","desc":["Each object in a 20-foot cube within range is outlined in blue, green, or violet light (your choice). Any creature in the area when the spell is cast is also outlined in light if it fails a dexterity saving throw. For the duration, objects and affected creatures shed dim light in a 10-foot radius.","Any attack roll against an affected creature or object has advantage if the attacker can see it, and the affected creature or object can't benefit from being invisible."],"range":"60 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"False Life","desc":["Bolstering yourself with a necromantic facsimile of life, you gain 1d4 + 4 temporary hit points for the duration."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you gain 5 additional temporary hit points for each slot level above 1st."],"range":"Self","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Feather Fall","desc":["Choose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends. If the creature lands before the spell ends, it takes no falling damage and can land on its feet, and the spell ends for that creature."],"range":"60 feet","duration":"1 minute","concentration":"no","casting_time":"1 reaction","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Floating Disk","desc":["This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, that floats 3 feet above the ground in an unoccupied space of your choice that you can see within range. The disk remains for the duration, and can hold up to 500 pounds. If more weight is placed on it, the spell ends, and everything on the disk falls to the ground.","The disk is immobile while you are within 20 feet of it. If you move more than 20 feet away from it, the disk follows you so that it remains within 20 feet of you. If can move across uneven terrain, up or down stairs, slopes and the like, but it can't cross an elevation change of 10 feet or more. For example, the disk can't move across a 10-foot-deep pit, nor could it leave such a pit if it was created at the bottom.","If you move more than 100 feet away from the disk (typically because it can't move around an obstacle to follow you), the spell ends."],"range":"30 feet","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Fog Cloud","desc":["You create a 20-foot-radius sphere of fog centered on a point within range. The sphere spreads around corners, and its area is heavily obscured. It lasts for the duration or until a wind of moderate or greater speed (at least 10 miles per hour) disperses it."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the radius of the fog increases by 20 feet for each slot level above 1st."],"range":"120 feet","duration":"Up to 1 hour","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Grease","desc":["Slick grease covers the ground in a 10-foot square centered on a point within range and turns it into difficult terrain for the duration.","When the grease appears, each creature standing in its area must succeed on a dexterity saving throw or fall prone. A creature that enters the area or ends its turn there must also succeed on a dexterity saving throw or fall prone."],"range":"60 feet","duration":"1 minute","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Guidance","desc":["You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends."],"range":"Touch","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Guiding Bolt","desc":["A flash of light streaks toward a creature of your choice within range. Make a ranged spell attack against the target. On a hit, the target takes 4d6 radiant damage, and the next attack roll made against this target before the end of your next turn has advantage, thanks to the mystical dim light glittering on the target until then."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st."],"range":"120 feet","duration":"1 round","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Healing Word","desc":["A creature of your choice that you can see within range regains hit points equal to 1d4 + your spellcasting ability modifier. This spell has no effect on undead or constructs."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d4 for each slot level above 1st."],"range":"60 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 bonus action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Heroism","desc":["A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to being frightened and gains temporary hit points equal to your spellcasting ability modifier at the start of each of its turns. When the spell ends, the target loses any remaining temporary hit points from this spell."],"range":"Touch","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Hideous Laughter","desc":["A creature of your choice that you can see within range perceives everything as hilariously funny and falls into fits of laughter if this spell affects it. The target must succeed on a wisdom saving throw or fall prone, becoming incapacitated and unable to stand up for the duration. A creature with an Intelligence score of 4 or less isn't affected.","At the end of each of its turns, and each time it takes damage, the target can make another wisdom saving throw. The target had advantage on the saving throw if it's triggered by damage. On a success, the spell ends."],"range":"30 feet","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Identify","desc":["You choose one object that you must touch throughout the casting of the spell. If it is a magic item or some other magic-imbued object, you learn its properties and how to use them, whether it requires attunement to use, and how many charges it has, if any. You learn whether any spells are affecting the item and what they are. If the item was created by a spell, you learn which spell created it.","If you instead touch a creature throughout the casting, you learn what spells, if any, are currently affecting it."],"range":"Touch","duration":"Instantaneous","concentration":"no","casting_time":"1 minute","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Illusory Script","desc":["You write on parchment, paper, or some other suitable writing material and imbue it with a potent illusion that lasts for the duration.","To you and any creatures you designate when you cast the spell, the writing appears normal, written in your hand, and conveys whatever meaning you intended when you wrote the text. To all others, the writing appears as if it were written in an unknown or magical script that is unintelligible. Alternatively, you can cause the writing to appear to be an entirely different message, written in a different hand and language, though the language must be one you know.","Should the spell be dispelled, the original script and the illusion both disappear.","A creature with truesight can read the hidden message."],"range":"Touch","duration":"10 days","concentration":"no","casting_time":"1 minute","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Inflict Wounds","desc":["Make a melee spell attack against a creature you can reach. On a hit, the target takes 3d10 necrotic damage."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d10 for each slot level above 1st."],"range":"Touch","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Jump","desc":["You touch a creature. The creature's jump distance is tripled until the spell ends."],"range":"Touch","duration":"1 minute","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Light","desc":["You touch one object that is no larger than 10 feet in any dimension. Until the spell ends, the object sheds bright light in a 20-foot radius and dim light for an additional 20 feet. The light can be colored as you like. Completely covering the object with something opaque blocks the light. The spell ends if you cast it again or dismiss it as an action.","If you target an object held or worn by a hostile creature, that creature must succeed on a dexterity saving throw to avoid the spell."],"range":"Touch","duration":"1 hour","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Longstrider","desc":["You touch a creature. The target's speed increases by 10 feet until the spell ends."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, you can target one additional creature for each spell slot above 1st."],"range":"Touch","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Mage Armor","desc":["You touch a willing creature who isn't wearing armor, and a protective magical force surrounds it until the spell ends. The target's base AC becomes 13 + its Dexterity modifier. The spell ends if the target dons armor or if you dismiss the spell as an action."],"range":"Touch","duration":"8 hours","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Mage Hand","desc":["A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration or until you dismiss it as an action. The hand vanishes if it is ever more than 30 feet away from you or if you cast this spell again.","You can use your action to control the hand. You can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.","The hand can't attack, activate magic items, or carry more than 10 pounds."],"range":"30 feet","duration":"1 minute","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Magic Missile","desc":["You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously, and you can direct them to hit one creature or several."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the spell creates one more dart for each slot level above 1st."],"range":"120 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Mending","desc":["This spell repairs a single break or tear in an object you touch, such as a broken key, a torn cloak, or a leaking wineskin. As long as the break or tear is no longer than 1 foot in any dimension, you mend it, leaving no trace of the former damage.","This spell can physically repair a magic item or construct, but the spell can't restore magic to such an object."],"range":"Touch","duration":"Instantaneous","concentration":"no","casting_time":"1 minute","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Message","desc":["You point your finger toward a creature within range and whisper a message. The target (and only the target) hears the message and can reply in a whisper that only you can hear.","You can cast this spell through solid objects if you are familiar with the target and know it is beyond the barrier. Magical silence, 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood blocks the spell. The spell doesn't have to follow a straight line and can travel freely around corners or through openings."],"range":"120 feet","duration":"1 round","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Minor Illusion","desc":["You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again.","If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends.","If you create an image of an objectâ€”such as a chair, muddy footprints, or a small chestâ€”it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it.","If a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature."],"range":"30 feet","duration":"1 minute","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Prestidigitation","desc":["This spell is a minor magical trick that novice spellcasters use for practice. You create one of the following magical effects within 'range':","You create an instantaneous, harmless sensory effect, such as a shower of sparks, a puff of wind, faint musical notes, or an odd odor.","You instantaneously light or snuff out a candle, a torch, or a small campfire.","You instantaneously clean or soil an object no larger than 1 cubic foot.","You chill, warm, or flavor up to 1 cubic foot of nonliving material for 1 hour.","You make a color, a small mark, or a symbol appear on an object or a surface for 1 hour.","You create a nonmagical trinket or an illusory image that can fit in your hand and that lasts until the end of your next turn.","If you cast this spell multiple times, you can have up to three of its non-instantaneous effects active at a time, and you can dismiss such an effect as an action."],"range":"10 feet","duration":"1 hour","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Produce Flame","desc":["A flickering flame appears in your hand. The flame remains there for the duration and harms neither you nor your equipment. The flame sheds bright light in a 10-foot radius and dim light for an additional 10 feet. The spell ends if you dismiss it as an action or if you cast it again.","You can also attack with the flame, although doing so ends the spell. When you cast this spell, or as an action on a later turn, you can hurl the flame at a creature within 30 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 fire damage.","This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."],"range":"Self","duration":"10 minutes","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Protection from Evil and Good","desc":["Until the spell ends, one willing creature you touch is protected against certain types of creatures: aberrations, celestials, elementals, fey, fiends, and undead.","The protection grants several benefits. Creatures of those types have disadvantage on attack rolls against the target. The target also can't be charmed, frightened, or possessed by them. If the target is already charmed, frightened, or possessed by such a creature, the target has advantage on any new saving throw against the relevant effect."],"range":"Touch","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Purify Food and Drink","desc":["All nonmagical food and drink within a 5-foot radius sphere centered on a point of your choice within range is purified and rendered free of poison and disease."],"range":"10 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Ray of Frost","desc":["A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 cold damage, and its speed is reduced by 10 feet until the start of your next turn.","The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."],"range":"60 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Resistance","desc":["You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one saving throw of its choice. It can roll the die before or after making the saving throw. The spell then ends."],"range":"Touch","duration":"Up to 1 minute","concentration":"yes","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Sacred Flame","desc":["Flame-like radiance descends on a creature that you can see within range. The target must succeed on a dexterity saving throw or take 1d8 radiant damage. The target gains no benefit from cover for this saving throw.","The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."],"range":"60 feet","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Sanctuary","desc":["You ward a creature within range against attack. Until the spell ends, any creature who targets the warded creature with an attack or a harmful spell must first make a wisdom saving throw. On a failed save, the creature must choose a new target or lose the attack or spell. This spell doesn't protect the warded creature from area effects, such as the explosion of a fireball.","If the warded creature makes an attack or casts a spell that affects an enemy creature, this spell ends."],"range":"30 feet","duration":"1 minute","concentration":"no","casting_time":"1 bonus action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Shield","desc":["An invisible barrier of magical force appears and protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from magic missile."],"range":"Self","duration":"1 round","concentration":"no","casting_time":"1 reaction","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Shield of Faith","desc":["A shimmering field appears and surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration."],"range":"60 feet","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 bonus action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"},{"url":"http://www.dnd5eapi.co/api/classes/7","name":"Paladin"}]},{"name":"Shillelagh","desc":["The wood of a club or a quarterstaff you are holding is imbued with nature's power. For the duration, you can use your spellcasting ability instead of Strength for the attack and damage rolls of melee attacks using that weapon, and the weapon's damage die becomes a d8. The weapon also becomes magical, if it isn't already. The spell ends if you cast it again or if you let go of the weapon."],"range":"Touch","duration":"1 minute","concentration":"no","casting_time":"1 bonus action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"}]},{"name":"Shocking Grasp","desc":["Lightning springs from your hand to deliver a shock to a creature you try to touch. Make a melee spell attack against the target. You have advantage on the attack roll if the target is wearing armor made of metal. On a hit, the target takes 1d8 lightning damage, and it can't take reactions until the start of its next turn.","The spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8)."],"range":"Touch","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Silent Image","desc":["You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects.","You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. For example, if you create an image of a creature and move it, you can alter the image so that it appears to be walking.","Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the creature can see through the image."],"range":"60 feet","duration":"Up to 10 minutes","concentration":"yes","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Sleep","desc":["This spell sends creatures into a magical slumber. Roll 5d8; the total is how many hit points of creatures this spell can affect. Creatures within 20 feet of a point you choose within range are affected in ascending order of their current hit points (ignoring unconscious creatures).","Starting with the creature that has the lowest current hit points, each creature affected by this spell falls unconscious until the spell ends, the sleeper takes damage, or someone uses an action to shake or slap the sleeper awake. Subtract each creature's hit points from the total before moving on to the creature with the next lowest hit points. A creature's hit points must be equal to or less than the remaining total for that creature to be affected.","Undead and creatures immune to being charmed aren't affected by this spell."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d8 for each slot level above 1st."],"range":"90 feet","duration":"1 minute","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Speak with Animals","desc":["You gain the ability to comprehend and verbally communicate with beasts for the duration. The knowledge and awareness of many beasts is limited by their intelligence, but at a minimum, beasts can give you information about nearby locations and monsters, including whatever they can perceive or have perceived within the past day. You might be able to persuade a beast to perform a small favor for you, at the DM's discretion."],"range":"Self","duration":"10 minutes","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/8","name":"Ranger"}]},{"name":"Thaumaturgy","desc":["You manifest a minor wonder, a sign of supernatural power, within range. You create one of the following magical effects within range.","- Your voice booms up to three times as loud as normal for 1 minute.","- You cause flames to flicker, brighten, dim, or change color for 1 minute.","- You cause harmless tremors in the ground for 1 minute.","- You create an instantaneous sound that originates from a point of your choice within range, such as a rumble of thunder, the cry of a raven, or ominous whispers.","- You instantaneously cause an unlocked door or window to fly open or slam shut.","- You alter the appearance of your eyes for 1 minute.","If you cast this spell multiple times, you can have up to three of its 1-minute effects active at a time, and you can dismiss such an effect as an action."],"range":"30 feet","duration":"1 minute","concentration":"no","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/3","name":"Cleric"}]},{"name":"Thunderwave","desc":["A wave of thunderous force sweeps out from you. Each creature in a 15-foot cube originating from you must make a constitution saving throw. On a failed save, a creature takes 2d8 thunder damage and is pushed 10 feet away from you. On a successful save, the creature takes half as much damage and isn't pushed.","In addition, unsecured objects that are completely within the area of effect are automatically pushed 10 feet away from you by the spell's effect, and the spell emits a thunderous boom audible out to 300 feet."],"higher_level":["When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st."],"range":"Self","duration":"Instantaneous","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/4","name":"Druid"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"True Strike","desc":["You extend your hand and point a finger at a target in range. Your magic grants you a brief insight into the target's defenses. On your next turn, you gain advantage on your first attack roll against the target, provided that this spell hasn't ended."],"range":"30 feet","duration":"Up to 1 round","concentration":"yes","casting_time":"1 action","level":0,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/10","name":"Sorcerer"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]},{"name":"Unseen Servant","desc":["This spell creates an invisible, mindless, shapeless force that performs simple tasks at your command until the spell ends. The servant springs into existence in an unoccupied space on the ground within range. It has AC 10, 1 hit point, and a Strength of 2, and it can't attack. If it drops to 0 hit points, the spell ends.","Once on each of your turns as a bonus action, you can mentally command the servant to move up to 15 feet and interact with an object. The servant can perform simple tasks that a human servant could do, such as fetching things, cleaning, mending, folding clothes, lighting fires, serving food, and pouring wind. Once you give the command, the servant performs the task to the best of its ability until it completes the task, then waits for your next command.","If you command the servant to perform a task that would move it more than 60 feet away from you, the spell ends."],"range":"60 feet","duration":"1 hour","concentration":"no","casting_time":"1 action","level":1,"classes":[{"url":"http://www.dnd5eapi.co/api/classes/2","name":"Bard"},{"url":"http://www.dnd5eapi.co/api/classes/11","name":"Warlock"},{"url":"http://www.dnd5eapi.co/api/classes/12","name":"Wizard"}]}]
 },{}],21:[function(require,module,exports){
 
 const races = require('./data-objects/races')
+
 function userInput(inputTag, triggerFn, progressLog, topic){
     const holder = document.getElementById('holder')
     document.querySelector('#choiceDisplay').textContent = ''
     holder.innerHTML = `<div id="inputScreen">${inputTag}</div>`
-    
-    switch(topic){
-        case 'names':
+    if(topic === 'names'){
+
             holder.children[0].innerHTML += `<h3>Having trouble thinking of ${topic}?</h3><br>
             <ul>
                 <li><b>Male ${progressLog[0][0]} Names:</b></li>
@@ -2034,19 +2068,8 @@ function userInput(inputTag, triggerFn, progressLog, topic){
                 <li><b>Female ${progressLog[0][0]} Names:</b></li>
                 <li>${races[progressLog[0][0]].names[1].join('</li><li>')}</li>
             </ul>`
-            break
-        case 'traits':
-            break
-        case 'ideals':
-            break
-        case 'bonds':
-            break
-        case 'flaws':
-            break            
-    }
+    }            
 
-
-    //validation
 
     document.querySelector('#userInput').addEventListener('keyup', function(e){
         if(e.target.value.length > 0){
@@ -2067,10 +2090,9 @@ function inputComplete(triggerFn, progressLog){
     let finalInput = document.getElementById('userInput').value
     progressLog.push(finalInput)
     
-
     document.querySelector('#next').classList.toggle('hidden')
     triggerFn()
 }
 
 module.exports = userInput
-},{"./data-objects/races":9}]},{},[16]);
+},{"./data-objects/races":10}]},{},[17]);

@@ -4,16 +4,17 @@ const subraces = require('./data-objects/subraces')
 const backgrounds = require('./data-objects/backgrounds')
 const classes = require('./data-objects/classes')
 const progressChoices = require('./classChoices')
-const { display, select } = require('./display')
+const { display } = require('./display')
 const prepareSpellOptions = require('./spellDisplay')
 const userInput = require('./userInput')
 const hpRoll = require('./hpRoll')
 const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData, addStatData } = require('./createUserObj')
+const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData } = require('./createUserObj')
 const createCharSheet = require('./createCharSheet')
 const characterProg = require('./charProg')
 const progressbar = document.querySelector('#progress')
 const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
+const alignment = require('./data-objects/alignment')
 
 let userObj = {
     race: '',
@@ -77,16 +78,17 @@ function createDNDCharacter(){
             let storedProgress = []
             let stringStoredProgress = JSON.stringify(storedProgress)
             localStorage.setItem('storedProgress', stringStoredProgress)
+           
             //function to display races
             prompter.innerHTML = '<h2>Choose your race</h2><p>What kind of adventurer will you be?</p>'
             display(races, userProgress, createDNDCharacter)
+
             break
         case 1:
             document.querySelector('#back').classList.remove('hidden')
     
             //add race data to user object
             addRaceData(userObj, races[userProgress[0][0]])
-            
             
             //change progressbar
             progressbar.className = 'ten'
@@ -97,7 +99,6 @@ function createDNDCharacter(){
             userInput(inputTag, createDNDCharacter, userProgress, 'names')
 
             break
-
         case 2:
             //add name to user object
             userObj.name = userProgress[1]
@@ -114,6 +115,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
             }
+
             break
         case 3:
             //add bonus languages if user is half elf
@@ -127,14 +129,14 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.skills, userProgress, createDNDCharacter)
             }
+
             break
         case 4:
             //add bonus skills if user is half elf
             if (userProgress[3] !== null) { for (let skill of userProgress[3]) { userObj.skills.push(skill) } }
 
-            
-            
             prompter.innerHTML = "<h2>Choose your stats</h2> <p>Another benefit of being a Half Elf is deciding where your strengths lay. Pick 2 stats to receive a +1 boost.</p>"
+            
             //choose stats if applicable
             if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.stats){
                 choiceNotPresent(userProgress, createDNDCharacter)
@@ -142,6 +144,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.stats, userProgress, createDNDCharacter)
             }
+           
             break
         case 5: 
             //add bonus stats if user is half elf
@@ -150,6 +153,7 @@ function createDNDCharacter(){
                     userObj.stats[stat]++
                 }
             }
+            
             //choose dragon breath if applicable
             prompter.innerHTML = "<h2>Who's your dad?</h2> <p>Dragonborn are direct descendants of <i>real</i> dragons. Pick your heritage and your bonus dragon breath weapon.</p>"
             if(userProgress[0][0] !== 'Dragonborn'){
@@ -158,6 +162,7 @@ function createDNDCharacter(){
             else{
                 display(races.Dragonborn.choices.weapons, userProgress, createDNDCharacter)
             }
+           
             break
         case 6:
             //add dragonbreath if user is dragonborn
@@ -173,6 +178,7 @@ function createDNDCharacter(){
             else{
                 display(races[userProgress[0][0]].choices.subrace, userProgress, createDNDCharacter)
             }
+            
             break
         case 7: 
             //add subrace to user object
@@ -188,6 +194,7 @@ function createDNDCharacter(){
             else{
                 prepareSpellOptions(0, null, 1, userProgress, createDNDCharacter)
             }
+           
             break
         case 8:
             //add bonus spell if user is high elf
@@ -201,6 +208,7 @@ function createDNDCharacter(){
             else {
                 display(subraces.Elf[userProgress[6][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
             }
+           
             break
         case 9:
             //add bonus language if user is high elf
@@ -209,6 +217,7 @@ function createDNDCharacter(){
             //choose class
             prompter.innerHTML = "<h2>Choose a class</h2> <p>There are lots of different kinds of adventurers, each with their own special abilities. What kind are you?</p>"
             display(classes, userProgress, createDNDCharacter)
+            
             break
         case 10:
             //add class data to user object
@@ -229,8 +238,8 @@ function createDNDCharacter(){
             for (let skill of userProgress[10]) { userObj.skills.push(skill) }
 
             //choose class choices 2
-            
             progressChoices(classes, userProgress, 1, createDNDCharacter)
+            
             break
         case 12: 
             //add class choice 2 to user object
@@ -238,6 +247,7 @@ function createDNDCharacter(){
 
             //choose class choices 3
             progressChoices(classes, userProgress, 2, createDNDCharacter)
+            
             break
         case 13:
             //add class choice 3 user object
@@ -245,6 +255,7 @@ function createDNDCharacter(){
 
             //choose class choices 4
             progressChoices(classes, userProgress, 3, createDNDCharacter)
+            
             break
         case 14: 
             //add class choice 4 to user object
@@ -265,6 +276,7 @@ function createDNDCharacter(){
             //choose background
             prompter.innerHTML = '<h2>Pick a background</h2> <p>What were you doing before your adventure?</p>'
             display(backgrounds, userProgress, createDNDCharacter)
+            
             break
         case 16:
             //add background to user object
@@ -282,6 +294,7 @@ function createDNDCharacter(){
                 prompter.innerHTML = `<h2>Pick your languages</h2> <p>As a ${userObj.background} you can pick an additional language.</p>`
                 display(languages, userProgress, createDNDCharacter, 'languages')
             }
+           
             break
         case 17:
             //add bonus background languages 
@@ -290,6 +303,7 @@ function createDNDCharacter(){
             //attribute stats
             prompter.innerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
             displayStats(userProgress, createDNDCharacter)
+           
             break
         case 18:
             //add stats to user object
@@ -303,6 +317,7 @@ function createDNDCharacter(){
             //roll HP
             prompter.innerHTML = `<h2>How tough are you?</h2> <p>Roll the dice to see how many hit points your character has. Hit points are equal to this roll plue your constitution modifier (${Math.floor((userObj.stats.CON - 10) / 2)})</p>`
             hpRoll(userProgress, createDNDCharacter)
+           
             break
         case 19:
             //add HP to user object
@@ -354,7 +369,6 @@ function createDNDCharacter(){
             // flaws
             prompter.innerHTML = "<h2>What's wrong with you?</h2><p>Everybody's got them, what are your character's weaknesses?</p>"
             inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1]}'s flaws?" value="" autofocus></textarea>`
-
             userInput(inputTag5, createDNDCharacter, userProgress)
             
             break

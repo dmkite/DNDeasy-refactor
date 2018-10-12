@@ -1,7 +1,7 @@
-// const spells = require('./spellList')
-const spells = require('./test')
-const { createDNDCharacter, userProgress } = require('./main')
-const {display, select} = require('./display')
+
+const spells = require('./data-objects/spells')
+
+const {select} = require('./display')
 
 function prepareSpellOptions(level, className, numOfChoices = 1, progressLog, triggerFn){
     let holder = document.getElementById('holder')

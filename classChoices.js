@@ -1,6 +1,5 @@
-const classes = require('./data-objects/classes')
 const spelldisplay = require('./spellDisplay')
-const {display, select } = require('./display')
+const {display } = require('./display')
 const { choiceNotPresent } = require('./storeProgress')
 
 function progressChoices(progressPoint, progressLog, number, triggerFn){

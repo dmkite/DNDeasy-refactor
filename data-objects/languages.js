@@ -9,4 +9,4 @@ const languages = {
     Infernal: { desc: 'The language of demons', img: 'img/tiefling.jpg', reverse: "Infernal was the language of the baatezu, a subtype of devils, and of the Nine Hells."}
 }
 
-module.exports = languagesg
+module.exports = languages

@@ -1,8 +1,6 @@
 const skills = require('./skills')
-// const spells= require('./spells') just trying this 
-// const spells = require('./../spellList')
-const spells = require('./../test')
-const { createDNDCharacter, userProgress } = require('../main')
+const spells = require('./spells')
+
 
 const { Acrobatics, 'Animal Handling': animalHandling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, 'Sleight of Hand': sleightOfHand, Stealth, Survival } = skills
 const classes = {
@@ -148,7 +146,7 @@ const classes = {
             tools:["Theive's Tools"]
         },
         armorType: ['scale'],
-        choices: { skills: [4, { Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Persuasion, sleightOfHand, Stealth, Survival }]/*, Expertise: [1, userProgress[10]or whichever choosing class skills is]*/ },
+        choices: { skills: [4, { Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Persuasion, sleightOfHand, Stealth, Survival }] },
         equipment: ['2 shortswords', "dungeoneer's pack", 'longbow'],
         features: ['Expertise', 'Sneak Attack', "Theives' Cant"],
         desc: 'The Dastardly Infiltrator',
