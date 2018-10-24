@@ -17,5 +17,7 @@
     "run-all": "^1.0.1",
     "watchify": "^3.11.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "octicons": "^8.1.0"
+  }
 }

@@ -1,392 +1,688 @@
-const languages = require('./data-objects/languages')
-const races = require('./data-objects/races')
-const subraces = require('./data-objects/subraces')
-const backgrounds = require('./data-objects/backgrounds')
-const classes = require('./data-objects/classes')
-const progressChoices = require('./classChoices')
-const { display } = require('./display')
-const prepareSpellOptions = require('./spellDisplay')
-const userInput = require('./userInput')
-const hpRoll = require('./hpRoll')
-const displayStats = require('./diceStats')
-const { addRaceData, addSubraceData, addClassData, addClassChoices, addBackgroundData } = require('./createUserObj')
-const createCharSheet = require('./createCharSheet')
-const characterProg = require('./charProg')
-const progressbar = document.querySelector('#progress')
-const { storeProgress, revertProgress, choiceNotPresent } = require('./storeProgress')
-const alignment = require('./data-objects/alignment')
+const races = require('./races')
+const equipment = require('./equipment')
+const languages = require('./languages')
+const skills = require('./skills')
+const subraces = require('./subraces')
+const spells = require('./spells')
+const classes = require('./classes')
+const startingEquipment = require('./startingEquipment')
 
-let userObj = {
-    race: '',
-    name: '',
-    stats: {
-        STR: 0,
-        DEX: 0,
-        CON: 0,
-        INT: 0,
-        WIS: 0,
-        CHA: 0
+const displayBoard = {
+    element: document.querySelector('#displayBoard'),
+    clear: function(){
+        const self = this
+        self.element.innerHTML = ''
     },
-    speed: 0,
-    profs: {
-        weapons: [],
-        armor: [],
-        tools: [],
-        other: [],
+    display: function(inputArray, displayFn){
+        const self = this
+        let content = []
+        for(let i = 0; i < inputArray.length; i++){
+            content.push(displayFn(inputArray[i]))
+        }
+        self.element.innerHTML = content.join('\n')
     },
-    features: [],
-    languages: [],
-    spells: {
-        cantrips: [],
-        level1: []
+    prepForSelection: function(){
+            let self = this
+            if(self.choicesLeft === 0){
+                self.choicesLeft = 1
+            }
+            let cards = document.querySelectorAll('.card')
+            for(let card of cards){
+                card.addEventListener('click', function (e) { 
+                    select(e)
+                })
+            }
+        
     },
-    HP: 0,
-    AC: 0,
-    DC: 0,
-    equipment: {
-        weapons: [],
-        other: [],
-        shield: []
-    },
-    skills: [],
-    background: '',
-    traits: '',
-    bonds: '',
-    ideals: '',
-    flaws: '',
-    classType: '',
-    savingThrow: []
+    choicesLeft:1,
+    userInput:''
 }
 
-let userProgress = []
+let user = {
+    progress: [],
+    choiceSkipped: function(){
+        const self = this
+        self.progress.push(null)
+        return createDNDChar()
+    },
+    addSelected: function(){
+        const selections = document.querySelector('.selected')
+    }, 
+    storeAndProceed: function(){
+        
+        const selections = document.querySelectorAll('.selected')
+        if (selections.length > 1) {
+            let tempResult = []
+            for (let selection of selections) {
+                tempResult.push(selection)
+            }
+            user.progress.push(tempResult)
+        }
+        else {
+            user.progress.push(selections[0].children[1].children[0].textContent)
+        }
+        user.saveProg()  
+        createDNDChar()
+    },
+    saveProg: function () {
+        if (!!localStorage.getItem('storedUser')) {
+            let stringStorage = localStorage.getItem('storedUser')
+            let storageArray = JSON.parse(stringStorage)
+            storageArray.push(user)
+            stringStorage = JSON.stringify(storageArray)
+            localStorage.setItem('storedUser', stringStorage)
+        }
+    },
+    revertProg: function(){
+        let stringStorage = localStorage.getItem('storedUser')
+        let storageArray = JSON.parse(stringStorage)
+        storageArray.pop()
+        let mostRecentlyStored = storageArray[storageArray.length - 1]
+        console.log(storageArray)
+        let lastLog = mostRecentlyStored.progress
+        
 
-function createDNDCharacter(){
-    
-    const prompter = document.querySelector('#prompter')
-    
-    document.querySelector('#back').onclick = function(){
-        let position = revertProgress()
-        userObj = position.user
-        userProgress = position.progressLog
-        createDNDCharacter()
+        let lastDecision = lastLog[lastLog.length - 1]
+        //returns last item of array
+
+        if (lastDecision !== null) {
+            user = storageArray[storageArray.length - 1]
+        }
+        else {
+            while (lastDecision === null) {
+                storageArray.pop()
+                mostRecentlyStored = storageArray[storageArray.length - 1]
+                lastLog = mostRecentlyStored.progress
+                lastDecision = lastLog[lastLog.length - 1]
+            }
+
+            storageString = JSON.stringify(storageArray)
+
+            localStorage.setItem('storedUser', storageString)
+
+            user = storageArray[storageArray.length - 1]
+        }
+
+        createDNDChar()
     }
 
-    document.querySelector('#next').classList.add('hidden')
+}
 
-    switch(userProgress.length){
-        case 0:
-            let storedProgress = []
-            let stringStoredProgress = JSON.stringify(storedProgress)
-            localStorage.setItem('storedProgress', stringStoredProgress)
-           
-            //function to display races
-            prompter.innerHTML = '<h2>Choose your race</h2><p>What kind of adventurer will you be?</p>'
-            display(races, userProgress, createDNDCharacter)
+const controlBoard = {
+    element:document.querySelector('#controls'),
+    updatePrompt: function(prompt){
+        if(!!document.querySelector('#prompter')){
+            document.querySelector('#prompter').remove()
+        }
+        
+        let prompter = document.createElement('div')
+        prompter.id = 'prompter'
+        document.querySelector('body').appendChild(prompter)
 
-            break
-        case 1:
-            document.querySelector('#back').classList.remove('hidden')
+        document.querySelector('#prompter').textContent = prompt
+        let span = document.createElement('span')
+        document.querySelector('#prompter').appendChild(span)
+        document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
+    },
+    back: document.querySelector('#back')
+}
+
+function raceTemplateFn({name, speed, ability_bonuses, traits, img}){
+    const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+    statBonus = ''
+    for(let i = 0; i < ability_bonuses.length; i ++){
+        if(ability_bonuses[i] > 0){
+            statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
+        }
+    }
+    let traitString = ''
+
+    for (let trait in traits){
+        traitString += `${trait.name}<br>`
+    }
+
+    return `<div class="card">
+        <img class="card-img-top" src="${img}" alt="Image of ${name}">
+        <div class="card-body">
+            <h5 class="card-title">${name}</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div>
+        <ul class="list-group list-group-flush hidden">
+            <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
+            <li class="list-group-item">Racial Features:<br>${traitString}</li>
+        </ul>
+        <div class="card-body hidden">
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+        </div>
+</div>`
+}
+
+function displaySubchoice(race, options, dataObj) {
+    let optionArray = race[options].from
+    let subchoiceTemplate = []
+    for (let option of optionArray) {
+        let desc
+        for (let item of dataObj) {
+            if (item.name === option.name) {
+                if(!!item.desc){
+                    desc = item.desc[0]
+                }
+                else{
+                    desc = 'No description available'
+                }
+            }
+        }
+        subchoiceTemplate.push(
+            `<div class="card">
+                <img class="card-img-top" src="https://via.placeholder.com/300" alt="Image of ${option.name}">
+                <div class="card-body">
+                    <h5 class="card-title">${option.name}</h5>
+                </div>
+            </div>
+            
+            <div class="hidden hidden-desc">${desc}</div>`
+        )
+
+    }
+    displayBoard.element.innerHTML = subchoiceTemplate.join('\n')
+    displayBoard.choicesLeft = race[options].choose
+    const cards = document.querySelectorAll('.card')
+    for (let card of cards) {
+        card.onclick = function (e) { select(e) }
+    }
+}
+
+function select(e){
+    const card = e.currentTarget
+    const next = document.querySelector('#next')
+    for(let child of displayBoard.element.children){
+        if(child.classList.contains('hidden-desc')){
+            child.classList.add('hidden')
+        }
+    }
+
+    if (card.classList.contains('selected')) {   //if you select an item that has already been selected
+        displayBoard.choicesLeft++                              //add a choice to the list
+        card.classList.toggle('selected')            //remvoe 'selected' class
+    }
+    else {                                                  //if you select an item that has not been selected
+        if (displayBoard.choicesLeft > 0) {                         //if you have choices left
+            displayBoard.choicesLeft--                              //reduce choices left
+            card.classList.toggle('selected')            // give item a class of selected
+        }
+        else{                                                  //if you don't have choices left
+            alert('You have no choices left')
+        }
+    }
+
     
-            //add race data to user object
-            addRaceData(userObj, races[userProgress[0][0]])
-            
-            //change progressbar
-            progressbar.className = 'ten'
+    if(displayBoard.choicesLeft === 0){    
+        next.classList.remove('inactive')
+        next.onclick = user.storeAndProceed
+    }
+    else{
+        next.classList.add('inactive')
+        next.onclick = null
+    }
 
-            //funtion to choose name
-            prompter.innerHTML = "<h2>What's in a name?</h2> <p>No one wants to go on a quest with <i>Kyle</i>... The right name can make a big difference in the world of DND</p>"
-            let inputTag = '<input id="userInput" type="text" require minlength="1" placeholder ="what is your name?" value="" autofocus>'
-            userInput(inputTag, createDNDCharacter, userProgress, 'names')
+    if (card.nextElementSibling !== null){
+        card.nextElementSibling.classList.toggle('hidden')        
+    }
+
+    document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
+}
+
+function dataDisplay(choiceArray, dataArray) {
+    if (choiceArray === null) {
+        choiceArray = []
+        for (let item of dataArray) {
+            choiceArray.push(item.name)
+        }
+    }
+    
+    let itemHTML = []
+    for (let itemChoice of choiceArray) {
+        for (let item of dataArray) {
+            if (itemChoice === item.name) {
+                itemHTML.push(
+                    `<div class="card">
+                        <img class="card-img-top" src="" alt="Image of ${item.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${item.name}</h5>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        </div>
+                        <ul class="list-group list-group-flush hidden">
+                            <li class="list-group-item">Racial Features:<br>${item.desc}</li>
+                        </ul>
+                        <div class="card-body hidden">
+                            <a href="#" class="card-link">Card link</a>
+                            <a href="#" class="card-link">Another link</a>
+                        </div>
+                    </div>`
+                )
+            }
+        }
+        
+        displayBoard.element.innerHTML = itemHTML.join('')
+        displayBoard.prepForSelection()
+    }
+}
+
+function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
+    const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+    statBonus = ''
+    for (let i = 0; i < ability_bonuses.length; i++) {
+        if (ability_bonuses[i] > 0) {
+            statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
+        }
+    }
+    let traitString = ''
+
+    for (let trait in racial_traits) {
+        traitString += `${racial_traits.name}<br>`
+    }
+
+    return `<div class="card">
+                                <img class="card-img-top" src="" alt="Image of ${name}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${name}</h5>
+                                    <p class="card-text">${desc}</p>
+                                </div>
+                                <ul class="list-group list-group-flush hidden">
+                                    <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
+                                    <li class="list-group-item">Racial Features:<br>${traitString}</li>
+                                </ul>
+                                <div class="card-body hidden">
+                                    <a href="#" class="card-link">Card link</a>
+                                    <a href="#" class="card-link">Another link</a>
+                                </div>
+                            </div>`
+}
+
+//Procedural
+document.querySelector('.btn-secondary').addEventListener('click', function(){
+    let storageKeys = Object.keys(localStorage)
+    document.querySelector('body').innerHTML += '<b id="error">you have nothing to load</b>'
+
+})
+
+document.querySelector('.btn-primary').addEventListener('click', function () {
+    let storage = []
+    let stringStorage = JSON.stringify(storage)
+    localStorage.setItem('storedUser', stringStorage)
+    createDNDChar()
+})
+
+
+function createDNDChar(){
+    controlBoard.back.onclick = user.revertProg
+    controlBoard.back.classList.remove('inactive')
+    switch(user.progress.length){
+        case 0:
+            controlBoard.back.onclick = null
+            controlBoard.back.classList.add('inactive')
+            displayBoard.clear()
+            document.querySelector('#user').classList.toggle('inactive')
+            displayBoard.display(races, raceTemplateFn)
+            displayBoard.prepForSelection()
+            controlBoard.updatePrompt("Here's your prompt")
+            break
+
+        case 1:
+            for (let race of races) {
+                if (race.name === user.progress[0]) {
+                    user.raceIndex = race.index - 1
+                }
+            }
+
+            //determine proficiency/language/trait options
+            if ( races[user.raceIndex].name === 'Dwarf' ){
+                displaySubchoice(races[user.raceIndex], 'starting_proficiency_options', equipment)
+                controlBoard.updatePrompt('Select a tool proficiency')
+            }
+            else if (races[user.raceIndex].name === "Half-Elf" || races[user.raceIndex].name === "Human" ){
+                displaySubchoice(races[user.raceIndex], 'language_options', languages)
+                controlBoard.updatePrompt('Select another language')
+            }
+            else if (races[user.raceIndex].name === "Dragonborn"){
+                displaySubchoice(races[user.raceIndex], 'trait_options', equipment)
+                controlBoard.updatePrompt('Select a Draconic Ancestry')
+            }
+            else{
+                user.choiceSkipped()
+            }
 
             break
+
         case 2:
-            //add name to user object
-            userObj.name = userProgress[1]
-            
-            //change progressbar
-            progressbar.className = 'twenty'
+            //determine subrace/features options
+            if( races[user.raceIndex].name === 'Half-Elf' ){
+                dataDisplay(null, skills)
+                displayBoard.choicesLeft = 2
+            }
+            else if(races[user.raceIndex].subraces.length > 0){
+                let subraceTemplate = []
 
-            // choose a language if applicable
-            prompter.innerHTML = "<h2>Stacking up Languages</h2> <p>Always spending time between worlds, Half Elves know a variety of tongues. Select a bonus language</p>"
-            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.languages){
-                choiceNotPresent(userProgress, createDNDCharacter)
+                for(let subrace of subraces){
+                    if(subrace.race.name === user.progress[0]){
+                        subraceTemplate.push(subraceTemplateFn(subrace))
+                    }
+                }
+                displayBoard.element.innerHTML = subraceTemplate.join('')     
                 
+                displayBoard.prepForSelection()   
             }
             else{
-                display(races[userProgress[0][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
+                user.choiceSkipped()
             }
-
             break
+
         case 3:
-            //add bonus languages if user is half elf
-            if(userProgress[2] !== null){userObj.languages[0].push(userProgress[2][0])}
-            
-            //choose skills if applicable
-            prompter.innerHTML = "<h2>Skillz</h2> <p>As a Half Elf you've spent a lot of time alone honing your sills. Pick 2 that you're proficient in.</p>"
-            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.skills){
-                choiceNotPresent(userProgress, createDNDCharacter)
-            }
-            else{
-                display(races[userProgress[0][0]].choices.skills, userProgress, createDNDCharacter)
-            }
-
-            break
-        case 4:
-            //add bonus skills if user is half elf
-            if (userProgress[3] !== null) { for (let skill of userProgress[3]) { userObj.skills.push(skill) } }
-
-            prompter.innerHTML = "<h2>Choose your stats</h2> <p>Another benefit of being a Half Elf is deciding where your strengths lay. Pick 2 stats to receive a +1 boost.</p>"
-            
-            //choose stats if applicable
-            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.stats){
-                choiceNotPresent(userProgress, createDNDCharacter)
-            }
-            else{
-                display(races[userProgress[0][0]].choices.stats, userProgress, createDNDCharacter)
-            }
-           
-            break
-        case 5: 
-            //add bonus stats if user is half elf
-            if (userProgress[4] !== null) {
-                for (let stat of userProgress[4]) {
-                    userObj.stats[stat]++
+            //determine subrace options
+            for (let subrace of subraces) {
+                if (subrace.name === user.progress[2]) {
+                    user.subraceIndex = subrace.index - 1
                 }
             }
             
-            //choose dragon breath if applicable
-            prompter.innerHTML = "<h2>Who's your dad?</h2> <p>Dragonborn are direct descendants of <i>real</i> dragons. Pick your heritage and your bonus dragon breath weapon.</p>"
-            if(userProgress[0][0] !== 'Dragonborn'){
-                choiceNotPresent(userProgress, createDNDCharacter)
+            if( user.progress[2] === 'High Elf'){
+                displaySubchoice(subraces[user.subraceIndex], 'language_options', languages)
             }
             else{
-                display(races.Dragonborn.choices.weapons, userProgress, createDNDCharacter)
+                user.choiceSkipped()
             }
-           
             break
-        case 6:
-            //add dragonbreath if user is dragonborn
-            if(userProgress[5] !== null){
-                userObj.equipment.weapons.push(userProgress[5][0])
-            }
-            
-            //choose subrace if applicable
-            prompter.innerHTML = `<h2>Choose a subrace</h2> <p>There's more than one kind of ${userProgress[0][0]}. Which kind are you?</p>`
-            if(!races[userProgress[0][0]].choices || !races[userProgress[0][0]].choices.subrace){
-                choiceNotPresent(userProgress, createDNDCharacter)
-            }
-            else{
-                display(races[userProgress[0][0]].choices.subrace, userProgress, createDNDCharacter)
-            }
-            
-            break
-        case 7: 
-            //add subrace to user object
-            if(userProgress[6] !== null){
-                addSubraceData(userObj, subraces[userProgress[0][0]][userProgress[6][0]])
-            }
-            
-            //choose spell
-            prompter.innerHTML = "<h2>Choose a Cantrip</h2> <p>Cantrips are spells you can cast without any trouble. You know one right off the bat because you're a High Elf</p>"
-            if(userProgress[6] === null || userProgress[6][0] !== 'High Elf'){
-                choiceNotPresent(userProgress, createDNDCharacter)
-            }
-            else{
-                prepareSpellOptions(0, null, 1, userProgress, createDNDCharacter)
-            }
-           
-            break
-        case 8:
-            //add bonus spell if user is high elf
-            if (userProgress[7] !== null) {userObj.spells.cantrips.push(userProgress[7][0]) }
-    
-            //choose language
-            prompter.innerHTML = "<h2>Choose another language</h2> <p>Your status as a high elf means you're familiar with lots of languages. Pick one that you're fluent in.</p>"
-            if (userProgress[6] === null || userProgress[6][0] !== 'High Elf') {
-                choiceNotPresent(userProgress, createDNDCharacter)
+
+        case 4:
+            if (user.progress[2] === 'High Elf') {
+                displaySubchoice(subraces[user.subraceIndex], 'racial_trait_options', spells)
             }
             else {
-                display(subraces.Elf[userProgress[6][0]].choices.languages, userProgress, createDNDCharacter, 'languages')
+                user.choiceSkipped()
             }
-           
             break
-        case 9:
-            //add bonus language if user is high elf
-            if (userProgress[8] !== null) { userObj.languages[0].push(userProgress[8][0]) }
-
-            //choose class
-            prompter.innerHTML = "<h2>Choose a class</h2> <p>There are lots of different kinds of adventurers, each with their own special abilities. What kind are you?</p>"
-            display(classes, userProgress, createDNDCharacter)
-            
+        
+        case 5: 
+            displayBoard.display(classes, classTemplateFn)
+            displayBoard.prepForSelection()
+            controlBoard.updatePrompt('Select your class')
             break
-        case 10:
-            //add class data to user object
-            addClassData(userObj, classes[userProgress[9][0]])
-            userObj.classType = userProgress[9][0]
 
-            //change progressbar
-            progressbar.className = 'thirty'
+        case 6:
+            //prof choices
+            for (let classType of classes) {
+                if (classType.name === user.progress[5]) {
+                    user.classIndex = classType.index - 1
+                }
+            }
+        
+            let skillChoiceArray = []
+            for (let skill of classes[user.classIndex].proficiency_choices[0].from){
+                skillChoiceArray.push(skill.name)
+            }
+        
+            dataDisplay(skillChoiceArray, skills)
+            displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[0].choose
 
-            //choose skills
-            prompter.innerHTML = `<h2>Choose your skills</h2> <p>As a ${userProgress[9][0]}, you're proficient in different skills. Choose your strong suits</p>`
-            
-            progressChoices(classes, userProgress, 0, createDNDCharacter)
-            
+            controlBoard.updatePrompt(`Choose ${displayBoard.choicesLeft} skills`)
             break
-        case 11:
-            // add class skills to user object
-            for (let skill of userProgress[10]) { userObj.skills.push(skill) }
 
-            //choose class choices 2
-            progressChoices(classes, userProgress, 1, createDNDCharacter)
-            
-            break
-        case 12: 
-            //add class choice 2 to user object
-            if(userProgress[11] !== null){addClassChoices(userObj, userProgress[11], classes[userProgress[9][0]], 1)}
-
-            //choose class choices 3
-            progressChoices(classes, userProgress, 2, createDNDCharacter)
-            
-            break
-        case 13:
-            //add class choice 3 user object
-            if (userProgress[12] !== null) { addClassChoices(userObj, userProgress[12], classes[userProgress[9][0]], 2) }
-
-            //choose class choices 4
-            progressChoices(classes, userProgress, 3, createDNDCharacter)
-            
-            break
-        case 14: 
-            //add class choice 4 to user object
-            if (userProgress[13] !== null) { addClassChoices(userObj, userProgress[13], classes[userProgress[9][0]], 3) }
-            
-            //choose alignment
-            prompter.innerHTML = `<h2>Are you a good ${userObj.classType} or a bad ${userObj.classType}?</h2> <p>Alignment is a 2 axis decision. Are you prone to selflessness or selfishness? Are you prone to order or spontaneity?</p>`
-            display(alignment, userProgress, createDNDCharacter)
-            
-            break
-        case 15:
-            //add alignment to user object
-            userObj.alignment = userProgress[14][0]
-
-            //change progressbar
-            progressbar.className = 'forty'
-
-            //choose background
-            prompter.innerHTML = '<h2>Pick a background</h2> <p>What were you doing before your adventure?</p>'
-            display(backgrounds, userProgress, createDNDCharacter)
-            
-            break
-        case 16:
-            //add background to user object
-            addBackgroundData(userObj, backgrounds[userProgress[15][0]])
-            userObj.background = userProgress[15][0]
-            
-            //change progressbar
-            progressbar.className = 'fifty'
-
-            //choose background choices 
-            if(!!backgrounds[userProgress[15][0]].choices === false){
-                choiceNotPresent(userProgress, createDNDCharacter)
+        case 7:
+            if( user.progress[5] === 'Monk' || user.progress[5] === 'Bard' ){
+                let skillChoiceArray = []
+                for (let instrument of classes[user.classIndex].proficiency_choices[1].from) {
+                    skillChoiceArray.push(instrument.name)
+                }
+                dataDisplay(skillChoiceArray, equipment)
+                displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[1].choose
             }
             else{
-                prompter.innerHTML = `<h2>Pick your languages</h2> <p>As a ${userObj.background} you can pick an additional language.</p>`
-                display(languages, userProgress, createDNDCharacter, 'languages')
+                user.choiceSkipped()
             }
-           
             break
-        case 17:
-            //add bonus background languages 
-            if (userProgress[15] !== null) { userObj.languages.push(userProgress[16]) } 
-            
-            //attribute stats
-            prompter.innerHTML = '<h2>Parsel out your stats</h2> <p>Stats have been generated for you, decide where you want to attribute them.</p>'
-            displayStats(userProgress, createDNDCharacter)
-           
-            break
-        case 18:
-            //add stats to user object
-            for(let stat in userProgress[17][0]){
-                userObj.stats[stat] += Number(userProgress[17][0][stat])
+        
+        case 8:
+            if (user.progress[5] === 'Monk' ) {
+                let skillChoiceArray = []
+                for (let item of classes[user.classIndex].proficiency_choices[2].from) {
+                    skillChoiceArray.push(item.name)
+                }
+                dataDisplay(skillChoiceArray, equipment)
+                displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[2].choose
             }
-
-            //change progressbar
-            progressbar.className = 'sixty'
-
-            //roll HP
-            prompter.innerHTML = `<h2>How tough are you?</h2> <p>Roll the dice to see how many hit points your character has. Hit points are equal to this roll plue your constitution modifier (${Math.floor((userObj.stats.CON - 10) / 2)})</p>`
-            hpRoll(userProgress, createDNDCharacter)
-           
+            else {
+                user.choiceSkipped()
+            }
             break
-        case 19:
-            //add HP to user object
-            userObj.HP += Number(userProgress[18][0])
+        
+        case 9:
+        console.log(user.classIndex)
+            if(user.classIndex >= 1 && user.classIndex <= 3 || user.classIndex >= 9){
+                console.log('still went to wrong part', 'even though changed')
+                displayBoard.choicesLeft = classes[user.classIndex].spellcasting.cantrips
 
-            //change progressbar
-            progressbar.className = 'seventy'
-
-            //traits
-            prompter.innerHTML = '<h2>What are your personality traits?</h2><p>Spend some time thinking about this, it makes the role playing experience much easier!</p>'
-            let inputTag2 = `<textarea id="userInput" type="text" require maxlength="140" placeholder="How would you describe ${userProgress[1]}?" value="" autofocus></textarea>`
-            userInput(inputTag2, createDNDCharacter, userProgress)
-
+                controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.cantrips} Cantrips`)
+                
+                spellDisplay(classes[user.classIndex].name, 0)
+            }
+            else{
+                user.choiceSkipped()
+            }
             break
-        case 20:
-            //add traits to user object
-            userObj.traits = userProgress[19]
-            
-            //change progressbar
-            progressbar.className = 'eighty'
 
-            //ideals
-            prompter.innerHTML = '<h2>What are your ideals?</h2><p>What is important to your character?</p>'
+        case 10: 
+            if(user.classIndex === 1 || user.classIndex === 10 || user.classIndex === 9){
+                displayBoard.choicesLeft = classes[user.classIndex].spellcasting.first_level
 
-            let inputTag3 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what does ${userProgress[1]} stand for?" value="" autofocus></textarea>`
-            userInput(inputTag3, createDNDCharacter, userProgress)
+                controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.first_level} level 1 spells`)
 
+                spellDisplay(classes[user.classIndex].name, 1)
+            }
+            else{
+                user.choiceSkipped()
+            }
             break
-        case 21:
-            //add ideals to user object
-            userObj.ideals = userProgress[20]
 
-            //change progressbar
-            progressbar.className = 'ninety'
-
-            //bonds
-            prompter.innerHTML = '<h2>What are your bonds?</h2><p>Who or what does your character value?</p>'
-            inputTag4 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what is ${userProgress[1]} connected to?" value="" autofocus></textarea>`
-            userInput(inputTag4, createDNDCharacter, userProgress)
-
+        case 11:
+            controlBoard.updatePrompt('Choose your equipment')
+            displayBoard.element.innerHTML = ''
+            equipmentFunction(startingEquipment[user.classIndex].choice_1[0].from[0], startingEquipment[user.classIndex].choice_1[1].from, 1)
             break
-        case 22:
-            //add bonds to user object 
-            userObj.bonds = userProgress[21]
 
-            //change progressbar
-            progressbar.className = 'hundred'
-
-            // flaws
-            prompter.innerHTML = "<h2>What's wrong with you?</h2><p>Everybody's got them, what are your character's weaknesses?</p>"
-            inputTag5 = `<textarea id="userInput" type="text" require maxlength="140" placeholder ="what are ${userProgress[1]}'s flaws?" value="" autofocus></textarea>`
-            userInput(inputTag5, createDNDCharacter, userProgress)
-            
-            break
-        default:
-            //add bonds to user object 
-            userObj.flaws = userProgress[22]
-
-            createCharSheet(userObj)
-            return
     }
-    characterProg(userObj)   
-    storeProgress(userObj, userProgress)
+    }
+
+function equipmentFunction(firstOption, secondOptions, choiceNum){
+        let equipmentOptions = []
+        let idOptions = []
+        console.log(firstOption)
+        if (firstOption !== null){
+            equipmentOptions.push(firstOption)
+            idOptions.push(firstOption.item.name.split(' ').join(''))
+        }
+
+        for(let option of secondOptions){
+            equipmentOptions.push(option)
+            idOptions.push(option.item.name.split(' ').join(''))
+        }
+
+        let equipmentHTML = []
+     
+        for(let i = 0; i < equipmentOptions.length; i++){
+            let damageVal = equipment[Number(equipmentOptions[i].item.url) - 1].damage
+            
+            if(!!damageVal){
+                let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) | ${damageVal.dice_count}d${damageVal.dice_value} ${damageVal.damage_type.name}</label>
+                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
+                equipmentHTML.push(optionHTML)
+            }
+            else if (!!equipment[Number(firstOption.item.url) - 1].contents){
+                console.log('ok')
+
+                optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) </label>
+                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
+                equipmentHTML.push(optionHTML)
+                // ^^ is just place holder
+            }
+            else{
+                let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) </label>
+                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
+                equipmentHTML.push(optionHTML)
+            }
+            }
+        displayBoard.element.innerHTML += `<form id="equipmentForm${choiceNum}"><h2>Equipment Choice ${choiceNum}</h2>${equipmentHTML.join('')}</form>`
+        
+        choiceNum++
+        if(choiceNum === 2){
+            equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
+        }
+
+        else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3){
+            equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
+        }
+
+        else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4){
+            equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
+        }
+        else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5){
+            equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
+            
+        }
+        const next = document.querySelector('#next')
+        next.classList.add('inactive')
+        next.onclick = null
+
+        document.addEventListener('change', function(){
+            let selectionCt = document.querySelectorAll('h2').length
+            let selectedCt = 0
+            let inputs = document.querySelectorAll('input')
+            for(let input of inputs){
+                if (input.checked){ selectedCt++}
+            }
+
+            if(selectionCt === selectedCt){
+                next.classList.remove('inactive')
+                next.onclick = function(){displayBoard.element.innerHTML = ''}
+            }
+        })
+    }
+
+function classTemplateFn({ name, hit_die, saving_throws }) {
+    return `<div class="card">
+        <img class="card-img-top" src="" alt="Image of ${name}">
+        <div class="card-body">
+            <h5 class="card-title">${name}</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div>
+        <div class="card-body hidden">
+            <p>Hit Die: 1d${hit_die}</p>
+            <p>Saving Throws: ${saving_throws[0].name}, ${saving_throws[1].name}</p>
+        </div>
+    </div>`
+}
+
+function spellDisplay(className, level) {
+    let spellHTML = {
+        attack: [],
+        utility: [],
+        strategy: [],
+        support: []
+    }
+    
+
+    for (let spell of spells) {
+        if (spell.level === level) {
+            for (let classList of spell.classes) {
+                if (classList.name === className) {
+                    
+                    let spellCardHTML = `
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${spell.name}</h5>
+                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                        </div>
+                                        <div class="card-body hidden">
+                                            <p>Range: ${spell.name}</p>
+                                            <p>Duration: ${spell.duration}</p>
+                                            <p>Concentration: ${spell.concentration}</p>
+                                            <p>Casting Time: ${spell.casting_time}</p>
+                                        </div>
+                                    </div>`
+                    if (spell.attack) {
+                        spellHTML.attack.push(spellCardHTML)
+                    }
+                    else if (spell.utility) {
+                        spellHTML.utility.push(spellCardHTML)
+                    }
+                    else if (spell.strategy) {
+                        spellHTML.strategy.push(spellCardHTML)
+                    }
+                    else {
+                        spellHTML.support.push(spellCardHTML)
+                    }
+                }
+            }
+        }
+    }   
+    if(spellHTML.attack.length > 0){
+    displayBoard.element.innerHTML = `
+        <button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="attackSpells">
+            <div class="horizontalScroll">
+                ${spellHTML.attack.join('')}
+            </div>
+        </div>`
+    }
+    if(spellHTML.strategy.length > 0){
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#strategySpells" aria-expanded="false" aria-controls="strategySpells">Strategy Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="strategySpells">
+            <div class="horizontalScroll">
+                ${spellHTML.strategy.join('')}
+            </div>
+        </div>`
+    }
+    if (spellHTML.utility.length > 0) {
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#utilitySpells" aria-expanded="false" aria-controls="utilitySpells">Utility Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="utilitySpells">
+            <div class="horizontalScroll">
+                ${spellHTML.utility.join('')}
+            </div>
+        </div>`
+    }
+    if(spellHTML.support.length > 0){        
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#supportSpells" aria-expanded="false" aria-controls="supportSpells">Support Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="supportSpells">
+            <div class="horizontalScroll">
+                ${spellHTML.support.join('')}
+            </div>
+        </div>`
+    }
+    
+    displayBoard.prepForSelection()
+    
+    document.addEventListener('click', function(){
+        let spellButtons = document.querySelectorAll('.spellButton')
+        let horizontalScrollDivs = document.querySelectorAll('.horizontalScroll')
+        
+        for(let i = 0; i < horizontalScrollDivs.length; i++){
+            let selectedCounter = 0
+            let scrollDiv = horizontalScrollDivs[i]
+            for(let child of scrollDiv.children){
+                if(child.classList.contains('selected')){
+                    selectedCounter++
+                }
+            }
+            spellButtons[i].children[0].textContent = `${selectedCounter} selected`
+        }
+    })
+
+
+        
 }
 
 
-
-createDNDCharacter()
-
-const expObj = {createDNDCharacter, userProgress, userObj}
-
-module.exports = expObj
