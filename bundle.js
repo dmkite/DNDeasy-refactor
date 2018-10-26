@@ -5062,6 +5062,209 @@ function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
                             </div>`
 }
 
+
+
+function equipmentFunction(firstOption, secondOptions, choiceNum) {
+    let equipmentOptions = []
+    let idOptions = []
+    console.log(firstOption)
+    if (firstOption !== null) {
+        equipmentOptions.push(firstOption)
+        idOptions.push(firstOption.item.name.split(' ').join(''))
+    }
+
+    for (let option of secondOptions) {
+        equipmentOptions.push(option)
+        idOptions.push(option.item.name.split(' ').join(''))
+    }
+
+    let equipmentHTML = []
+
+    for (let i = 0; i < equipmentOptions.length; i++) {
+        let damageVal = equipment[Number(equipmentOptions[i].item.url) - 1].damage
+
+        if (!!damageVal) {
+            let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) | ${damageVal.dice_count}d${damageVal.dice_value} ${damageVal.damage_type.name}
+            
+                    <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
+            </label>`
+            
+            equipmentHTML.push(optionHTML)
+        }
+        else if (!!equipment[Number(firstOption.item.url) - 1].contents) {
+            console.log('ok')
+
+            optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
+            <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
+            </label>`
+                
+            equipmentHTML.push(optionHTML)
+            // ^^ is just place holder
+        }
+        else {
+            let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
+                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
+            </label>
+                `
+            equipmentHTML.push(optionHTML)
+        }
+    }
+    displayBoard.element.innerHTML += `<form id="equipmentForm${choiceNum}"><h2>Equipment Choice ${choiceNum}</h2>${equipmentHTML.join('')}</form>`
+
+    choiceNum++
+    if (choiceNum === 2) {
+        equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
+    }
+
+    else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3) {
+        equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
+    }
+
+    else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4) {
+        equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
+    }
+    else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5) {
+        equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
+
+    }
+    const next = document.querySelector('#next')
+    next.classList.add('inactive')
+    next.onclick = null
+
+    document.addEventListener('change', function () {
+        let selectionCt = document.querySelectorAll('h2').length
+        let selectedCt = 0
+        let inputs = document.querySelectorAll('input')
+        for (let input of inputs) {
+            if (input.checked) { selectedCt++ }
+        }
+
+        if (selectionCt === selectedCt) {
+            next.classList.remove('inactive')
+            next.onclick = function () { displayBoard.element.innerHTML = '' }
+        }
+    })
+}
+
+function classTemplateFn({ name, hit_die, saving_throws }) {
+    return `<div class="card">
+        <img class="card-img-top" src="" alt="Image of ${name}">
+        <div class="card-body">
+            <h5 class="card-title">${name}</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        </div>
+        <div class="card-body hidden">
+            <p>Hit Die: 1d${hit_die}</p>
+            <p>Saving Throws: ${saving_throws[0].name}, ${saving_throws[1].name}</p>
+        </div>
+    </div>`
+}
+
+function spellDisplay(className, level) {
+    let spellHTML = {
+        attack: [],
+        utility: [],
+        strategy: [],
+        support: []
+    }
+
+
+    for (let spell of spells) {
+        if (spell.level === level) {
+            for (let classList of spell.classes) {
+                if (classList.name === className) {
+
+                    let spellCardHTML = `
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${spell.name}</h5>
+                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                        </div>
+                                        <div class="card-body hidden">
+                                            <p>Range: ${spell.name}</p>
+                                            <p>Duration: ${spell.duration}</p>
+                                            <p>Concentration: ${spell.concentration}</p>
+                                            <p>Casting Time: ${spell.casting_time}</p>
+                                        </div>
+                                    </div>`
+                    if (spell.attack) {
+                        spellHTML.attack.push(spellCardHTML)
+                    }
+                    else if (spell.utility) {
+                        spellHTML.utility.push(spellCardHTML)
+                    }
+                    else if (spell.strategy) {
+                        spellHTML.strategy.push(spellCardHTML)
+                    }
+                    else {
+                        spellHTML.support.push(spellCardHTML)
+                    }
+                }
+            }
+        }
+    }
+    if (spellHTML.attack.length > 0) {
+        displayBoard.element.innerHTML = `
+        <button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="attackSpells">
+            <div class="horizontalScroll">
+                ${spellHTML.attack.join('')}
+            </div>
+        </div>`
+    }
+    if (spellHTML.strategy.length > 0) {
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#strategySpells" aria-expanded="false" aria-controls="strategySpells">Strategy Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="strategySpells">
+            <div class="horizontalScroll">
+                ${spellHTML.strategy.join('')}
+            </div>
+        </div>`
+    }
+    if (spellHTML.utility.length > 0) {
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#utilitySpells" aria-expanded="false" aria-controls="utilitySpells">Utility Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="utilitySpells">
+            <div class="horizontalScroll">
+                ${spellHTML.utility.join('')}
+            </div>
+        </div>`
+    }
+    if (spellHTML.support.length > 0) {
+        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#supportSpells" aria-expanded="false" aria-controls="supportSpells">Support Spells<span class="numSpellsSelected"></span></button>
+
+        <div class="collapse" id="supportSpells">
+            <div class="horizontalScroll">
+                ${spellHTML.support.join('')}
+            </div>
+        </div>`
+    }
+
+    displayBoard.prepForSelection()
+
+    document.addEventListener('click', function () {
+        let spellButtons = document.querySelectorAll('.spellButton')
+        let horizontalScrollDivs = document.querySelectorAll('.horizontalScroll')
+
+        for (let i = 0; i < horizontalScrollDivs.length; i++) {
+            let selectedCounter = 0
+            let scrollDiv = horizontalScrollDivs[i]
+            for (let child of scrollDiv.children) {
+                if (child.classList.contains('selected')) {
+                    selectedCounter++
+                }
+            }
+            spellButtons[i].children[0].textContent = `${selectedCounter} selected`
+        }
+    })
+
+
+
+}
+
+
+
 //Procedural
 document.querySelector('.btn-secondary').addEventListener('click', function(){
     let storageKeys = Object.keys(localStorage)
@@ -5254,199 +5457,6 @@ function createDNDChar(){
 
     }
     }
-
-function equipmentFunction(firstOption, secondOptions, choiceNum){
-        let equipmentOptions = []
-        let idOptions = []
-        console.log(firstOption)
-        if (firstOption !== null){
-            equipmentOptions.push(firstOption)
-            idOptions.push(firstOption.item.name.split(' ').join(''))
-        }
-
-        for(let option of secondOptions){
-            equipmentOptions.push(option)
-            idOptions.push(option.item.name.split(' ').join(''))
-        }
-
-        let equipmentHTML = []
-     
-        for(let i = 0; i < equipmentOptions.length; i++){
-            let damageVal = equipment[Number(equipmentOptions[i].item.url) - 1].damage
-            
-            if(!!damageVal){
-                let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) | ${damageVal.dice_count}d${damageVal.dice_value} ${damageVal.damage_type.name}</label>
-                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
-                equipmentHTML.push(optionHTML)
-            }
-            else if (!!equipment[Number(firstOption.item.url) - 1].contents){
-                console.log('ok')
-
-                optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) </label>
-                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
-                equipmentHTML.push(optionHTML)
-                // ^^ is just place holder
-            }
-            else{
-                let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) </label>
-                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">`
-                equipmentHTML.push(optionHTML)
-            }
-            }
-        displayBoard.element.innerHTML += `<form id="equipmentForm${choiceNum}"><h2>Equipment Choice ${choiceNum}</h2>${equipmentHTML.join('')}</form>`
-        
-        choiceNum++
-        if(choiceNum === 2){
-            equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
-        }
-
-        else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3){
-            equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
-        }
-
-        else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4){
-            equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
-        }
-        else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5){
-            equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
-            
-        }
-        const next = document.querySelector('#next')
-        next.classList.add('inactive')
-        next.onclick = null
-
-        document.addEventListener('change', function(){
-            let selectionCt = document.querySelectorAll('h2').length
-            let selectedCt = 0
-            let inputs = document.querySelectorAll('input')
-            for(let input of inputs){
-                if (input.checked){ selectedCt++}
-            }
-
-            if(selectionCt === selectedCt){
-                next.classList.remove('inactive')
-                next.onclick = function(){displayBoard.element.innerHTML = ''}
-            }
-        })
-    }
-
-function classTemplateFn({ name, hit_die, saving_throws }) {
-    return `<div class="card">
-        <img class="card-img-top" src="" alt="Image of ${name}">
-        <div class="card-body">
-            <h5 class="card-title">${name}</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        </div>
-        <div class="card-body hidden">
-            <p>Hit Die: 1d${hit_die}</p>
-            <p>Saving Throws: ${saving_throws[0].name}, ${saving_throws[1].name}</p>
-        </div>
-    </div>`
-}
-
-function spellDisplay(className, level) {
-    let spellHTML = {
-        attack: [],
-        utility: [],
-        strategy: [],
-        support: []
-    }
-    
-
-    for (let spell of spells) {
-        if (spell.level === level) {
-            for (let classList of spell.classes) {
-                if (classList.name === className) {
-                    
-                    let spellCardHTML = `
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${spell.name}</h5>
-                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                        </div>
-                                        <div class="card-body hidden">
-                                            <p>Range: ${spell.name}</p>
-                                            <p>Duration: ${spell.duration}</p>
-                                            <p>Concentration: ${spell.concentration}</p>
-                                            <p>Casting Time: ${spell.casting_time}</p>
-                                        </div>
-                                    </div>`
-                    if (spell.attack) {
-                        spellHTML.attack.push(spellCardHTML)
-                    }
-                    else if (spell.utility) {
-                        spellHTML.utility.push(spellCardHTML)
-                    }
-                    else if (spell.strategy) {
-                        spellHTML.strategy.push(spellCardHTML)
-                    }
-                    else {
-                        spellHTML.support.push(spellCardHTML)
-                    }
-                }
-            }
-        }
-    }   
-    if(spellHTML.attack.length > 0){
-    displayBoard.element.innerHTML = `
-        <button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="attackSpells">
-            <div class="horizontalScroll">
-                ${spellHTML.attack.join('')}
-            </div>
-        </div>`
-    }
-    if(spellHTML.strategy.length > 0){
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#strategySpells" aria-expanded="false" aria-controls="strategySpells">Strategy Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="strategySpells">
-            <div class="horizontalScroll">
-                ${spellHTML.strategy.join('')}
-            </div>
-        </div>`
-    }
-    if (spellHTML.utility.length > 0) {
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#utilitySpells" aria-expanded="false" aria-controls="utilitySpells">Utility Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="utilitySpells">
-            <div class="horizontalScroll">
-                ${spellHTML.utility.join('')}
-            </div>
-        </div>`
-    }
-    if(spellHTML.support.length > 0){        
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#supportSpells" aria-expanded="false" aria-controls="supportSpells">Support Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="supportSpells">
-            <div class="horizontalScroll">
-                ${spellHTML.support.join('')}
-            </div>
-        </div>`
-    }
-    
-    displayBoard.prepForSelection()
-    
-    document.addEventListener('click', function(){
-        let spellButtons = document.querySelectorAll('.spellButton')
-        let horizontalScrollDivs = document.querySelectorAll('.horizontalScroll')
-        
-        for(let i = 0; i < horizontalScrollDivs.length; i++){
-            let selectedCounter = 0
-            let scrollDiv = horizontalScrollDivs[i]
-            for(let child of scrollDiv.children){
-                if(child.classList.contains('selected')){
-                    selectedCounter++
-                }
-            }
-            spellButtons[i].children[0].textContent = `${selectedCounter} selected`
-        }
-    })
-
-
-        
-}
-
 
 
 },{"./classes":1,"./equipment":2,"./languages":3,"./races":5,"./skills":6,"./spells":7,"./startingEquipment":8,"./subraces":9}],5:[function(require,module,exports){
