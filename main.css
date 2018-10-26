@@ -175,3 +175,19 @@ h1{
     overflow:hidden;
 }
 
+label{
+    width:100%;
+    display:flex;
+    justify-content: space-between;
+    height: 30px;
+    line-height:30px;
+}
+
+label input[type="radio"]{
+    height:30px;
+
+}
+
+label:nth-of-type(odd){
+    background-color:#eee;
+}
