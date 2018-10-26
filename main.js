@@ -6,6 +6,7 @@ const subraces = require('./subraces')
 const spells = require('./spells')
 const classes = require('./classes')
 const startingEquipment = require('./startingEquipment')
+const features = require('./features')
 
 const displayBoard = {
     element: document.querySelector('#displayBoard'),
@@ -305,7 +306,6 @@ function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
 function equipmentFunction(firstOption, secondOptions, choiceNum) {
     let equipmentOptions = []
     let idOptions = []
-    console.log(firstOption)
     if (firstOption !== null) {
         equipmentOptions.push(firstOption)
         idOptions.push(firstOption.item.name.split(' ').join(''))
@@ -319,6 +319,7 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
     let equipmentHTML = []
 
     for (let i = 0; i < equipmentOptions.length; i++) {
+        
         let damageVal = equipment[Number(equipmentOptions[i].item.url) - 1].damage
 
         if (!!damageVal) {
@@ -329,16 +330,14 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
             
             equipmentHTML.push(optionHTML)
         }
-        else if (!!equipment[Number(firstOption.item.url) - 1].contents) {
-            console.log('ok')
-
-            optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
-            <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
-            </label>`
+        // else if (!!equipment[Number(firstOption.item.url) - 1].contents) {
+        //     optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
+        //     <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
+        //     </label>`
                 
-            equipmentHTML.push(optionHTML)
-            // ^^ is just place holder
-        }
+        //     equipmentHTML.push(optionHTML)
+        //     // ^^ is just place holder
+        // }
         else {
             let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
                 <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
@@ -352,18 +351,21 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
     choiceNum++
     if (choiceNum === 2) {
         equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
+        console.log('going to 1st choice')
     }
 
     else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3) {
         equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
+        console.log('going to 3rd choice')
     }
 
     else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4) {
+        console.log('going to 4th choice')
         equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
     }
     else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5) {
+        console.log('going to 5th choice')
         equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
-
     }
     const next = document.querySelector('#next')
     next.classList.add('inactive')
@@ -379,7 +381,17 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
 
         if (selectionCt === selectedCt) {
             next.classList.remove('inactive')
-            next.onclick = function () { displayBoard.element.innerHTML = '' }
+            next.onclick = function () { 
+                let equipmentArray = []
+                let inputs = document.querySelectorAll('input')
+                for(let input of inputs){
+                    if (input.checked){
+                        equipmentArray.push(input.parentElement.textContent)
+                    }
+                }
+                user.progress.push(equipmentArray)
+                return createDNDChar()
+             }
         }
     })
 }
@@ -406,7 +418,7 @@ function spellDisplay(className, level) {
         support: []
     }
 
-
+    displayBoard.element.innerHTML = ''
     for (let spell of spells) {
         if (spell.level === level) {
             for (let classList of spell.classes) {
@@ -660,9 +672,9 @@ function createDNDChar(){
             break
         
         case 9:
-        console.log(user.classIndex)
+        
             if(user.classIndex >= 1 && user.classIndex <= 3 || user.classIndex >= 9){
-                console.log('still went to wrong part', 'even though changed')
+                console.log(classes[user.classIndex].name)
                 displayBoard.choicesLeft = classes[user.classIndex].spellcasting.cantrips
 
                 controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.cantrips} Cantrips`)
@@ -693,6 +705,33 @@ function createDNDChar(){
             equipmentFunction(startingEquipment[user.classIndex].choice_1[0].from[0], startingEquipment[user.classIndex].choice_1[1].from, 1)
             break
 
-    }
+        case 12: 
+            controlBoard.updatePrompt(`${classes[user.classIndex].name} Choices`)
+            if(user.classIndex === 4 || user.classIndex === 8 || user.classIndex === 9){
+                function featureChoices(){
+                    for(let feature of features){
+                        if(feature.class.name === user.progress[5] && !!feature.choice){
+                            displayBoard.element.innerHTML = `${feature.desc}`
+                            for(let choice of feature.choice.from){
+                                displayBoard.element.innerHTML += `<p>${choice.name}</p><p>${choice.desc[0]}</p>`
+ 
+
+                            }
+                        } 
+
+                    }
+                }
+                featureChoices()
+            }
+            else{
+                user.choiceSkipped()
+            }
+            break
+
+        case 13:
+            controlBoard.updatePrompt('Roll Stats')
+            displayBoard.element.innerHTML = 'stat rolling goes here'
+ }
+     
     }
 
