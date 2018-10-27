@@ -55,7 +55,7 @@ let user = {
         if (selections.length > 1) {
             let tempResult = []
             for (let selection of selections) {
-                tempResult.push(selection)
+                tempResult.push(selection.children[1].children[0].textContent)
             }
             user.progress.push(tempResult)
         }
@@ -243,6 +243,22 @@ function dataDisplay(choiceArray, dataArray) {
     }
     
     let itemHTML = []
+    //prevent duplication
+    for(let itemIndex in choiceArray){
+        
+        if (user.progress.includes(choiceArray[itemIndex])){
+            choiceArray.splice(itemIndex, 1)
+        }
+        for(let progressPoint of user.progress){
+            
+            if(progressPoint === null){continue}
+            if(progressPoint.includes(choiceArray[itemIndex])){
+                choiceArray.splice(itemIndex, 1, null)
+            }
+        }
+    }
+    choiceArray = choiceArray.filter(choice => choice !== null)
+
     for (let itemChoice of choiceArray) {
         for (let item of dataArray) {
             if (itemChoice === item.name) {
@@ -330,14 +346,6 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
             
             equipmentHTML.push(optionHTML)
         }
-        // else if (!!equipment[Number(firstOption.item.url) - 1].contents) {
-        //     optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
-        //     <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
-        //     </label>`
-                
-        //     equipmentHTML.push(optionHTML)
-        //     // ^^ is just place holder
-        // }
         else {
             let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
                 <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
@@ -351,20 +359,20 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
     choiceNum++
     if (choiceNum === 2) {
         equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
-        console.log('going to 1st choice')
+        
     }
 
     else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3) {
         equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
-        console.log('going to 3rd choice')
+        
     }
 
     else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4) {
-        console.log('going to 4th choice')
+        
         equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
     }
     else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5) {
-        console.log('going to 5th choice')
+        
         equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
     }
     const next = document.querySelector('#next')
@@ -707,15 +715,14 @@ function createDNDChar(){
 
         case 12: 
             controlBoard.updatePrompt(`${classes[user.classIndex].name} Choices`)
-            if(user.classIndex === 4 || user.classIndex === 8 || user.classIndex === 9){
+            console.log(user.progress)
+            if(user.classIndex === 4 ){
                 function featureChoices(){
                     for(let feature of features){
                         if(feature.class.name === user.progress[5] && !!feature.choice){
                             displayBoard.element.innerHTML = `${feature.desc}`
                             for(let choice of feature.choice.from){
                                 displayBoard.element.innerHTML += `<p>${choice.name}</p><p>${choice.desc[0]}</p>`
- 
-
                             }
                         } 
 
@@ -723,6 +730,27 @@ function createDNDChar(){
                 }
                 featureChoices()
             }
+            else if(user.classIndex === 8){
+                let rogueSkillArray = []
+                
+                if(user.progress[2] !== null){
+                    for (let skill of user.progress[2]){
+                        rogueSkillArray.push(skill)
+                    }
+                }
+
+                for(let skill of user.progress[6]){
+                    rogueSkillArray.push(skill)
+                }
+                
+                displayBoard.element.innerHTML = ''
+                for(let skill of rogueSkillArray){
+                    displayBoard.element.innerHTML += `<p>${skill}</p>`
+                }
+                
+            }
+
+            else if( user.classIndex === 9){}
             else{
                 user.choiceSkipped()
             }
