@@ -128,7 +128,7 @@ const controlBoard = {
     back: document.querySelector('#back')
 }
 
-function raceTemplateFn({name, speed, ability_bonuses, traits, img}){
+function raceTemplateFn({name, speed, ability_bonuses, traits}){
     const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
     statBonus = ''
     for(let i = 0; i < ability_bonuses.length; i ++){
@@ -143,7 +143,7 @@ function raceTemplateFn({name, speed, ability_bonuses, traits, img}){
     }
 
     return `<div class="card">
-        <img class="card-img-top" src="${img}" alt="Image of ${name}">
+        <img class="card-img-top" src="img/dwarf.jpg" alt="Image of ${name}">
         <div class="card-body">
             <h5 class="card-title">${name}</h5>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -156,8 +156,40 @@ function raceTemplateFn({name, speed, ability_bonuses, traits, img}){
             <a href="#" class="card-link">Card link</a>
             <a href="#" class="card-link">Another link</a>
         </div>
+        <div class="gradient${Math.floor(Math.random() * 12) + 1}"></div>
 </div>`
 }
+
+// function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
+//     const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+//     statBonus = ''
+//     for (let i = 0; i < ability_bonuses.length; i++) {
+//         if (ability_bonuses[i] > 0) {
+//             statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
+//         }
+//     }
+//     let traitString = ''
+
+//     for (let trait in racial_traits) {
+//         traitString += `${racial_traits.name}<br>`
+//     }
+
+//     return `<div class="card">
+//                                 <img class="card-img-top" src="" alt="Image of ${name}">
+//                                 <div class="card-body">
+//                                     <h5 class="card-title">${name}</h5>
+//                                     <p class="card-text">${desc}</p>
+//                                 </div>
+//                                 <ul class="list-group list-group-flush hidden">
+//                                     <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
+//                                     <li class="list-group-item">Racial Features:<br>${traitString}</li>
+//                                 </ul>
+//                                 <div class="card-body hidden">
+//                                     <a href="#" class="card-link">Card link</a>
+//                                     <a href="#" class="card-link">Another link</a>
+//                                 </div>
+//                             </div>`
+// }
 
 function displaySubchoice(race, options, dataObj) {
     let optionArray = race[options].from
@@ -234,7 +266,7 @@ function select(e){
     document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
 }
 
-function dataDisplay(choiceArray, dataArray) {
+function dataDisplay(choiceArray, dataArray, preventDupe = true) {
     if (choiceArray === null) {
         choiceArray = []
         for (let item of dataArray) {
@@ -244,21 +276,22 @@ function dataDisplay(choiceArray, dataArray) {
     
     let itemHTML = []
     //prevent duplication
-    for(let itemIndex in choiceArray){
-        
-        if (user.progress.includes(choiceArray[itemIndex])){
-            choiceArray.splice(itemIndex, 1)
-        }
-        for(let progressPoint of user.progress){
+    if(preventDupe){
+        for(let itemIndex in choiceArray){
             
-            if(progressPoint === null){continue}
-            if(progressPoint.includes(choiceArray[itemIndex])){
-                choiceArray.splice(itemIndex, 1, null)
+            if (user.progress.includes(choiceArray[itemIndex])){
+                choiceArray.splice(itemIndex, 1)
+            }
+            for(let progressPoint of user.progress){
+                
+                if(progressPoint === null){continue}
+                if(progressPoint.includes(choiceArray[itemIndex])){
+                    choiceArray.splice(itemIndex, 1, null)
+                }
             }
         }
+        choiceArray = choiceArray.filter(choice => choice !== null)
     }
-    choiceArray = choiceArray.filter(choice => choice !== null)
-
     for (let itemChoice of choiceArray) {
         for (let item of dataArray) {
             if (itemChoice === item.name) {
@@ -285,38 +318,6 @@ function dataDisplay(choiceArray, dataArray) {
         displayBoard.prepForSelection()
     }
 }
-
-function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
-    const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
-    statBonus = ''
-    for (let i = 0; i < ability_bonuses.length; i++) {
-        if (ability_bonuses[i] > 0) {
-            statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
-        }
-    }
-    let traitString = ''
-
-    for (let trait in racial_traits) {
-        traitString += `${racial_traits.name}<br>`
-    }
-
-    return `<div class="card">
-                                <img class="card-img-top" src="" alt="Image of ${name}">
-                                <div class="card-body">
-                                    <h5 class="card-title">${name}</h5>
-                                    <p class="card-text">${desc}</p>
-                                </div>
-                                <ul class="list-group list-group-flush hidden">
-                                    <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
-                                    <li class="list-group-item">Racial Features:<br>${traitString}</li>
-                                </ul>
-                                <div class="card-body hidden">
-                                    <a href="#" class="card-link">Card link</a>
-                                    <a href="#" class="card-link">Another link</a>
-                                </div>
-                            </div>`
-}
-
 
 
 function equipmentFunction(firstOption, secondOptions, choiceNum) {
@@ -434,12 +435,13 @@ function spellDisplay(className, level) {
 
                     let spellCardHTML = `
                                     <div class="card">
+                                        <div></div>
                                         <div class="card-body">
                                             <h5 class="card-title">${spell.name}</h5>
                                             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                                         </div>
                                         <div class="card-body hidden">
-                                            <p>Range: ${spell.name}</p>
+                                            <p>Range: ${spell.range}</p>
                                             <p>Duration: ${spell.duration}</p>
                                             <p>Concentration: ${spell.concentration}</p>
                                             <p>Casting Time: ${spell.casting_time}</p>
@@ -521,6 +523,10 @@ function spellDisplay(className, level) {
 
 }
 
+displayBoard.element.addEventListener('click',function(){
+    document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
+    console.log('x')
+})
 
 
 //Procedural
@@ -539,6 +545,7 @@ document.querySelector('.btn-primary').addEventListener('click', function () {
 
 
 function createDNDChar(){
+    
     controlBoard.back.onclick = user.revertProg
     controlBoard.back.classList.remove('inactive')
     switch(user.progress.length){
@@ -589,7 +596,7 @@ function createDNDChar(){
 
                 for(let subrace of subraces){
                     if(subrace.race.name === user.progress[0]){
-                        subraceTemplate.push(subraceTemplateFn(subrace))
+                        subraceTemplate.push(raceTemplateFn(subrace))
                     }
                 }
                 displayBoard.element.innerHTML = subraceTemplate.join('')     
@@ -654,11 +661,12 @@ function createDNDChar(){
         case 7:
             if( user.progress[5] === 'Monk' || user.progress[5] === 'Bard' ){
                 let skillChoiceArray = []
-                for (let instrument of classes[user.classIndex].proficiency_choices[1].from) {
+                let instrumentChoices = classes[user.classIndex].proficiency_choices[1] 
+                for (let instrument of instrumentChoices.from) {
                     skillChoiceArray.push(instrument.name)
                 }
                 dataDisplay(skillChoiceArray, equipment)
-                displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[1].choose
+                displayBoard.choicesLeft = instrumentChoices.choose
             }
             else{
                 user.choiceSkipped()
@@ -668,11 +676,12 @@ function createDNDChar(){
         case 8:
             if (user.progress[5] === 'Monk' ) {
                 let skillChoiceArray = []
-                for (let item of classes[user.classIndex].proficiency_choices[2].from) {
+                let toolChoices = classes[user.classIndex].proficiency_choices[2] 
+                for (let item of toolChoices.from) {
                     skillChoiceArray.push(item.name)
                 }
                 dataDisplay(skillChoiceArray, equipment)
-                displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[2].choose
+                displayBoard.choicesLeft = toolChoices.choose
             }
             else {
                 user.choiceSkipped()
@@ -682,7 +691,6 @@ function createDNDChar(){
         case 9:
         
             if(user.classIndex >= 1 && user.classIndex <= 3 || user.classIndex >= 9){
-                console.log(classes[user.classIndex].name)
                 displayBoard.choicesLeft = classes[user.classIndex].spellcasting.cantrips
 
                 controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.cantrips} Cantrips`)
@@ -714,6 +722,7 @@ function createDNDChar(){
             break
 
         case 12: 
+            //class feature choices
             controlBoard.updatePrompt(`${classes[user.classIndex].name} Choices`)
             console.log(user.progress)
             if(user.classIndex === 4 ){
@@ -743,23 +752,71 @@ function createDNDChar(){
                     rogueSkillArray.push(skill)
                 }
                 
-                displayBoard.element.innerHTML = ''
-                for(let skill of rogueSkillArray){
-                    displayBoard.element.innerHTML += `<p>${skill}</p>`
-                }
                 
+                dataDisplay(rogueSkillArray, skills, false)
+                displayBoard.choicesLeft = 2
+                controlBoard.updatePrompt('Choose 2 skills that receive a +4 bonus')
             }
 
-            else if( user.classIndex === 9){}
+            else if( user.classIndex === 9){
+                displayBoard.element.innerHTML = `
+                <div class="card" style="width: 100%;">
+                        <img class="card-img-top" src="" alt="Image of Wild Magic">
+                        <div class="card-body">
+                            <h5 class="card-title">Wild Magic</h5>
+                            <p class="card-text">You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again.
+                            <br>Your spellcasting can unleash surges of untamed magic. Immediately after you cast a sorcerer spell of 1st level or higher, the DM can have you roll a d20. If you roll a 1, roll on the Wild Magic Surge table to create a random magical effect.</p>
+                        </div>
+                    </div>
+                    <div class="card dragonAncestry" style="width: 100%;">
+                        <img class="card-img-top" src="" alt="Image of Draconic Bloodline">
+                        <div class="card-body">
+                            <h5 class="card-title">Draconic Bloodline</h5>
+                            <p class="card-text">'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.
+                            <br>You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.</p>
+                        </div>
+                    </div>`
+                    displayBoard.prepForSelection()
+            }
             else{
                 user.choiceSkipped()
             }
             break
 
         case 13:
-            controlBoard.updatePrompt('Roll Stats')
-            displayBoard.element.innerHTML = 'stat rolling goes here'
+            let draconicArray = []
+            if(user.progress[12] === 'Draconic Bloodline'){
+                controlBoard.updatePrompt('Select your draconic ancestry')
+                let draconicArray = []
+                for(let feature of features){
+                    if(feature.index === 305){
+                        for(let ancestorType of feature.choice.from){
+                            draconicArray.push(
+                                `<label name="ancestry">
+                                    ${ancestorType.name}
+                                    <input type="radio" value=${ancestorType.name.split(' ').join('')}>
+                                <label>`
+                            )
+                        }
+                    }
+                }
+                
+                displayBoard.element.innerHTML = `<form id="draconicAncestry">${draconicArray.join('')}</form>`
+                displayBoard.choicesLeft = 1
+                displayBoard.element.addEventListener('change', function(){
+                    let inputs = document.querySelectorAll('#draconicAncestry input')
+                    for(let input of inputs){
+                        if(input.selected === true){
+                            document.querySelector('#next').classList.remove('inactive')
+                        }
+                    }
+                })
+            }
+            else{
+                user.choiceSkipped()
+            }
+            
+            
  }
      
     }
-

@@ -464,43 +464,43 @@ const features = [
             choose: 1, type: 'feature', from: [
         {
                 "url": "306",
-                "name": "Dragon Ancestor: Black - Acid Damage"
+                "name": "Black Dragon - Acid Damage"
             },
         {
         "url": "307",
-        "name": "Dragon Ancestor: Blue - Lightning Damage"
+        "name": "Blue Dragon - Lightning Damage"
     },
     {
         "url": "308",
-        "name": "Dragon Ancestor: Brass - Fire Damage"
+        "name": "Brass Dragon - Fire Damage"
     },
     {
         "url": "309",
-        "name": "Dragon Ancestor: Bronze - Lightning Damage"
+        "name": "Bronze Dragon - Lightning Damage"
     },
     {
         "url": "310",
-        "name": "Dragon Ancestor: Copper - Acid Damage"
+        "name": "Copper Dragon - Acid Damage"
     },
     {
         "url": "311",
-        "name": "Dragon Ancestor: Gold - Fire Damage"
-    },
+        "name": "Gold Dragon - Fire Damage"
+    }, 
     {
         "url": "312",
-        "name": "Dragon Ancestor: Green - Poison Damage"
+        "name": "Green Dragon - Poison Damage"
     },
     {
         "url": "313",
-        "name": "Dragon Ancestor: Red - Fire Damage"
+        "name": "Red Dragon - Fire Damage"
     },
     {
         "url": "314",
-        "name": "Dragon Ancestor: Silver - Cold Damage"
+        "name": "Silver Dragon - Cold Damage"
     },
     {
         "url": "315",
-        "name": "Dragon Ancestor: White - Cold Damage"
+        "name": "White Dragon - Cold Damage"
     }
 ]
  },

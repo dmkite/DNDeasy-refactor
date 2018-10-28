@@ -191,3 +191,72 @@ label input[type="radio"]{
 label:nth-of-type(odd){
     background-color:#eee;
 }
+
+.gradient1, .gradient2, .gradient3, .gradient4, .gradient5, .gradient6, .gradient7, .gradient8, .gradient9, .gradient10, .gradient11, .gradient12{
+    padding-bottom:100%; 
+    width:100%;
+    background: linear-gradient(to bottom right, #32feac90, #ff903290);
+    position:absolute;
+    top:0; 
+    left:0;
+}
+
+.gradient2{
+    background: linear-gradient(to bottom right, #ff9a9e90, #fad0c490);
+}
+
+.gradient3{
+    background: linear-gradient(to bottom right, #a1c4fd90, #c2e9fb90);
+}
+
+.gradient4{
+    background: linear-gradient(to bottom right, #667eea90, #764ba290);
+}
+
+.gradient5{
+    background: linear-gradient(to bottom right, #89f7fe90, #66a6ff90);
+}
+
+.gradient6{
+    background: linear-gradient(to bottom right, #13547a90, #80d0c790);
+}
+
+.gradient7{
+    background: linear-gradient(to bottom right, #96deda90, #50c9c390);
+}
+
+.gradient8{
+    background: linear-gradient(to bottom right, #ffc3a090, #ffafbd90);
+}
+
+.gradient9{
+    background: linear-gradient(to bottom right, #fad0c490, #ffd1ff90);
+}
+
+.gradient10{
+    background: linear-gradient(to bottom right, #f6d36590, #fda08590);
+}
+
+.gradient11{
+    background: linear-gradient(to bottom right, #fbc2eb90, #a6c1ee90);
+}
+
+.gradient12{
+    background: linear-gradient(to bottom right, #d4fc7990, #96e6a190);
+}
+
+#draconicAncestry label{
+    display:block;
+    position:static
+}
+
+#draconicAncestry{
+    border:1px dotted red;
+    height:100vh;
+    
+}
+
+
+
+
+
