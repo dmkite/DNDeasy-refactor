@@ -115,10 +115,10 @@ h1{
     width:200px;
 }
 
-.hidden-desc{
+/* .hidden-desc{
     position:fixed;
     bottom:100px;
-}
+} */
 
 #controls .dropdown-menu{
     width: 300px;

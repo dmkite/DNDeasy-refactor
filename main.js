@@ -14,13 +14,44 @@ const displayBoard = {
         const self = this
         self.element.innerHTML = ''
     },
-    display: function(inputArray, displayFn){
+    display: function(inputArray){
         const self = this
         let content = []
-        for(let i = 0; i < inputArray.length; i++){
-            content.push(displayFn(inputArray[i]))
+        for(let inputEntry of inputArray){
+            const name = inputEntry.name
+            const img = inputEntry.img
+            const desc = inputEntry.img
+            let info1
+            let info2
+            let info3
+
+            if(inputArray === races){
+                const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+                statBonus = ''
+                for (let i = 0; i < inputEntry.ability_bonuses.length; i++) {
+                    if (inputEntry.ability_bonuses[i] > 0) {
+                        statBonus += `+${inputEntry.ability_bonuses[i]} ${statNames[i]}<br>`
+                    }
+                }
+                let traitString = ''
+
+                for (let trait in inputEntry.traits) {
+                    traitString += `${trait.name}<br>`
+                }
+                info1 = `StatBonus: ${statBonus}`
+                info2 = `Features: ${traitString}`
+                info3 = `Speed: ${inputEntry.speed}`
+            }
+            
+            if (inputArray === classes){
+                info1 = `Hit Die: ${inputEntry.hit_die}`
+                info2 = `Saving Throws: ${inputEntry.saving_throws[0].name}, ${inputEntry.saving_throws[0].name}`
+            }
+            
+            content.push(this.htmlTemplate(img, name, desc, info1, info2, info3))
         }
         self.element.innerHTML = content.join('\n')
+        self.prepForSelection()
     },
     prepForSelection: function(){
             let self = this
@@ -30,13 +61,30 @@ const displayBoard = {
             let cards = document.querySelectorAll('.card')
             for(let card of cards){
                 card.addEventListener('click', function (e) { 
-                    select(e)
+                    user.select(e)
                 })
             }
         
     },
     choicesLeft:1,
-    userInput:''
+    userInput:'',
+    htmlTemplate: function(img = 'img/dwarf.jpg', name, desc = '', info1 = '', info2 = '', info3 =''){
+        return `<div class="card">
+                <img class="card-img-top cardImg" src="${img}" alt="Image of ${name}">
+                <div class="card-body">
+                    <h5 class="card-title">${name}</h5> 
+                </div>
+                <div class="hidden raceDisplay">
+                    <p>${desc}</p>
+                    <p>${info1}</p>
+                    <p>${info2}</p>
+                    <p>${info3}</p>
+                </div>
+                <div class="gradient${Math.floor(Math.random() * 12) + 1} cardImg"></div>
+            </div>
+
+            <div class="hidden hidden-desc displaySubchoice">${desc}</div>`
+    }
 }
 
 let user = {
@@ -75,38 +123,51 @@ let user = {
         }
     },
     revertProg: function(){
-        let stringStorage = localStorage.getItem('storedUser')
-        let storageArray = JSON.parse(stringStorage)
-        storageArray.pop()
-        let mostRecentlyStored = storageArray[storageArray.length - 1]
-        console.log(storageArray)
-        let lastLog = mostRecentlyStored.progress
         
+        let storageString = localStorage.getItem('storedUser')
+        let storageArray = JSON.parse(storageString)
+        storageArray.pop()
+        storageString = JSON.stringify(storageArray)
+        localStorage.setItem('storedUser', storageString)
+        
+        if(storageArray.length > 1){
+            user.progress = storageArray[storageArray.length - 1].progress
+        }
+        else{
+            user.progress = []
+        }
+        displayBoard.choicesLeft = 0
+        return createDNDChar()
+    },
 
-        let lastDecision = lastLog[lastLog.length - 1]
-        //returns last item of array
+    select: function(e){
+        const card = e.currentTarget
+        const next = document.querySelector('#next')
 
-        if (lastDecision !== null) {
-            user = storageArray[storageArray.length - 1]
+        if (card.classList.contains('selected')) {   
+            displayBoard.choicesLeft++                           
+            card.classList.toggle('selected')          
+        }
+        else {                                                 
+            if (displayBoard.choicesLeft > 0) {                       
+                displayBoard.choicesLeft--                            
+                card.classList.toggle('selected')            
+            }
+            else {                                                  
+                alert('You have no choices left')
+            }
+        }
+
+        if (displayBoard.choicesLeft === 0) {
+            next.classList.remove('inactive')
+            next.onclick = user.storeAndProceed
         }
         else {
-            while (lastDecision === null) {
-                storageArray.pop()
-                mostRecentlyStored = storageArray[storageArray.length - 1]
-                lastLog = mostRecentlyStored.progress
-                lastDecision = lastLog[lastLog.length - 1]
-            }
-
-            storageString = JSON.stringify(storageArray)
-
-            localStorage.setItem('storedUser', storageString)
-
-            user = storageArray[storageArray.length - 1]
+            next.classList.add('inactive')
+            next.onclick = null
         }
-
-        createDNDChar()
-    }
-
+        document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
+        }
 }
 
 const controlBoard = {
@@ -128,69 +189,6 @@ const controlBoard = {
     back: document.querySelector('#back')
 }
 
-function raceTemplateFn({name, speed, ability_bonuses, traits}){
-    const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
-    statBonus = ''
-    for(let i = 0; i < ability_bonuses.length; i ++){
-        if(ability_bonuses[i] > 0){
-            statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
-        }
-    }
-    let traitString = ''
-
-    for (let trait in traits){
-        traitString += `${trait.name}<br>`
-    }
-
-    return `<div class="card">
-        <img class="card-img-top" src="img/dwarf.jpg" alt="Image of ${name}">
-        <div class="card-body">
-            <h5 class="card-title">${name}</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        </div>
-        <ul class="list-group list-group-flush hidden">
-            <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
-            <li class="list-group-item">Racial Features:<br>${traitString}</li>
-        </ul>
-        <div class="card-body hidden">
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
-        </div>
-        <div class="gradient${Math.floor(Math.random() * 12) + 1}"></div>
-</div>`
-}
-
-// function subraceTemplateFn({ name, desc, ability_bonuses, racial_traits }) {
-//     const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
-//     statBonus = ''
-//     for (let i = 0; i < ability_bonuses.length; i++) {
-//         if (ability_bonuses[i] > 0) {
-//             statBonus += `+${ability_bonuses[i]} ${statNames[i]}<br>`
-//         }
-//     }
-//     let traitString = ''
-
-//     for (let trait in racial_traits) {
-//         traitString += `${racial_traits.name}<br>`
-//     }
-
-//     return `<div class="card">
-//                                 <img class="card-img-top" src="" alt="Image of ${name}">
-//                                 <div class="card-body">
-//                                     <h5 class="card-title">${name}</h5>
-//                                     <p class="card-text">${desc}</p>
-//                                 </div>
-//                                 <ul class="list-group list-group-flush hidden">
-//                                     <li class="list-group-item">Stat Bonuses:<br>${statBonus}</li>
-//                                     <li class="list-group-item">Racial Features:<br>${traitString}</li>
-//                                 </ul>
-//                                 <div class="card-body hidden">
-//                                     <a href="#" class="card-link">Card link</a>
-//                                     <a href="#" class="card-link">Another link</a>
-//                                 </div>
-//                             </div>`
-// }
-
 function displaySubchoice(race, options, dataObj) {
     let optionArray = race[options].from
     let subchoiceTemplate = []
@@ -207,14 +205,7 @@ function displaySubchoice(race, options, dataObj) {
             }
         }
         subchoiceTemplate.push(
-            `<div class="card">
-                <img class="card-img-top" src="https://via.placeholder.com/300" alt="Image of ${option.name}">
-                <div class="card-body">
-                    <h5 class="card-title">${option.name}</h5>
-                </div>
-            </div>
-            
-            <div class="hidden hidden-desc">${desc}</div>`
+            displayBoard.htmlTemplate(undefined, option.name, undefined, undefined, undefined, undefined, desc, undefined)
         )
 
     }
@@ -222,49 +213,10 @@ function displaySubchoice(race, options, dataObj) {
     displayBoard.choicesLeft = race[options].choose
     const cards = document.querySelectorAll('.card')
     for (let card of cards) {
-        card.onclick = function (e) { select(e) }
+        card.onclick = function (e) { user.select(e) }
     }
 }
 
-function select(e){
-    const card = e.currentTarget
-    const next = document.querySelector('#next')
-    for(let child of displayBoard.element.children){
-        if(child.classList.contains('hidden-desc')){
-            child.classList.add('hidden')
-        }
-    }
-
-    if (card.classList.contains('selected')) {   //if you select an item that has already been selected
-        displayBoard.choicesLeft++                              //add a choice to the list
-        card.classList.toggle('selected')            //remvoe 'selected' class
-    }
-    else {                                                  //if you select an item that has not been selected
-        if (displayBoard.choicesLeft > 0) {                         //if you have choices left
-            displayBoard.choicesLeft--                              //reduce choices left
-            card.classList.toggle('selected')            // give item a class of selected
-        }
-        else{                                                  //if you don't have choices left
-            alert('You have no choices left')
-        }
-    }
-
-    
-    if(displayBoard.choicesLeft === 0){    
-        next.classList.remove('inactive')
-        next.onclick = user.storeAndProceed
-    }
-    else{
-        next.classList.add('inactive')
-        next.onclick = null
-    }
-
-    if (card.nextElementSibling !== null){
-        card.nextElementSibling.classList.toggle('hidden')        
-    }
-
-    document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
-}
 
 function dataDisplay(choiceArray, dataArray, preventDupe = true) {
     if (choiceArray === null) {
@@ -292,24 +244,12 @@ function dataDisplay(choiceArray, dataArray, preventDupe = true) {
         }
         choiceArray = choiceArray.filter(choice => choice !== null)
     }
+
     for (let itemChoice of choiceArray) {
         for (let item of dataArray) {
             if (itemChoice === item.name) {
                 itemHTML.push(
-                    `<div class="card">
-                        <img class="card-img-top" src="" alt="Image of ${item.name}">
-                        <div class="card-body">
-                            <h5 class="card-title">${item.name}</h5>
-                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        </div>
-                        <ul class="list-group list-group-flush hidden">
-                            <li class="list-group-item">Racial Features:<br>${item.desc}</li>
-                        </ul>
-                        <div class="card-body hidden">
-                            <a href="#" class="card-link">Card link</a>
-                            <a href="#" class="card-link">Another link</a>
-                        </div>
-                    </div>`
+                    displayBoard.htmlTemplate(undefined, item.name, undefined, undefined, undefined, item.desc, undefined)
                 )
             }
         }
@@ -318,6 +258,9 @@ function dataDisplay(choiceArray, dataArray, preventDupe = true) {
         displayBoard.prepForSelection()
     }
 }
+
+
+
 
 
 function equipmentFunction(firstOption, secondOptions, choiceNum) {
@@ -405,20 +348,6 @@ function equipmentFunction(firstOption, secondOptions, choiceNum) {
     })
 }
 
-function classTemplateFn({ name, hit_die, saving_throws }) {
-    return `<div class="card">
-        <img class="card-img-top" src="" alt="Image of ${name}">
-        <div class="card-body">
-            <h5 class="card-title">${name}</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        </div>
-        <div class="card-body hidden">
-            <p>Hit Die: 1d${hit_die}</p>
-            <p>Saving Throws: ${saving_throws[0].name}, ${saving_throws[1].name}</p>
-        </div>
-    </div>`
-}
-
 function spellDisplay(className, level) {
     let spellHTML = {
         attack: [],
@@ -433,20 +362,8 @@ function spellDisplay(className, level) {
             for (let classList of spell.classes) {
                 if (classList.name === className) {
 
-                    let spellCardHTML = `
-                                    <div class="card">
-                                        <div></div>
-                                        <div class="card-body">
-                                            <h5 class="card-title">${spell.name}</h5>
-                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                        </div>
-                                        <div class="card-body hidden">
-                                            <p>Range: ${spell.range}</p>
-                                            <p>Duration: ${spell.duration}</p>
-                                            <p>Concentration: ${spell.concentration}</p>
-                                            <p>Casting Time: ${spell.casting_time}</p>
-                                        </div>
-                                    </div>`
+                    let spellCardHTML =  displayBoard.htmlTemplate(undefined, spell.name, spell.desc[0], `Range: ${spell.range}`, `Duration: ${spell.duration}`, `Casting Time: ${spell.casting_time}`)
+
                     if (spell.attack) {
                         spellHTML.attack.push(spellCardHTML)
                     }
@@ -463,42 +380,23 @@ function spellDisplay(className, level) {
             }
         }
     }
-    if (spellHTML.attack.length > 0) {
-        displayBoard.element.innerHTML = `
-        <button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
 
-        <div class="collapse" id="attackSpells">
-            <div class="horizontalScroll">
-                ${spellHTML.attack.join('')}
-            </div>
-        </div>`
+    for(let key in spellHTML){
+        if (spellHTML[key].length > 0){
+            displayBoard.element.innerHTML += 
+                `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
+
+                <div class="collapse" id="attackSpells">
+                    <div class="horizontalScroll">
+                        ${spellHTML[key].join('')}
+                    </div>
+                </div>`
+        }
+        
     }
-    if (spellHTML.strategy.length > 0) {
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#strategySpells" aria-expanded="false" aria-controls="strategySpells">Strategy Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="strategySpells">
-            <div class="horizontalScroll">
-                ${spellHTML.strategy.join('')}
-            </div>
-        </div>`
-    }
-    if (spellHTML.utility.length > 0) {
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#utilitySpells" aria-expanded="false" aria-controls="utilitySpells">Utility Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="utilitySpells">
-            <div class="horizontalScroll">
-                ${spellHTML.utility.join('')}
-            </div>
-        </div>`
-    }
-    if (spellHTML.support.length > 0) {
-        displayBoard.element.innerHTML += `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#supportSpells" aria-expanded="false" aria-controls="supportSpells">Support Spells<span class="numSpellsSelected"></span></button>
-
-        <div class="collapse" id="supportSpells">
-            <div class="horizontalScroll">
-                ${spellHTML.support.join('')}
-            </div>
-        </div>`
+    let cardImgs = document.querySelectorAll('.cardImg')
+    for(let img of cardImgs){
+        img.classList.add('hidden')
     }
 
     displayBoard.prepForSelection()
@@ -545,7 +443,7 @@ document.querySelector('.btn-primary').addEventListener('click', function () {
 
 
 function createDNDChar(){
-    
+    console.log(user.progress)
     controlBoard.back.onclick = user.revertProg
     controlBoard.back.classList.remove('inactive')
     switch(user.progress.length){
@@ -554,8 +452,8 @@ function createDNDChar(){
             controlBoard.back.classList.add('inactive')
             displayBoard.clear()
             document.querySelector('#user').classList.toggle('inactive')
-            displayBoard.display(races, raceTemplateFn)
-            displayBoard.prepForSelection()
+            displayBoard.display(races)
+            // displayBoard.prepForSelection()
             controlBoard.updatePrompt("Here's your prompt")
             break
 
@@ -593,15 +491,11 @@ function createDNDChar(){
             }
             else if(races[user.raceIndex].subraces.length > 0){
                 let subraceTemplate = []
-
-                for(let subrace of subraces){
-                    if(subrace.race.name === user.progress[0]){
-                        subraceTemplate.push(raceTemplateFn(subrace))
-                    }
-                }
-                displayBoard.element.innerHTML = subraceTemplate.join('')     
+                let subraceArray = subraces.filter(subrace => subrace.race.name === user.progress[0])
+                displayBoard.display(subraceArray)
+ 
                 
-                displayBoard.prepForSelection()   
+                // displayBoard.prepForSelection()   
             }
             else{
                 user.choiceSkipped()
@@ -634,8 +528,8 @@ function createDNDChar(){
             break
         
         case 5: 
-            displayBoard.display(classes, classTemplateFn)
-            displayBoard.prepForSelection()
+            displayBoard.display(classes)//classTemplateFn)
+            // displayBoard.prepForSelection()
             controlBoard.updatePrompt('Select your class')
             break
 
@@ -820,3 +714,5 @@ function createDNDChar(){
  }
      
     }
+
+    

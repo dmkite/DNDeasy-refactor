@@ -90,7 +90,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/1",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
     },
 	{
 		"index": 2,
@@ -158,7 +158,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/2",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 3,
@@ -211,7 +211,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/3",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 4,
@@ -307,7 +307,7 @@ const races = [
 		"traits": [],
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/4",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 5,
@@ -405,7 +405,7 @@ const races = [
 			},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/5",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 6,
@@ -462,7 +462,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/6",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 7,
@@ -577,7 +577,7 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/7",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 8,
@@ -632,7 +632,7 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/8",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	},
 	{
 		"index": 9,
@@ -681,7 +681,7 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/9",
-        "img": "https://via.placeholder.com/300"
+        "img": "img/dwarf.jpg"
 	}
 ]
 
