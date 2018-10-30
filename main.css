@@ -257,6 +257,70 @@ label:nth-of-type(odd){
 }
 
 
+.statHolderRow>div{
+    display:flex;
+    flex-flow:row-reverse;
+    text-align:bottom;
+    line-height:30px;
+}
+
+.statHolder{
+    height:30px;
+    width:50px;
+    border:2px solid #239090;
+    margin-bottom:20px;
+    box-sizing:border-box;
+    margin-left:20px;
+
+}
 
 
+.statNum{
+    height:30px;
+    width:30px;
+    background-color:#239090;
+    border-radius:50%;
+    line-height:30px;
+    text-align:center;
+    margin-bottom:20px;
+    color:white;
+    border:2px solid #239090;
+    box-sizing: border-box;
+}
 
+.statSelected{
+    background-color:white;
+    color:#239090
+    
+}
+
+.statHolderRow{
+    width:66%;
+}
+.statNumRow, {
+    width:33%;
+
+}
+
+
+.statHolder div{
+    width:100%;
+    border-radius:0;
+    height:26px;
+    line-height:26px;
+    background-color:#239090;
+    color:white;
+}
+
+.clear{
+    margin-right:90%
+}
+
+.statHolder p{
+    color:black !important;
+    
+}
+
+.numAdded{
+    font-weight:bold;
+}
