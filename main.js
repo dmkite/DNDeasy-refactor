@@ -7,7 +7,7 @@ const spells = require('./spells')
 const classes = require('./classes')
 const startingEquipment = require('./startingEquipment')
 const features = require('./features')
-
+const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
 const displayBoard = {
     element: document.querySelector('#displayBoard'),
     clear: function(){
@@ -26,7 +26,7 @@ const displayBoard = {
             let info3
 
             if(inputArray === races){
-                const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
+                
                 statBonus = ''
                 for (let i = 0; i < inputEntry.ability_bonuses.length; i++) {
                     if (inputEntry.ability_bonuses[i] > 0) {
@@ -84,6 +84,24 @@ const displayBoard = {
             </div>
 
             <div class="hidden hidden-desc displaySubchoice">${desc}</div>`
+    },
+    diceRoll: function(numDice, numSides) {
+        let statNums = []
+        for (let i = 0; i < numDice; i++) {
+            let score = Math.floor(Math.random() * numSides) + 1
+            statNums.push(score)
+        }
+        return statNums
+        },
+    statGen: function(rollFn, numDice, numSides, numTimes) {
+        let stats = []
+        for (let i = 0; i < numTimes; i++) {
+            let statNums = rollFn(numDice, numSides)
+            statNums.sort((a, b) => a - b)
+            statNums.shift()
+            stats.push(statNums.reduce((acc, num) => acc + num, 0))
+        }
+        return stats
     }
 }
 
@@ -167,6 +185,15 @@ let user = {
             next.onclick = null
         }
         document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
+        },
+        statSelect: function(e){
+            let statNums = document.querySelectorAll('.statNum')
+            for(statNum of statNums){
+                statNum.onclick = function(e){
+                    e.currentTarget.classList.toggle('statSelected')
+                }
+            }
+
         }
 }
 
@@ -441,7 +468,8 @@ document.querySelector('.btn-primary').addEventListener('click', function () {
     createDNDChar()
 })
 
-
+user.progress = ['Half-Elf', 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+user.raceIndex = 6
 function createDNDChar(){
     console.log(user.progress)
     controlBoard.back.onclick = user.revertProg
@@ -709,10 +737,184 @@ function createDNDChar(){
             else{
                 user.choiceSkipped()
             }
+            break
+        
+        case 14: 
+            displayBoard.clear()
+            controlBoard.updatePrompt('Allocate Stats')
+            document.querySelector('#prompter span').style.display = 'none'
+
+            let stats = displayBoard.statGen(displayBoard.diceRoll, 4, 6, 6)
+
+//generate stats and render
+            let statHolderHTML = []
+            let statNumHTML = []
+            let raceBonusData = races[user.raceIndex].ability_bonuses
+            let subraceBonusData
+
+            for(let i = 0; i < 6; i++){
+                let bonusText = ''
+                
+                if(user.subraceIndex !== undefined){
+                    subraceBonusData = subraces[subraceIndex].abilityBonuses[i]
+                }
+                if (!!raceBonusData[i] || !!subraceBonusData){
+                    bonusText = ` (+${raceBonusData[i] || subraceBonusData})`
+                }
+                statHolderHTML.push(`
+                    <div id="${statNames[i]}">
+                        <div class="statHolder"></div>
+                        ${statNames[i]} ${bonusText}
+                    </div>`)
+            }
+            for(let i = 0; i < 6; i++){
+                statNumHTML.push(`
+                <div class="statNum">
+                    ${stats[i]}
+                </div>`)
+            }
+            displayBoard.element.innerHTML = `
+                <div class="statHolderRow">${statHolderHTML.join('')}</div>
+
+                <div class="statNumRow">${statNumHTML.join('')}</div>
+                <button class="btn clear">Clear</button>`
+                                
+//add racial bonuses
+            let statNums = document.querySelectorAll('.statNum')
+            let statHolders = document.querySelectorAll('.statHolder')
+            let statNumRow = document.querySelector('.statNumRow')
+            let statHolderRow = document.querySelector('.statHolderRow')
             
-            
- }
-     
+            user.statSelect()
+// Click and allocate
+            for (let statNum of statNums) {
+
+                statNum.onclick = function (e) {
+                    for (let statNum of statNums) {
+                        statNum.classList.remove('statSelected')
+                    }
+                    e.target.classList.toggle('statSelected')
+                }
+            }
+
+            for (let statHolder of statHolders) {
+                statHolder.onclick = function (e) {
+                    let stat = document.querySelector('.statSelected')
+                    if (e.target.children.length === 0) {
+                        e.target.appendChild(stat)
+                    }
+                }
+            }
+// Revert on clear click
+            document.querySelector('.clear').addEventListener('click', function () {
+                for (let statNum of statNums) {
+                    statNumRow.appendChild(statNum)
+                    
+                }
+            })
+
+            displayBoard.element.addEventListener('click', function(){
+                if(statNumRow.children.length === 0){
+                    next.classList.remove('inactive')
+
+                    next.onclick = function () {
+                        let allocatedStats = []
+                        for (let statHolder of statHolders) {
+                            allocatedStats.push(Number(statHolder.children[0].innerHTML))
+                        }
+                        let statArray = [allocatedStats, raceBonusData, subraceBonusData = [0,0,0,0,0,0]]
+                        let statResult = statArray.reduce((acc, arr) => {
+                            console.log(acc)
+                            for (let i = 0; i < arr.length; i++) {
+                                acc[i] += arr[i]
+                            }
+                            return acc
+                        }, [0, 0, 0, 0, 0, 0])
+
+                        user.progress.push(statResult)
+                        return createDNDChar()
+                    }
+                }
+                else{
+                    next.onclick = null
+                    next.classList.add('inactive')
+                }
+
+               
+            })
+            break
+
+            case 15:
+            if (user.progress[0] === 'Half-Elf') {
+                document.querySelector('#Charisma').remove()
+                let statNums = document.querySelectorAll('.statNum')
+                let statHolders = document.querySelectorAll('.statHolder')
+
+                for(let i = 0; i < 5; i++){
+                    statNums[i].onclick = null
+                    statHolders[i].onclick = null
+                }
+
+                displayBoard.choicesLeft = 2
+                controlBoard.updatePrompt('As a Half-Elf add 1 point to two stats')
+                next.classList.add('inactive')
+
+
+                
+
+                for (let i = 0; i < statNums.length; i++) {
+                    statNums[i].onclick = function () {
+                        console.log('recognizing click')
+
+                        if (statNums[i].classList.contains('numAdded')) {
+                            statNums[i].innerHTML = Number(statNums[i].innerHTML) - 1
+                            statNums[i].classList.remove('numAdded')
+                            displayBoard.choicesLeft++
+                        }
+                        else{
+                            if (displayBoard.choicesLeft > 0){
+                                statNums[i].innerHTML = Number(statNums[i].innerHTML) + 1
+                                statNums[i].classList.add('numAdded')
+                                displayBoard.choicesLeft--
+
+                            }
+                            else{
+                                alert('no choices left')
+                            }
+                        }
+                        
+                    }
+                }
+
+                displayBoard.element.addEventListener('click', function(){
+                    let numAdded = document.querySelectorAll('.numAdded')
+                    if(numAdded.length === 2){
+                        next.classList.remove('inactive')
+                        next.onclick = function(){
+                            console.log(user.progress[14])
+                            for(let i = 0; i < statNums.length; i++){
+                                if(statNums[i].classList.contains('numAdded')){
+                                    user.progress[14][i] += 1
+                                }
+                            }
+                            console.log(user.progress[14])
+                            displayBoard.clear()
+
+                            return createDNDChar()
+                        }
+                    }
+                    else{
+                        next.classList.add('inactive')
+                        next.onclick = null
+                    }
+                })
+            }
+            user.choiceSkipped()
+            break
+         }
+
+
+          
     }
 
     
