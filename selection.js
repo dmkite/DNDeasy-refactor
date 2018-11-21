@@ -6,8 +6,8 @@ const races = require('./data/races')
 
 const displayBoard = document.querySelector('#displayBoard')
 
-function display(arr) {
-    let result = arr.map(item => standardTemplate(item))
+function display(arr, templateType = standardTemplate) {
+    let result = arr.map(item => templateType(item))
     displayBoard.innerHTML = result.join('')
     prepCards(arr)
 }
@@ -98,12 +98,12 @@ function skipDisplay(returnFn){
 }
 
 
-function selectFrom(choiceObj, originArray) {
+function selectFrom(choiceObj, originArray, templateType = standardTemplate) {
     let choiceArray
     if ( Array.isArray(choiceObj) ) choiceArray = choiceObj.map(item => item.name)
     else choiceArray = choiceObj.from.map(item => item.name)
     let displayArray = matchByName(originArray, choiceArray)
-    display(displayArray)
+    display(displayArray, templateType)
 }
 
 

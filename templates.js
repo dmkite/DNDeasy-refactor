@@ -18,4 +18,13 @@ function infoPageHTML(item){
     </div>`
 }
 
-module.exports = {standardTemplate, infoPageHTML}
+function radioTemplate(item){
+    const id = item.name.split(' ').join('')
+    return `
+    <input id="${id}" type="radio" name="choice1">
+    <label for="${id}">
+        ${item.name} | ${item.damage.dice_count}d${item.damage.dice_value} ${item.damage.damage_type.name}
+    </label>
+    `
+}
+module.exports = {standardTemplate, infoPageHTML, radioTemplate}

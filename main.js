@@ -48,6 +48,9 @@ function createDNDChar(){
         case 9:
             choiceFns.spellChoices(1, createDNDChar)
             break
+        case 10:
+            choiceFns.equipmentChoices(1)
+            break
         default:
             console.log(user.log.length, 'doh!')
     }

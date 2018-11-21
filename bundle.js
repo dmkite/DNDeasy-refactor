@@ -10,23 +10,24 @@ const skills = require('./data/skills')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
+const {standardTemplate, radioTemplate} = require('./templates')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
-    display(array)
+    display(array, standardTemplate)
     addDifferentListeners('#displayBoard', ['click', 'touch'], function(){readyToGo(returnFn)})  
 }
 
 function extraRaceChoices(returnFn){
     user.numChoices = 1
     if(user.raceId === 3 || user.raceId === 6){
-        display(languages)
+        display(languages, standardTemplate)
     } 
     else if(user.raceId === 0){
         selectFrom(races[user.raceId].starting_proficiency_options, equipment)
     }
     else if(user.raceId === 4){
-        display(races[4].trait_options.from)
+        display(races[4].trait_options.from, standardTemplate)
     }
     else{
         return skipDisplay(returnFn)
@@ -56,7 +57,7 @@ function skillDisplay(numChoices, list = null) {
         return display(result)
     }
     let result = preventDupe(skills)
-    display(result)
+    display(result, standardTemplate)
 }
 
 
@@ -88,23 +89,44 @@ function spellChoices(lvl, returnFn){
         if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
         else user.numChoices = classes[user.classId].spellcasting.first_level
         if (!user.numChoices){ return skipDisplay(returnFn)}
-        display(spellList)
-        steners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+        display(spellList, standardTemplate)
+        addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
     }
     else skipDisplay(returnFn)
 }
 
-function equipmentChoices(){
-    let equipOpts = startingEquip[user.classId]
-    // function for equipment choices 1
-    if(equipOpts.choice_2){}
+function equipmentChoices(num){
+    let equipOpts = startingEquip[user.classId][`choice_${num}`]
+    const quantityArray = []
+    let choiceArray = createChoiceArray(equipOpts, quantityArray)
+    selectFrom(choiceArray, equipment, radioTemplate)
+    addQuantity(quantityArray)
+}
+
+function createChoiceArray(array, quantityArray){
+    let result = array.reduce((acc, item) => {
+        for (let equipment of item.from) {
+            equipment.item.quantity = equipment.quantity
+            quantityArray.push(equipment.quantity)
+            acc.push(equipment.item)
+        }
+        return acc
+    }, [])
+    return result
+}
+
+function addQuantity(array){
+    const labels = document.querySelectorAll('label')
+    for(let i = 0; i < labels.length; i++){
+        labels[i].textContent += `(x${array[i]})`
+    }
 
 }
 
 
 
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices }
-},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./user":13,"./utils":14}],2:[function(require,module,exports){
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices }
+},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./templates":12,"./user":13,"./utils":14}],2:[function(require,module,exports){
 const classes = [
 	{
 		"index": 1,
@@ -8200,6 +8222,9 @@ function createDNDChar(){
         case 9:
             choiceFns.spellChoices(1, createDNDChar)
             break
+        case 10:
+            choiceFns.equipmentChoices(1)
+            break
         default:
             console.log(user.log.length, 'doh!')
     }
@@ -8219,8 +8244,8 @@ const races = require('./data/races')
 
 const displayBoard = document.querySelector('#displayBoard')
 
-function display(arr) {
-    let result = arr.map(item => standardTemplate(item))
+function display(arr, templateType = standardTemplate) {
+    let result = arr.map(item => templateType(item))
     displayBoard.innerHTML = result.join('')
     prepCards(arr)
 }
@@ -8311,12 +8336,12 @@ function skipDisplay(returnFn){
 }
 
 
-function selectFrom(choiceObj, originArray) {
+function selectFrom(choiceObj, originArray, templateType = standardTemplate) {
     let choiceArray
     if ( Array.isArray(choiceObj) ) choiceArray = choiceObj.map(item => item.name)
     else choiceArray = choiceObj.from.map(item => item.name)
     let displayArray = matchByName(originArray, choiceArray)
-    display(displayArray)
+    display(displayArray, templateType)
 }
 
 
@@ -8383,7 +8408,16 @@ function infoPageHTML(item){
     </div>`
 }
 
-module.exports = {standardTemplate, infoPageHTML}
+function radioTemplate(item){
+    const id = item.name.split(' ').join('')
+    return `
+    <input id="${id}" type="radio" name="choice1">
+    <label for="${id}">
+        ${item.name} | ${item.damage.dice_count}d${item.damage.dice_value} ${item.damage.damage_type.name}
+    </label>
+    `
+}
+module.exports = {standardTemplate, infoPageHTML, radioTemplate}
 },{}],13:[function(require,module,exports){
 const user = {
     log: [],

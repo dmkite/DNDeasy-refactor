@@ -9,23 +9,24 @@ const skills = require('./data/skills')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
+const {standardTemplate, radioTemplate} = require('./templates')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
-    display(array)
+    display(array, standardTemplate)
     addDifferentListeners('#displayBoard', ['click', 'touch'], function(){readyToGo(returnFn)})  
 }
 
 function extraRaceChoices(returnFn){
     user.numChoices = 1
     if(user.raceId === 3 || user.raceId === 6){
-        display(languages)
+        display(languages, standardTemplate)
     } 
     else if(user.raceId === 0){
         selectFrom(races[user.raceId].starting_proficiency_options, equipment)
     }
     else if(user.raceId === 4){
-        display(races[4].trait_options.from)
+        display(races[4].trait_options.from, standardTemplate)
     }
     else{
         return skipDisplay(returnFn)
@@ -55,7 +56,7 @@ function skillDisplay(numChoices, list = null) {
         return display(result)
     }
     let result = preventDupe(skills)
-    display(result)
+    display(result, standardTemplate)
 }
 
 
@@ -87,19 +88,40 @@ function spellChoices(lvl, returnFn){
         if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
         else user.numChoices = classes[user.classId].spellcasting.first_level
         if (!user.numChoices){ return skipDisplay(returnFn)}
-        display(spellList)
-        steners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+        display(spellList, standardTemplate)
+        addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
     }
     else skipDisplay(returnFn)
 }
 
-function equipmentChoices(){
-    let equipOpts = startingEquip[user.classId]
-    // function for equipment choices 1
-    if(equipOpts.choice_2){}
+function equipmentChoices(num){
+    let equipOpts = startingEquip[user.classId][`choice_${num}`]
+    const quantityArray = []
+    let choiceArray = createChoiceArray(equipOpts, quantityArray)
+    selectFrom(choiceArray, equipment, radioTemplate)
+    addQuantity(quantityArray)
+}
+
+function createChoiceArray(array, quantityArray){
+    let result = array.reduce((acc, item) => {
+        for (let equipment of item.from) {
+            equipment.item.quantity = equipment.quantity
+            quantityArray.push(equipment.quantity)
+            acc.push(equipment.item)
+        }
+        return acc
+    }, [])
+    return result
+}
+
+function addQuantity(array){
+    const labels = document.querySelectorAll('label')
+    for(let i = 0; i < labels.length; i++){
+        labels[i].textContent += `(x${array[i]})`
+    }
 
 }
 
 
 
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices }
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices }
