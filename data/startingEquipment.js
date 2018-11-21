@@ -309,7 +309,7 @@ const startingEquipment = [{
 		"choose": 3,
 		"type": "equipment",
 		"from": [{
-			"item": { "url": "39", "name": "Leather armor, Longbow (x1) | 1d8 Piercing"}, "quantity": 1}]
+			"item": { "url": "39", "name": "Leather armor & Longbow"}, "quantity": 1}]
 	}],
 	"choice_2": [{
 		"choose": 1,

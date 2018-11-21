@@ -43,13 +43,34 @@ function createDNDChar(){
             choiceFns.classExtraChoices(createDNDChar)
             break
         case 8:
-            choiceFns.spellChoices(0, createDNDChar)
+            choiceFns.classExtraChoices(createDNDChar)
             break
         case 9:
-            choiceFns.spellChoices(1, createDNDChar)
+            choiceFns.spellChoices(0, createDNDChar)
             break
         case 10:
-            choiceFns.equipmentChoices(1)
+            choiceFns.spellChoices(1, createDNDChar)
+            break
+        case 11:
+            choiceFns.equipmentChoices(1, createDNDChar)
+            break
+        case 12:
+            choiceFns.equipmentChoices(2, createDNDChar)
+            break
+        case 13:
+            choiceFns.equipmentChoices(3, createDNDChar)
+            break
+        case 14:
+            choiceFns.equipmentChoices(4, createDNDChar)
+            break
+        case 15:
+            choiceFns.equipmentChoices(5, createDNDChar)
+            break
+        case 16:
+            choiceFns.classFeatureChoices(5, createDNDChar)
+            break
+        case 17:
+            choiceFns.allocateStates(createDNDChar)
             break
         default:
             console.log(user.log.length, 'doh!')

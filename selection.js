@@ -1,7 +1,8 @@
 const user = require('./user')
-const { standardTemplate, infoPageHTML } = require('./templates')
+const { standardTemplate, infoPageHTML, classchoiceTemplate, sorcererTemplate } = require('./templates')
 const { addListenersToMany } = require('./utils')
 const races = require('./data/races')
+const skills = require('./data/skills')
 
 
 const displayBoard = document.querySelector('#displayBoard')
@@ -145,6 +146,75 @@ function createSpellList(lvl, spells) {
     return spellList
 }
 
+function createChoiceArray(array, quantityArray) {
+    let result = array.reduce((acc, item) => {
+        for (let equipment of item.from) {
+            equipment.item.quantity = equipment.quantity
+            quantityArray.push(equipment.quantity)
+            acc.push(equipment.item)
+        }
+        return acc
+    }, [])
+    return result
+}
 
+function addQuantity(array) {
+    const labels = document.querySelectorAll('label')
+    for (let i = 0; i < labels.length; i++) {
+        labels[i].textContent += `(x${array[i]})`
+    }
+}
 
-module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList}
+function prepForRadioSelection() {
+    let radios = document.querySelectorAll('input')
+    let radioStatus = false
+    for (let radio of radios) {
+        if (radio.checked) {
+            radioStatus = true;
+            break
+        }
+    }
+    if (radioStatus) {
+        addSelectedListener()
+        document.querySelector('#next').classList.remove('inactive')
+        document.querySelector('#next').onclick = function () {
+            addSelection()
+            return returnFn()
+        }
+    }
+}
+
+function addSelectedListener(){
+    displayBoard.addEventListener('click', function(){
+        let radios = document.querySelectorAll('input')
+        for(let radio of radios){
+            if(radio.checked) radio.classList.add('selected')
+            else radio.classList.remove('selected')
+        }
+    })
+}
+
+function displayFighterChoice(){
+    let choice = features.filter(feature => feature.index === 131)
+    const options = choice.choice.from
+    display(options, classChoiceTemplate)
+}
+
+function displayRogueChoice(index){
+    let skillOptions = user.log[6];
+    if (!!user.log[2]) skillOptions.push(user.log[2][0], user.log[2][1]) 
+    skillOptions = skillOptions.reduce((acc, skill) =>{
+       let item = {}
+       item.name = skill
+       acc.push(item)
+       return acc
+    }, [])
+    selectFrom(skillOptions, skills)
+    displayBoard.innerHTML = `<h2>Select a skill to receive a +4 bonus</h2> ${displayBoard.innerHTML}`
+}
+
+function displaySorcererChoice(){
+    displayBoard.innerHTML = sorcererTemplate()
+    prepCards()
+}
+module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice}

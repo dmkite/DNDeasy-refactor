@@ -1,5 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList} = require('./selection')
+const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList, addQuantity, prepForRadioSelection, createChoiceArray, displayFighterChoice, displayRogueChoice, displaySorcererChoice} = require('./selection')
 const {addDifferentListeners} = require('./utils')
 const languages = require('./data/languages')
 const equipment = require('./data/equipment')
@@ -11,6 +11,7 @@ const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
 const {standardTemplate, radioTemplate} = require('./templates')
+const stats = require('./stats')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
@@ -77,9 +78,17 @@ function classSkillChoice(returnFn){
 }
 
 function classExtraChoices(returnFn){
-    if(user.classId == 5) return selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+    if( (user.classId === 5 || user.classId === 1) && user.log.length === 7){
+        user.classId === 5 ? user.numChoices = 1 : user.numChoices = 3
+        selectFrom(classes[user.classId].proficiency_choices[1], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
+    else if(user.classId === 5){
+        user.numChoices = 1
+        selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
     skipDisplay(returnFn)
-
 }
 
 function spellChoices(lvl, returnFn){
@@ -95,38 +104,33 @@ function spellChoices(lvl, returnFn){
     else skipDisplay(returnFn)
 }
 
-function equipmentChoices(num){
+function equipmentChoices(num, returnFn){
     let equipOpts = startingEquip[user.classId][`choice_${num}`]
+    if (!equipOpts)return skipDisplay(returnFn)
     const quantityArray = []
     let choiceArray = createChoiceArray(equipOpts, quantityArray)
     selectFrom(choiceArray, equipment, radioTemplate)
     addQuantity(quantityArray)
+    prepForRadioSelection()
+    displayBoard.innerHTML = `<h2>Equipment Choice ${num}</h2> ${displayBoard.innerHTML}`
 }
 
-function createChoiceArray(array, quantityArray){
-    let result = array.reduce((acc, item) => {
-        for (let equipment of item.from) {
-            equipment.item.quantity = equipment.quantity
-            quantityArray.push(equipment.quantity)
-            acc.push(equipment.item)
-        }
-        return acc
-    }, [])
-    return result
+function classFeatureChoices(returnFn){
+    user.numChoices = 1
+    if (user.classId === 4) return displayFighterChoice()
+    if (user.classId === 8) return displayRogueChoice()
+    if (user.classId === 9) return displaySorcererChoice()
+    skipDisplay(returnFn)
 }
 
-function addQuantity(array){
-    const labels = document.querySelectorAll('label')
-    for(let i = 0; i < labels.length; i++){
-        labels[i].textContent += `(x${array[i]})`
-    }
-
+function allocateStats(){
+    let stats = statGen(6, 6, 4)
 }
 
 
 
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices }
-},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./templates":12,"./user":13,"./utils":14}],2:[function(require,module,exports){
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats }
+},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./stats":12,"./templates":13,"./user":14,"./utils":15}],2:[function(require,module,exports){
 const classes = [
 	{
 		"index": 1,
@@ -1876,6 +1880,17 @@ const equipment = [{
 			"name": "Two-Handed"
 		}],
 		"url": "11"
+	}, {
+		"index":11.5,
+		"name": "Leather armor & Longbow",
+		"damage": {
+			"dice_count": 1,
+			"dice_value": 8,
+			"damage_type": {
+				"url": "http://www.dnd5eapi.co/api/damage-types/8",
+				"name": "Piercing"
+			}
+		}
 	}, {
 		"index": 12,
 		"name": "Dart",
@@ -7258,7 +7273,7 @@ const startingEquipment = [{
 		"choose": 3,
 		"type": "equipment",
 		"from": [{
-			"item": { "url": "39", "name": "Leather armor, Longbow (x1) | 1d8 Piercing"}, "quantity": 1}]
+			"item": { "url": "39", "name": "Leather armor & Longbow"}, "quantity": 1}]
 	}],
 	"choice_2": [{
 		"choose": 1,
@@ -8217,13 +8232,34 @@ function createDNDChar(){
             choiceFns.classExtraChoices(createDNDChar)
             break
         case 8:
-            choiceFns.spellChoices(0, createDNDChar)
+            choiceFns.classExtraChoices(createDNDChar)
             break
         case 9:
-            choiceFns.spellChoices(1, createDNDChar)
+            choiceFns.spellChoices(0, createDNDChar)
             break
         case 10:
-            choiceFns.equipmentChoices(1)
+            choiceFns.spellChoices(1, createDNDChar)
+            break
+        case 11:
+            choiceFns.equipmentChoices(1, createDNDChar)
+            break
+        case 12:
+            choiceFns.equipmentChoices(2, createDNDChar)
+            break
+        case 13:
+            choiceFns.equipmentChoices(3, createDNDChar)
+            break
+        case 14:
+            choiceFns.equipmentChoices(4, createDNDChar)
+            break
+        case 15:
+            choiceFns.equipmentChoices(5, createDNDChar)
+            break
+        case 16:
+            choiceFns.classFeatureChoices(5, createDNDChar)
+            break
+        case 17:
+            choiceFns.allocateStates(createDNDChar)
             break
         default:
             console.log(user.log.length, 'doh!')
@@ -8235,11 +8271,12 @@ createDNDChar()
 
 
 module.exports = createDNDChar
-},{"./choice-functions":1,"./data/classes":2,"./data/languages":4,"./data/races":5,"./data/spells":7,"./data/subraces":9,"./selection":11,"./user":13}],11:[function(require,module,exports){
+},{"./choice-functions":1,"./data/classes":2,"./data/languages":4,"./data/races":5,"./data/spells":7,"./data/subraces":9,"./selection":11,"./user":14}],11:[function(require,module,exports){
 const user = require('./user')
-const { standardTemplate, infoPageHTML } = require('./templates')
+const { standardTemplate, infoPageHTML, classchoiceTemplate, sorcererTemplate } = require('./templates')
 const { addListenersToMany } = require('./utils')
 const races = require('./data/races')
+const skills = require('./data/skills')
 
 
 const displayBoard = document.querySelector('#displayBoard')
@@ -8383,11 +8420,126 @@ function createSpellList(lvl, spells) {
     return spellList
 }
 
+function createChoiceArray(array, quantityArray) {
+    let result = array.reduce((acc, item) => {
+        for (let equipment of item.from) {
+            equipment.item.quantity = equipment.quantity
+            quantityArray.push(equipment.quantity)
+            acc.push(equipment.item)
+        }
+        return acc
+    }, [])
+    return result
+}
+
+function addQuantity(array) {
+    const labels = document.querySelectorAll('label')
+    for (let i = 0; i < labels.length; i++) {
+        labels[i].textContent += `(x${array[i]})`
+    }
+}
+
+function prepForRadioSelection() {
+    let radios = document.querySelectorAll('input')
+    let radioStatus = false
+    for (let radio of radios) {
+        if (radio.checked) {
+            radioStatus = true;
+            break
+        }
+    }
+    if (radioStatus) {
+        addSelectedListener()
+        document.querySelector('#next').classList.remove('inactive')
+        document.querySelector('#next').onclick = function () {
+            addSelection()
+            return returnFn()
+        }
+    }
+}
+
+function addSelectedListener(){
+    displayBoard.addEventListener('click', function(){
+        let radios = document.querySelectorAll('input')
+        for(let radio of radios){
+            if(radio.checked) radio.classList.add('selected')
+            else radio.classList.remove('selected')
+        }
+    })
+}
+
+function displayFighterChoice(){
+    let choice = features.filter(feature => feature.index === 131)
+    const options = choice.choice.from
+    display(options, classChoiceTemplate)
+}
+
+function displayRogueChoice(index){
+    let skillOptions = user.log[6];
+    if (!!user.log[2]) skillOptions.push(user.log[2][0], user.log[2][1]) 
+    skillOptions = skillOptions.reduce((acc, skill) =>{
+       let item = {}
+       item.name = skill
+       acc.push(item)
+       return acc
+    }, [])
+    selectFrom(skillOptions, skills)
+    displayBoard.innerHTML = `<h2>Select a skill to receive a +4 bonus</h2> ${displayBoard.innerHTML}`
+}
+
+function displaySorcererChoice(){
+    displayBoard.innerHTML = sorcererTemplate()
+    prepCards()
+}
+module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice}
+
+},{"./data/races":5,"./data/skills":6,"./templates":13,"./user":14,"./utils":15}],12:[function(require,module,exports){
+function diceRoll(numDice, numSides) {
+    let statNums = []
+    for (let i = 0; i < numDice; i++) {
+        let score = Math.floor(Math.random() * numSides) + 1
+        statNums.push(score)
+    }
+    return statNums
+}
+
+function statGen(numDice, numSides, numTimes) {
+    let stats = []
+    for (let i = 0; i < numTimes; i++) {
+        let statNums = diceRoll(numDice, numSides)
+        statNums.sort((a, b) => a - b)
+        statNums.shift()
+        stats.push(statNums.reduce((acc, num) => acc + num, 0))
+    }
+    return stats
+}
+
+function prepForStats(statGen){
+    document.querySelector('#displayBoard').innerHTML = statTemplate(statArr)
+}
+
+function HPGen() {
+    let counter = 20
+    let hitDie = classes[user.classId].hit_die
+    let rollingDie = setInterval(function () { rollingAnimation(hitDie, counter) }, 100)
+    document.querySelector('.dice').onclick = null
+}
+
+function rollingAnimation(hitDie, counter) {
+    let diceNum = diceRoll(1, hitDie)
+    document.querySelector('.dice').textContent = diceNum[0]
+    counter--
+    if (counter === 0) {
+        clearInterval(rollingDie)
+        setTimeout(function () { document.querySelector('.dice').classList.add('animatedNum') }, 0)
+        let rolledNum = document.querySelector('.dice').textContent
+        const HP = Number(Math.floor((user.progress[14][1] - 10) / 2)) + Number(rolledNum)
+    }
+}
 
 
-module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList}
-
-},{"./data/races":5,"./templates":12,"./user":13,"./utils":14}],12:[function(require,module,exports){
+module.exports = statGen
+},{}],13:[function(require,module,exports){
 function standardTemplate(item) {
     return`
     <div class="card">
@@ -8410,15 +8562,74 @@ function infoPageHTML(item){
 
 function radioTemplate(item){
     const id = item.name.split(' ').join('')
-    return `
-    <input id="${id}" type="radio" name="choice1">
+    if(item.damage){
+        return `
+        <input id="${id}" type="radio" name="equipmentChoice">
+        <label for="${id}">
+            ${item.name} | ${item.damage.dice_count}d${item.damage.dice_value} ${item.damage.damage_type.name}
+        </label>
+        `
+    }
+    else{
+        return `
+    <input id="${id}" type="radio" name="equipmentChoice">
     <label for="${id}">
-        ${item.name} | ${item.damage.dice_count}d${item.damage.dice_value} ${item.damage.damage_type.name}
+        ${item.name} | 
     </label>
     `
+    }
 }
-module.exports = {standardTemplate, infoPageHTML, radioTemplate}
-},{}],13:[function(require,module,exports){
+
+function classChoiceTemplate(item){
+    return `
+    <div class="card">
+        <button class="select" type="button">select</button>
+        <img src="${item.img}" alt="Image of ${item.name}">
+        <h2>${item.name}</h2>
+        <p>${item.desc[0]}</p>
+    </div>`
+}
+
+function sorcererTemplate(){
+    return `
+    <div class="card">
+        <button class="select" type="button">select</button>
+        <img src="" alt="Image of Wild Magic">
+        <h2>Wild Magic</h2>
+        <p>You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again.
+        <br>Your spellcasting can unleash surges of untamed magic. Immediately after you cast a sorcerer spell of 1st level or higher, the DM can have you roll a d20. If you roll a 1, roll on the Wild Magic Surge table to create a random magical effect.</p>
+    </div>
+    <div class="card">
+        <img class="card-img-top" src="" alt="Image of Draconic Bloodline">
+        <h2>Draconic Bloodline</h2>
+        <p >At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.
+        <br>You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.</p>     
+    </div>`          
+}
+
+function statTemplate(statArr){}
+   return `<div id="statHolder" class="col-sm-12 col-md-6">
+        <div>STR</div>
+        <div>DEX</div>
+        <div>CON</div>
+        <div>INT</div>
+        <div>WIS</div>
+        <div>CHA</div>
+    </div>
+    <div id="stats" class="col-sm-12 col-md-6">
+        <div>${statArr[0]}</div>
+        <div>${statArr[1]}</div>
+        <div>${statArr[2]}</div>
+        <div>${statArr[3]}</div>
+        <div>${statArr[4]}</div>
+        <div>${statArr[5]}</div>
+    </div>
+    <button class="reset" type="button">reset</button>`
+    
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate}
+
+},{}],14:[function(require,module,exports){
 const user = {
     log: [],
     raceId: undefined,
@@ -8428,7 +8639,7 @@ const user = {
 }
 
 module.exports = user
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 
 
 function addListenersToMany(element, listenerType, fn) {
@@ -8440,6 +8651,7 @@ function addListenersToMany(element, listenerType, fn) {
 function addDifferentListeners(element, listenerArray, fn){
     listenerArray.forEach(listener => addListenersToMany(element, listener, fn))
 }
+
 
 module.exports = {addListenersToMany, addDifferentListeners}
 },{}]},{},[10]);

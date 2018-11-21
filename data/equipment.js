@@ -399,6 +399,17 @@ const equipment = [{
 		}],
 		"url": "11"
 	}, {
+		"index":11.5,
+		"name": "Leather armor & Longbow",
+		"damage": {
+			"dice_count": 1,
+			"dice_value": 8,
+			"damage_type": {
+				"url": "http://www.dnd5eapi.co/api/damage-types/8",
+				"name": "Piercing"
+			}
+		}
+	}, {
 		"index": 12,
 		"name": "Dart",
 		"equipment_category": "Weapon",

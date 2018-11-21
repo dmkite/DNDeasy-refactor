@@ -1,4 +1,4 @@
-const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList} = require('./selection')
+const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList, addQuantity, prepForRadioSelection, createChoiceArray, displayFighterChoice, displayRogueChoice, displaySorcererChoice} = require('./selection')
 const {addDifferentListeners} = require('./utils')
 const languages = require('./data/languages')
 const equipment = require('./data/equipment')
@@ -10,6 +10,7 @@ const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
 const {standardTemplate, radioTemplate} = require('./templates')
+const stats = require('./stats')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
@@ -76,9 +77,17 @@ function classSkillChoice(returnFn){
 }
 
 function classExtraChoices(returnFn){
-    if(user.classId == 5) return selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+    if( (user.classId === 5 || user.classId === 1) && user.log.length === 7){
+        user.classId === 5 ? user.numChoices = 1 : user.numChoices = 3
+        selectFrom(classes[user.classId].proficiency_choices[1], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
+    else if(user.classId === 5){
+        user.numChoices = 1
+        selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
     skipDisplay(returnFn)
-
 }
 
 function spellChoices(lvl, returnFn){
@@ -94,34 +103,29 @@ function spellChoices(lvl, returnFn){
     else skipDisplay(returnFn)
 }
 
-function equipmentChoices(num){
+function equipmentChoices(num, returnFn){
     let equipOpts = startingEquip[user.classId][`choice_${num}`]
+    if (!equipOpts)return skipDisplay(returnFn)
     const quantityArray = []
     let choiceArray = createChoiceArray(equipOpts, quantityArray)
     selectFrom(choiceArray, equipment, radioTemplate)
     addQuantity(quantityArray)
+    prepForRadioSelection()
+    displayBoard.innerHTML = `<h2>Equipment Choice ${num}</h2> ${displayBoard.innerHTML}`
 }
 
-function createChoiceArray(array, quantityArray){
-    let result = array.reduce((acc, item) => {
-        for (let equipment of item.from) {
-            equipment.item.quantity = equipment.quantity
-            quantityArray.push(equipment.quantity)
-            acc.push(equipment.item)
-        }
-        return acc
-    }, [])
-    return result
+function classFeatureChoices(returnFn){
+    user.numChoices = 1
+    if (user.classId === 4) return displayFighterChoice()
+    if (user.classId === 8) return displayRogueChoice()
+    if (user.classId === 9) return displaySorcererChoice()
+    skipDisplay(returnFn)
 }
 
-function addQuantity(array){
-    const labels = document.querySelectorAll('label')
-    for(let i = 0; i < labels.length; i++){
-        labels[i].textContent += `(x${array[i]})`
-    }
-
+function allocateStats(){
+    let stats = statGen(6, 6, 4)
 }
 
 
 
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices }
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats }

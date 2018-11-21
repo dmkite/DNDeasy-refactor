@@ -10,4 +10,5 @@ function addDifferentListeners(element, listenerArray, fn){
     listenerArray.forEach(listener => addListenersToMany(element, listener, fn))
 }
 
+
 module.exports = {addListenersToMany, addDifferentListeners}
