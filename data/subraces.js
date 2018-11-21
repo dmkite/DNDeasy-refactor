@@ -189,7 +189,8 @@ const subraces = [
 			"type": "trait"
 		}
 		,
-		"url": "http://www.dnd5eapi.co/api/subraces/2"
+		"url": "http://www.dnd5eapi.co/api/subraces/2",
+		img: 'img/high-elf.jpg'
 	},
 	{
 		"index": 3,
@@ -309,7 +310,8 @@ const subraces = [
 			}
 		],
 		"racial_trait_options": {},
-		"url": "http://www.dnd5eapi.co/api/subraces/5"
+		"url": "http://www.dnd5eapi.co/api/subraces/5",
+		img: 'img/wood-elf.jpg'
 	},
 	{
 		"index": 6,
@@ -361,7 +363,8 @@ const subraces = [
 			}
 		],
 		"racial_trait_options": {},
-		"url": "http://www.dnd5eapi.co/api/subraces/6"
+		"url": "http://www.dnd5eapi.co/api/subraces/6",
+		img: 'img/dark-elf.jpg'
 	}
 ]
 

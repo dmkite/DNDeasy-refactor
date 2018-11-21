@@ -1,8 +1,115 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList} = require('./selection')
+const {addDifferentListeners} = require('./utils')
+const languages = require('./data/languages')
+const equipment = require('./data/equipment')
+const user = require('./user')
+const races = require('./data/races')
+const subraces = require('./data/subraces')
+const skills = require('./data/skills')
+const spells = require('./data/spells')
+const classes = require('./data/classes')
+const startingEquip = require('./data/startingEquipment')
+
+function raceChoice(array, returnFn){
+    user.numChoices = 1
+    display(array)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function(){readyToGo(returnFn)})  
+}
+
+function extraRaceChoices(returnFn){
+    user.numChoices = 1
+    if(user.raceId === 3 || user.raceId === 6){
+        display(languages)
+    } 
+    else if(user.raceId === 0){
+        selectFrom(races[user.raceId].starting_proficiency_options, equipment)
+    }
+    else if(user.raceId === 4){
+        display(races[4].trait_options.from)
+    }
+    else{
+        return skipDisplay(returnFn)
+    }
+
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+}
+
+function subraceChoice(returnFn){
+    
+    if(races[user.raceId].subraces.length === 0) return skipDisplay(returnFn)
+    user.numChoices = 1
+    selectFrom(races[user.raceId].subraces, subraces)
+}
+
+function skillDisplay(numChoices, list = null) {
+    user.numChoices = numChoices
+    if (!!list) {
+        let optionsArray = skills.reduce((acc, skill) => {
+            for (let item of list) {
+                if (item.name === skill.name){ acc.push(skill)}
+            }
+            return acc
+        }, [])
+        let result = preventDupe(optionsArray)
+        
+        return display(result)
+    }
+    let result = preventDupe(skills)
+    display(result)
+}
+
+
+function subraceExtraChoices(key, array, returnFn){
+    user.numChoices = 0
+    if (user.log[2] == 'High Elf') { 
+        user.numChoices = 1
+        selectFrom(subraces[user.subraceId][key], array)
+    }
+    else return skipDisplay(returnFn)
+}
+
+function classSkillChoice(returnFn){
+    user.numChoices = classes[user.classId].proficiency_choices[0].choose
+    skillDisplay(user.numChoices, classes[user.classId].proficiency_choices[0].from)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+}
+
+function classExtraChoices(returnFn){
+    if(user.classId == 5) return selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+    skipDisplay(returnFn)
+
+}
+
+function spellChoices(lvl, returnFn){
+    const id = user.classId
+    if(id >= 1 && id <= 3 || id >= 9){
+        let spellList = createSpellList(lvl, spells)
+        if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
+        else user.numChoices = classes[user.classId].spellcasting.first_level
+        if (!user.numChoices){ return skipDisplay(returnFn)}
+        display(spellList)
+        steners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    }
+    else skipDisplay(returnFn)
+}
+
+function equipmentChoices(){
+    let equipOpts = startingEquip[user.classId]
+    // function for equipment choices 1
+    if(equipOpts.choice_2){}
+
+}
+
+
+
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices }
+},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./user":13,"./utils":14}],2:[function(require,module,exports){
 const classes = [
 	{
 		"index": 1,
 		"name": "Barbarian",
+		img: 'img/barbarian.jpg',
 		"hit_die": 12,
 		"proficiency_choices": [
 			{
@@ -90,6 +197,7 @@ const classes = [
 	{
 		"index": 2,
 		"name": "Bard",
+		img: 'img/bard.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -278,6 +386,7 @@ const classes = [
 	{
 		"index": 3,
 		"name": "Cleric",
+		img: 'img/cleric.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -360,6 +469,7 @@ const classes = [
 	{
 		"index": 4,
 		"name": "Druid",
+		img: 'img/druid.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -494,6 +604,7 @@ const classes = [
 	{
 		"index": 5,
 		"name": "Fighter",
+		img: 'img/fighter.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -585,6 +696,7 @@ const classes = [
 	{
 		"index": 6,
 		"name": "Monk",
+		img: 'img/monk.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
             {
@@ -788,6 +900,7 @@ const classes = [
 	{
 		"index": 7,
 		"name": "Paladin",
+		img: 'img/paladin.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -871,6 +984,7 @@ const classes = [
 	{
 		"index": 8,
 		"name": "Ranger",
+		img: 'img/ranger.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -967,6 +1081,7 @@ const classes = [
 	{
 		"index": 9,
 		"name": "Rogue",
+		img: 'img/rogue.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -1082,6 +1197,7 @@ const classes = [
 	{
 		"index": 10,
 		"name": "Sorcerer",
+		img: 'img/sorcerer.jpg',
 		"hit_die": 6,
 		"proficiency_choices": [
 			{
@@ -1168,6 +1284,7 @@ const classes = [
 	{
 		"index": 11,
 		"name": "Warlock",
+		img: 'img/warlock.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -1250,6 +1367,7 @@ const classes = [
 	{
 		"index": 12,
 		"name": "Wizard",
+		img: 'img/wizard.jpg',
 		"hit_die": 6,
 		"proficiency_choices": [
 			{
@@ -1335,7 +1453,7 @@ const classes = [
 	}
 ]
 module.exports = classes
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 const equipment = [{
 	"index": 1,
 	"name": "Club",
@@ -4643,723 +4761,6 @@ const equipment = [{
 	}]
 
 module.exports = equipment
-},{}],3:[function(require,module,exports){
-const features = [ 
-    { index: 1,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/1',
-       name: 'Barbarian' },
-    subclass: {},
-    name: 'Rage',
-    level: 1,
-    desc:
-     [ 'In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action. While raging, you gain the following benefits if you aren\'t wearing heavy armor:',
-       '• You have advantage on Strength checks and Strength saving throws.',
-       '• When you make a melee weapon Attack using Strength, you gain a +2 bonus to the damage roll. This bonus increases as you level.',
-       '• You have Resistance to bludgeoning, piercing, and slashing damage.',
-       'If you are able to cast Spells, you can\'t cast them or concentrate on them while raging.',
-       'Your rage lasts for 1 minute. It ends early if you are knocked Unconscious or if Your Turn ends and you haven\'t attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on Your Turn as a Bonus Action.',
-       'Once you have raged the maximum number of times for your barbarian level, you must finish a Long Rest before you can rage again. You may rage 2 times at 1st level, 3 at 3rd, 4 at 6th, 5 at 12th, and 6 at 17th.' ],
-    url: '1' },
-  { index: 2,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/1',
-       name: 'Barbarian' },
-    subclass: {},
-    name: 'Unarmored Defense',
-    level: 1,
-    desc:
-     [ 'While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.' ],
-    url: '2' },
-  { index: 25,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/2', name: 'Bard' },
-    subclass: {},
-    name: 'Spellcasting',
-    level: 1,
-    desc:
-     [ 'You have learned to untangle and reshape the fabric of reality in harmony with your wishes and music. Your spells are part of your vast repertoire, magic that you can tune to different situations.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/bard',
-    url: '25' },
-  { index: 26,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/2', name: 'Bard' },
-    subclass: {},
-    name: 'Bardic Inspiration (d6)',
-    level: 1,
-    desc:
-     [ 'You can inspire others through stirring words or music. To do so, you use a bonus action on your turn to choose one creature other than yourself within 60 feet of you who can hear you. That creature gains one Bardic Inspiration die, a d6. Once within the next 10 minutes, the creature can roll the die and add the number rolled to one ability check, attack roll, or saving throw it makes. The creature can wait until after it rolls the d20 before deciding to use the Bardic Inspiration die, but must decide before the GM says whether the roll succeeds or fails. Once the Bardic Inspiration die is rolled, it is lost. A creature can have only one Bardic Inspiration die at a time.',
-       'You can use this feature a number of times equal to your Charisma modifier (a minimum of once). You regain any expended uses when you finish a long rest. ',
-       'Your Bardic Inspiration die changes when you reach certain levels in this class. The die becomes a d8 at 5th level, a d10 at 10th level, and a d12 at 15th level.' ],
-    url: '26' },
-  { index: 71,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/3', name: 'Cleric' },
-    subclass: {},
-    name: 'Spellcasting',
-    level: 1,
-    desc:
-     [ 'As a conduit for divine power, you can cast cleric spells.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/cleric',
-    url: '71' },
-  { index: 72,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/3', name: 'Cleric' },
-    subclass: {},
-    name: 'Divine Domain',
-    level: 1,
-    desc:
-     [ 'Choose one domain related to your deity: Knowledge, Life, Light, Nature, Tempest, Trickery, or War. Only the Life domain is detailed in the Open Game Licensed SRD. Additional Domains are described in the official rulebooks or products from other publishers.',
-       'Your domain grants you domain spells and other features when you choose it at 1st level. It also grants you additional ways to use Channel Divinity when you gain that feature at 2nd level, and additional benefits at 6th, 8th, and 17th levels.' ],
-    url: '72' },
-  { index: 73,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/3', name: 'Cleric' },
-    subclass: {},
-    name: 'Domain Spells 1',
-    level: 1,
-    desc:
-     [ 'Each domain has a list of spells—its domain spells— that you gain at the cleric levels noted in the domain description. Once you gain a domain spell, you always have it prepared, and it doesn’t count against the number of spells you can prepare each day.',
-       'If you have a domain spell that doesn’t appear on the cleric spell list, the spell is nonetheless a cleric spell for you.' ],
-    url: '73' },
-  { index: 74,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/3', name: 'Cleric' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/3', name: 'Life' },
-    name: 'Bonus Proficiency',
-    level: 1,
-    desc:
-     [ 'When you choose this domain at 1st level, you gain proficiency with heavy armor.' ],
-    url: '74' },
-  { index: 75,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/3', name: 'Cleric' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/3', name: 'Life' },
-    name: 'Disciple of Life',
-    level: 1,
-    desc:
-     [ 'Also starting at 1st level, your healing spells are more effective. Whenever you use a spell of 1st level or higher to restore hit points to a creature, the creature regains additional hit points equal to 2 + the spell’s level.' ],
-    url: '75' },
-  { index: 100,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/4', name: 'Druid' },
-    subclass: {},
-    name: 'Spellcasting',
-    level: 1,
-    desc:
-     [ 'Drawing on the divine essence of nature itself, you can cast spells to shape that essence to your will.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/druid',
-    url: '100' },
-  { index: 101,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/4', name: 'Druid' },
-    subclass: {},
-    name: 'Druidic',
-    level: 1,
-    desc:
-     [ 'You know Druidic, the secret language of druids. You can speak the language and use it to leave hidden messages. You and others who know this language automatically spot such a message. Others spot the message\'s presence with a successful DC 15 Wisdom (Perception) check but can\'t decipher it without magic.' ],
-    url: '101' },
-  { 
-      index: 131,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Choose: Fighting Style',
-    level: 1,
-      desc:   [ 'You adopt a particular style of fighting as your specialty. Choose one of the following options. You can’t take a Fighting Style option more than once, even if you later get to choose again.' ],
-    choice: { choose: 1, type: 'feature', from: [
-        {
-        url: "132",
-        name: "Archery",
-        desc:
-                ['You gain a +2 bonus to attack rolls you make with ranged weapons.']
-    },
-    {
-        url: "133",
-        name: "Defense",
-        desc: ['While you are wearing armor, you gain a +1 bonus to AC.'],
-    },
-    {
-        url: "134",
-        name: "Dueling",
-        desc: ['When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.']
-    },
-    {
-        url: "135",
-        name: "Great Weapon Fighting",
-        desc:
-            ['When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2. The weapon must have the two-handed or versatile property for you to gain this benefit.']
-    },
-    {
-        url: "136",
-        name: "Protection",
-        desc: ['When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.']
-    },
-    {
-        url: "137",
-        name: "Two-Weapon Fighting",
-        desc: ['When you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.']
-    }
-] },
-    url: '131' },
-  { index: 132,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Archery',
-    level: 1,
-    desc:
-     [ 'You gain a +2 bonus to attack rolls you make with ranged weapons.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '132' },
-  { index: 133,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Defense',
-    level: 1,
-    desc:
-     [ 'While you are wearing armor, you gain a +1 bonus to AC.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '133' },
-  { index: 134,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Dueling',
-    level: 1,
-    desc:
-     [ 'When you are wielding a melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '134' },
-  { index: 135,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Great Weapon Fighting',
-    level: 1,
-    desc:
-     [ 'When you roll a 1 or 2 on a damage die for an attack you make with a melee weapon that you are wielding with two hands, you can reroll the die and must use the new roll, even if the new roll is a 1 or a 2. The weapon must have the two-handed or versatile property for you to gain this benefit.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '135' },
-  { index: 136,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Protection',
-    level: 1,
-    desc:
-     [ 'When a creature you can see attacks a target other than you that is within 5 feet of you, you can use your reaction to impose disadvantage on the attack roll. You must be wielding a shield.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '136' },
-  { index: 137,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Two-Weapon Fighting',
-    level: 1,
-    desc:
-     [ 'When you engage in two-weapon fighting, you can add your ability modifier to the damage of the second attack.' ],
-    group: 'Fighting Style (Fighter)',
-    url: '137' },
-  { index: 138,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/5', name: 'Fighter' },
-    subclass: {},
-    name: 'Second Wind',
-    level: 1,
-    desc:
-     [ 'You have a limited well of stamina that you can draw on to protect yourself from harm. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level. Once you use this feature, you must finish a short or long rest before you can use it again.' ],
-    url: '138' },
-  { index: 160,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/6', name: 'Monk' },
-    subclass: {},
-    name: 'Unarmored Defense',
-    level: 1,
-    desc:
-     [ 'Beginning at 1st level, while you are wearing no armor and not wielding a shield, your AC equals 10 + your Dexterity modifier + your Wisdom modifier.' ],
-    url: '160' },
-  { index: 161,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/6', name: 'Monk' },
-    subclass: {},
-    name: 'Martial Arts',
-    level: 1,
-    desc:
-     [ 'At 1st level, your practice of martial arts gives you mastery of combat styles that use unarmed strikes and monk weapons, which are shortswords and any simple melee weapons that don’t have the two- handed or heavy property.',
-       'You gain the following benefits while you are unarmed or wielding only monk weapons and you aren’t wearing armor or wielding a shield:',
-       '• You can use Dexterity instead of Strength for the attack and damage rolls of your unarmed strikes and monk weapons.',
-       '• You can roll a d4 in place of the normal damage of your unarmed strike or monk weapon. This die changes as you gain monk levels, as shown in the Martial Arts column of Table: The Monk.',
-       '• When you use the Attack action with an unarmed strike or a monk weapon on your turn, you can make one unarmed strike as a bonus action. For example, if you take the Attack action and attack with a quarterstaff, you can also make an unarmed strike as a bonus action, assuming you haven’t already taken a bonus action this turn.',
-       'Certain monasteries use specialized forms of the monk weapons. For example, you might use a club that is two lengths of wood connected by a short chain (called a nunchaku) or a sickle with a shorter, straighter blade (called a kama). Whatever name you use for a monk weapon, you can use the game statistics provided for the weapon.' ],
-    url: '161' },
-  { index: 191,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/7', name: 'Paladin' },
-    subclass: {},
-    name: 'Divine Sense',
-    level: 1,
-    desc:
-     [ 'The presence of strong evil registers on your senses like a noxious odor, and powerful good rings like heavenly music in your ears. As an action, you can open your awareness to detect such forces. Until the end of your next turn, you know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover. You know the type (celestial, fiend, or undead) of any being whose presence you sense, but not its identity. Within the same radius, you also detect the presence of any place or object that has been consecrated or desecrated, as with the hallow spell.',
-       'You can use this feature a number of times equal to 1 + your Charisma modifier. When you finish a long rest, you regain all expended uses.' ],
-    url: '191' },
-  { index: 192,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/7', name: 'Paladin' },
-    subclass: {},
-    name: 'Lay on Hands',
-    level: 1,
-    desc:
-     [ 'Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you take a long rest. With that pool, you can restore a total number of hit points equal to your paladin level × 5.',
-       'As an action, you can touch a creature and draw power from the pool to restore a number of hit points to that creature, up to the maximum amount remaining in your pool.',
-       'Alternatively, you can expend 5 hit points from your pool of healing to cure the target of one disease or neutralize one poison affecting it. You can cure multiple diseases and neutralize multiple poisons with a single use of Lay on Hands, expending hit points separately for each one.',
-       'This feature has no effect on undead and constructs.' ],
-    url: '192' },
-  { index: 220,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/8', name: 'Ranger' },
-    subclass: {},
-    name: 'Favored Enemy (1 type)',
-    level: 1,
-    desc:
-     [ 'Beginning at 1st level, you have significant experience studying, tracking, hunting, and even talking to a certain type of enemy.',
-       'Choose a type of favored enemy: aberrations, beasts, celestials, constructs, dragons, elementals, fey, fiends, giants, monstrosities, oozes, plants, or undead. Alternatively, you can select two races of humanoid (such as gnolls and orcs) as favored enemies.',
-       'You have advantage on Wisdom (Survival) checks to track your favored enemies, as well as on Intelligence checks to recall information about them.',
-       'When you gain this feature, you also learn one language of your choice that is spoken by your favored enemies, if they speak one at all.',
-       'You choose one additional favored enemy, as well as an associated language, at 6th and 14th level. As you gain levels, your choices should reflect the types of monsters you have encountered on your adventures.' ],
-    url: '220' },
-  { index: 221,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/8', name: 'Ranger' },
-    subclass: {},
-    name: 'Natural Explorer (1 terrain type)',
-    level: 1,
-    desc:
-     [ 'You are particularly familiar with one type of natural environment and are adept at traveling and surviving in such regions. Choose one type of favored terrain: arctic, coast, desert, forest, grassland, mountain, or swamp. When you make an Intelligence or Wisdom check related to your favored terrain, your proficiency bonus is doubled if you are using a skill that you’re proficient in.',
-       'While traveling for an hour or more in your favored terrain, you gain the following benefits:',
-       '• Difficult terrain doesn’t slow your group’s travel.',
-       '• Your group can’t become lost except by magical means.',
-       '• Even when you are engaged in another activity while traveling (such as foraging, navigating, or tracking), you remain alert to danger.',
-       '• If you are traveling alone, you can move stealthily at a normal pace.',
-       '• When you forage, you find twice as much food as you normally would.',
-       '• While tracking other creatures, you also learn their exact number, their sizes, and how long ago they passed through the area.',
-       'You choose additional favored terrain types at 6th and 10th level.' ],
-    url: '221' },
-  { index: 260,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/9', name: 'Rogue' },
-    subclass: {},
-    name: 'Choose: Expertise 1',
-    level: 1,
-    desc:
-     [ 'At 1st level, choose two of your skill proficiencies, or one of your skill proficiencies and your proficiency with thieves’ tools. Your proficiency bonus is doubled for any ability check you make that uses either of the chosen proficiencies.',
-       'At 6th level, you can choose two more of your proficiencies (in skills or with thieves’ tools) to gain this benefit' ],
-      choice: {
-          choose: 2, type: 'feature', from: [
-              {
-                  "url": "278",
-                  "name": "Expertise: Acrobatics",
-                  desc:[]
-              },
-              {
-                  "url": "277",
-                  "name": "Expertise: Animal Handling",
-                  desc: []
-              },
-              {
-                  "url": "261",
-                  "name": "Expertise: Arcana",
-                  desc: []
-              },
-              {
-                  "url": "262",
-                  "name": "Expertise: Athletics",
-                  desc: []
-              },
-              {
-                  "url": "263",
-                  "name": "Expertise: Deception",
-                  desc: []
-              },
-              {
-                  "url": "264",
-                  "name": "Expertise: History",
-                  desc: []
-              },
-              {
-                  "url": "265",
-                  "name": "Expertise: Insight",
-                  desc: []
-              },
-              {
-                  "url": "266",
-                  "name": "Expertise: Intimidation",
-                  desc: []
-              },
-              {
-                  "url": "267",
-                  "name": "Expertise: Investigation",
-                  desc: []
-              },
-              {
-                  "url": "268",
-                  "name": "Expertise: Medicine",
-                  desc: []
-              },
-              {
-                  "url": "269",
-                  "name": "Expertise: Nature",
-                  desc: []
-              },
-              {
-                  "url": "270",
-                  "name": "Expertise: Perception",
-                  desc: []
-              },
-              {
-                  "url": "271",
-                  "name": "Expertise: Performance",
-                  desc: []
-              },
-              {
-                  "url": "272",
-                  "name": "Expertise: Persuasion",
-                  desc: []
-              },
-              {
-                  "url": "273",
-                  "name": "Expertise: Religion",
-                  desc: []
-              },
-              {
-                  "url": "274",
-                  "name": "Expertise: Sleight of Hand",
-                  desc: []
-              },
-              {
-                  "url": "275",
-                  "name": "Expertise: Stealth",
-                  desc: []
-              },
-              {
-                  "url": "276",
-                  "name": "Expertise: Survival",
-                  desc: []
-              }
-          ] },
-    url: '260' },
-  { index: 280,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/9', name: 'Rogue' },
-    subclass: {},
-    name: 'Sneak Attack',
-    level: 1,
-    desc:
-     [ 'Beginning at 1st level, you know how to strike subtly and exploit a foe’s distraction. Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon.',
-       'You don’t need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn’t incapacitated, and you don’t have disadvantage on the attack roll.',
-       'The amount of the extra damage increases as you gain levels in this class, as shown in the Sneak Attack column of the Rogue table.' ],
-    url: '280' },
-  { index: 281,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/9', name: 'Rogue' },
-    subclass: {},
-    name: 'Thieves\' Cant',
-    level: 1,
-    desc:
-     [ 'During your rogue training you learned thieves’ cant, a secret mix of dialect, jargon, and code that allows you to hide messages in seemingly normal conversation. Only another creature that knows thieves’ cant understands such messages. It takes four times longer to convey such a message than it does to speak the same idea plainly.',
-       'In addition, you understand a set of secret signs and symbols used to convey short, simple messages, such as whether an area is dangerous or the territory of a thieves’ guild, whether loot is nearby, or whether the people in an area are easy marks or will provide a safe house for thieves on the run.' ],
-    url: '281' },
-  { index: 303,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass: {},
-    name: 'Spellcasting',
-    level: 1,
-    desc:
-     [ 'An event in your past, or in the life of a parent or ancestor, left an indelible mark on you, infusing you with arcane magic. This font of magic, whatever its origin, fuels your spells.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/sorcerer',
-    url: '303' },
-  { index: 304,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass: {},
-    name: 'Sorcerous Origin',
-    level: 1,
-    desc:
-     [ 'Choose a sorcerous origin, which describes the source of your innate magical power: Draconic Bloodline or Wild Magic, both detailed at the end of the class description.',
-       'Your choice grants you features when you choose it at 1st level and again at 6th, 14th, and 18th level.' ],
-    url: '304' },
-  { index: 305,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Choose: Dragon Ancestor',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-        choice: {
-            choose: 1, type: 'feature', from: [
-        {
-                "url": "306",
-                "name": "Black Dragon - Acid Damage"
-            },
-        {
-        "url": "307",
-        "name": "Blue Dragon - Lightning Damage"
-    },
-    {
-        "url": "308",
-        "name": "Brass Dragon - Fire Damage"
-    },
-    {
-        "url": "309",
-        "name": "Bronze Dragon - Lightning Damage"
-    },
-    {
-        "url": "310",
-        "name": "Copper Dragon - Acid Damage"
-    },
-    {
-        "url": "311",
-        "name": "Gold Dragon - Fire Damage"
-    }, 
-    {
-        "url": "312",
-        "name": "Green Dragon - Poison Damage"
-    },
-    {
-        "url": "313",
-        "name": "Red Dragon - Fire Damage"
-    },
-    {
-        "url": "314",
-        "name": "Silver Dragon - Cold Damage"
-    },
-    {
-        "url": "315",
-        "name": "White Dragon - Cold Damage"
-    }
-]
- },
-    url: '305' },
-  { index: 306,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Black - Acid Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '306' },
-  { index: 307,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Blue - Lightning Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '307' },
-  { index: 308,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Brass - Fire Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '308' },
-  { index: 309,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Bronze - Lightning Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '309' },
-  { index: 310,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Copper - Acid Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '310' },
-  { index: 311,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Gold - Fire Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '311' },
-  { index: 312,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Green - Poison Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '312' },
-  { index: 313,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Red - Fire Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '313' },
-  { index: 314,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: Silver - Cold Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '314' },
-  { index: 315,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Dragon Ancestor: White - Cold Damage',
-    level: 1,
-    desc:
-     [ 'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.',
-       'You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.' ],
-    group: 'Dragon Ancestor',
-    url: '315' },
-  { index: 316,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/10',
-       name: 'Sorcerer' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/10',
-       name: 'Draconic' },
-    name: 'Draconic Resilience',
-    level: 1,
-    desc:
-     [ 'As magic flows through your body, it causes physical traits of your dragon ancestors to emerge. At 1st level, your hit point maximum increases by 1 and increases by 1 again whenever you gain a level in this class.',
-       'Additionally, parts of your skin are covered by a thin sheen of dragon-like scales. When you aren’t wearing armor, your AC equals 13 + your Dexterity modifier.' ],
-    url: '316' },
-  { index: 340,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/11',
-       name: 'Warlock' },
-    subclass: {},
-    name: 'Otherworldly Patron',
-    level: 1,
-    desc:
-     [ 'At 1st level, you have struck a bargain with an otherworldly being of your choice: the Archfey, the Fiend, or the Great Old One, each of which is detailed at the end of the class description. Your choice grants you features at 1st level and again at 6th, 10th, and 14th level.' ],
-    url: '340' },
-  { index: 341,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/11',
-       name: 'Warlock' },
-    subclass:
-     { url: 'http://www.dnd5eapi.co/api/subclasses/11',
-       name: 'Fiend' },
-    name: 'Dark One\'s Blessing',
-    level: 1,
-    desc:
-     [ 'Starting at 1st level, when you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + your warlock level (minimum of 1).' ],
-    url: '341' },
-  { index: 342,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/11',
-       name: 'Warlock' },
-    subclass: {},
-    name: 'Pact Magic',
-    level: 1,
-    desc:
-     [ 'Your arcane research and the magic bestowed on you by your patron have given you facility with spells.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/warlock',
-    url: '342' },
-  { index: 400,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/12', name: 'Wizard' },
-    subclass: {},
-    name: 'Spellcasting',
-    level: 1,
-    desc:
-     [ 'As a student of arcane magic, you have a spellbook containing spells that show the first glimmerings of your true power.' ],
-    reference: 'http://www.dnd5eapi.co/api/spellcasting/wizard',
-    url: '400' },
-  { index: 401,
-    class:
-     { url: 'http://www.dnd5eapi.co/api/classes/12', name: 'Wizard' },
-    subclass: {},
-    name: 'Arcane Recovery',
-    level: 1,
-    desc:
-     [ 'You have learned to regain some of your magical energy by studying your spellbook. Once per day when you finish a short rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your wizard level (rounded up), and none of the slots can be 6th level or higher.',
-       'For example, if you’re a 4th-level wizard, you can recover up to two levels worth of spell slots. You can recover either a 2nd-level spell slot or two 1st-level spell slots.' ],
-    url: '401' } ]
-
-
-    module.exports = features
 },{}],4:[function(require,module,exports){
 const languages = [{
 	"index": 1,
@@ -5477,927 +4878,6 @@ const languages = [{
 
 module.exports = languages
 },{}],5:[function(require,module,exports){
-const races = require('./races')
-const equipment = require('./equipment')
-const languages = require('./languages')
-const skills = require('./skills')
-const subraces = require('./subraces')
-const spells = require('./spells')
-const classes = require('./classes')
-const startingEquipment = require('./startingEquipment')
-const features = require('./features')
-const statNames = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma']
-const displayBoard = {
-    element: document.querySelector('#displayBoard'),
-    clear: function(){
-        const self = this
-        self.element.innerHTML = ''
-    },
-    display: function(inputArray){
-        const self = this
-        let content = []
-        for(let inputEntry of inputArray){
-            const name = inputEntry.name
-            const img = inputEntry.img
-            const desc = inputEntry.img
-            let info1
-            let info2
-            let info3
-
-            if(inputArray === races){
-                
-                statBonus = ''
-                for (let i = 0; i < inputEntry.ability_bonuses.length; i++) {
-                    if (inputEntry.ability_bonuses[i] > 0) {
-                        statBonus += `+${inputEntry.ability_bonuses[i]} ${statNames[i]}<br>`
-                    }
-                }
-                let traitString = ''
-
-                for (let trait in inputEntry.traits) {
-                    traitString += `${trait.name}<br>`
-                }
-                info1 = `StatBonus: ${statBonus}`
-                info2 = `Features: ${traitString}`
-                info3 = `Speed: ${inputEntry.speed}`
-            }
-            
-            if (inputArray === classes){
-                info1 = `Hit Die: ${inputEntry.hit_die}`
-                info2 = `Saving Throws: ${inputEntry.saving_throws[0].name}, ${inputEntry.saving_throws[0].name}`
-            }
-            
-            content.push(this.htmlTemplate(img, name, desc, info1, info2, info3))
-        }
-        self.element.innerHTML = content.join('\n')
-        self.prepForSelection()
-    },
-    prepForSelection: function(){
-            let self = this
-            if(self.choicesLeft === 0){
-                self.choicesLeft = 1
-            }
-            let cards = document.querySelectorAll('.card')
-            for(let card of cards){
-                card.addEventListener('click', function (e) { 
-                    user.select(e)
-                })
-            }
-        
-    },
-    choicesLeft:1,
-    userInput:'',
-    htmlTemplate: function(img = 'img/dwarf.jpg', name, desc = '', info1 = '', info2 = '', info3 =''){
-        return `<div class="card">
-                <img class="card-img-top cardImg" src="${img}" alt="Image of ${name}">
-                <div class="card-body">
-                    <h5 class="card-title">${name}</h5> 
-                </div>
-                <div class="hidden raceDisplay">
-                    <p>${desc}</p>
-                    <p>${info1}</p>
-                    <p>${info2}</p>
-                    <p>${info3}</p>
-                </div>
-                <div class="gradient${Math.floor(Math.random() * 12) + 1} cardImg"></div>
-            </div>
-
-            <div class="hidden hidden-desc displaySubchoice">${desc}</div>`
-    },
-    diceRoll: function(numDice, numSides) {
-        let statNums = []
-        for (let i = 0; i < numDice; i++) {
-            let score = Math.floor(Math.random() * numSides) + 1
-            statNums.push(score)
-        }
-        return statNums
-        },
-    statGen: function(rollFn, numDice, numSides, numTimes) {
-        let stats = []
-        for (let i = 0; i < numTimes; i++) {
-            let statNums = rollFn(numDice, numSides)
-            statNums.sort((a, b) => a - b)
-            statNums.shift()
-            stats.push(statNums.reduce((acc, num) => acc + num, 0))
-        }
-        return stats
-    }
-}
-
-let user = {
-    progress: [],
-    choiceSkipped: function(){
-        const self = this
-        self.progress.push(null)
-        return createDNDChar()
-    },
-    addSelected: function(){
-        const selections = document.querySelector('.selected')
-    }, 
-    storeAndProceed: function(){
-        
-        const selections = document.querySelectorAll('.selected')
-        if (selections.length > 1) {
-            let tempResult = []
-            for (let selection of selections) {
-                tempResult.push(selection.children[1].children[0].textContent)
-            }
-            user.progress.push(tempResult)
-        }
-        else {
-            user.progress.push(selections[0].children[1].children[0].textContent)
-        }
-        user.saveProg()  
-        createDNDChar()
-    },
-    saveProg: function () {
-        if (!!localStorage.getItem('storedUser')) {
-            let stringStorage = localStorage.getItem('storedUser')
-            let storageArray = JSON.parse(stringStorage)
-            storageArray.push(user)
-            stringStorage = JSON.stringify(storageArray)
-            localStorage.setItem('storedUser', stringStorage)
-        }
-    },
-    revertProg: function(){
-        
-        let storageString = localStorage.getItem('storedUser')
-        let storageArray = JSON.parse(storageString)
-        storageArray.pop()
-        storageString = JSON.stringify(storageArray)
-        localStorage.setItem('storedUser', storageString)
-        
-        if(storageArray.length > 1){
-            user.progress = storageArray[storageArray.length - 1].progress
-        }
-        else{
-            user.progress = []
-        }
-        displayBoard.choicesLeft = 0
-        return createDNDChar()
-    },
-
-    select: function(e){
-        const card = e.currentTarget
-        const next = document.querySelector('#next')
-
-        if (card.classList.contains('selected')) {   
-            displayBoard.choicesLeft++                           
-            card.classList.toggle('selected')          
-        }
-        else {                                                 
-            if (displayBoard.choicesLeft > 0) {                       
-                displayBoard.choicesLeft--                            
-                card.classList.toggle('selected')            
-            }
-            else {                                                  
-                alert('You have no choices left')
-            }
-        }
-
-        if (displayBoard.choicesLeft === 0) {
-            next.classList.remove('inactive')
-            next.onclick = user.storeAndProceed
-        }
-        else {
-            next.classList.add('inactive')
-            next.onclick = null
-        }
-        document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
-        },
-        statSelect: function(e){
-            let statNums = document.querySelectorAll('.statNum')
-            for(statNum of statNums){
-                statNum.onclick = function(e){
-                    e.currentTarget.classList.toggle('statSelected')
-                }
-            }
-
-        }
-}
-
-const controlBoard = {
-    element:document.querySelector('#controls'),
-    updatePrompt: function(prompt){
-        if(!!document.querySelector('#prompter')){
-            document.querySelector('#prompter').remove()
-        }
-        
-        let prompter = document.createElement('div')
-        prompter.id = 'prompter'
-        document.querySelector('body').appendChild(prompter)
-
-        document.querySelector('#prompter').textContent = prompt
-        let span = document.createElement('span')
-        document.querySelector('#prompter').appendChild(span)
-        document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
-    },
-    back: document.querySelector('#back')
-}
-
-function displaySubchoice(race, options, dataObj) {
-    let optionArray = race[options].from
-    let subchoiceTemplate = []
-    for (let option of optionArray) {
-        let desc
-        for (let item of dataObj) {
-            if (item.name === option.name) {
-                if(!!item.desc){
-                    desc = item.desc[0]
-                }
-                else{
-                    desc = 'No description available'
-                }
-            }
-        }
-        subchoiceTemplate.push(
-            displayBoard.htmlTemplate(undefined, option.name, undefined, undefined, undefined, undefined, desc, undefined)
-        )
-
-    }
-    displayBoard.element.innerHTML = subchoiceTemplate.join('\n')
-    displayBoard.choicesLeft = race[options].choose
-    const cards = document.querySelectorAll('.card')
-    for (let card of cards) {
-        card.onclick = function (e) { user.select(e) }
-    }
-}
-
-
-function dataDisplay(choiceArray, dataArray, preventDupe = true) {
-    if (choiceArray === null) {
-        choiceArray = []
-        for (let item of dataArray) {
-            choiceArray.push(item.name)
-        }
-    }
-    
-    let itemHTML = []
-    //prevent duplication
-    if(preventDupe){
-        for(let itemIndex in choiceArray){
-            
-            if (user.progress.includes(choiceArray[itemIndex])){
-                choiceArray.splice(itemIndex, 1)
-            }
-            for(let progressPoint of user.progress){
-                
-                if(progressPoint === null){continue}
-                if(progressPoint.includes(choiceArray[itemIndex])){
-                    choiceArray.splice(itemIndex, 1, null)
-                }
-            }
-        }
-        choiceArray = choiceArray.filter(choice => choice !== null)
-    }
-
-    for (let itemChoice of choiceArray) {
-        for (let item of dataArray) {
-            if (itemChoice === item.name) {
-                itemHTML.push(
-                    displayBoard.htmlTemplate(undefined, item.name, undefined, undefined, undefined, item.desc, undefined)
-                )
-            }
-        }
-        
-        displayBoard.element.innerHTML = itemHTML.join('')
-        displayBoard.prepForSelection()
-    }
-}
-
-
-
-
-
-function equipmentFunction(firstOption, secondOptions, choiceNum) {
-    let equipmentOptions = []
-    let idOptions = []
-    if (firstOption !== null) {
-        equipmentOptions.push(firstOption)
-        idOptions.push(firstOption.item.name.split(' ').join(''))
-    }
-
-    for (let option of secondOptions) {
-        equipmentOptions.push(option)
-        idOptions.push(option.item.name.split(' ').join(''))
-    }
-
-    let equipmentHTML = []
-
-    for (let i = 0; i < equipmentOptions.length; i++) {
-        
-        let damageVal = equipment[Number(equipmentOptions[i].item.url) - 1].damage
-
-        if (!!damageVal) {
-            let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) | ${damageVal.dice_count}d${damageVal.dice_value} ${damageVal.damage_type.name}
-            
-                    <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
-            </label>`
-            
-            equipmentHTML.push(optionHTML)
-        }
-        else {
-            let optionHTML = `<label for="${idOptions[i]}">${equipmentOptions[i].item.name} (x${equipmentOptions[i].quantity}) 
-                <input type="radio" id="${idOptions[i]}" name="equipmentChoice${choiceNum}">
-            </label>
-                `
-            equipmentHTML.push(optionHTML)
-        }
-    }
-    displayBoard.element.innerHTML += `<form id="equipmentForm${choiceNum}"><h2>Equipment Choice ${choiceNum}</h2>${equipmentHTML.join('')}</form>`
-
-    choiceNum++
-    if (choiceNum === 2) {
-        equipmentFunction(startingEquipment[user.classIndex].choice_2[0].from[0], startingEquipment[user.classIndex].choice_2[1].from, choiceNum)
-        
-    }
-
-    else if (choiceNum === 3 && !!startingEquipment[user.classIndex].choice_3) {
-        equipmentFunction(startingEquipment[user.classIndex].choice_3[0].from[0], startingEquipment[user.classIndex].choice_3[1].from, choiceNum)
-        
-    }
-
-    else if (choiceNum === 4 && !!startingEquipment[user.classIndex].choice_4) {
-        
-        equipmentFunction(startingEquipment[user.classIndex].choice_4[0].from[0], startingEquipment[user.classIndex].choice_4[1].from, choiceNum)
-    }
-    else if (choiceNum === 5 && !!startingEquipment[user.classIndex].choice_5) {
-        
-        equipmentFunction(null, startingEquipment[user.classIndex].choice_5[0].from, choiceNum)
-    }
-    const next = document.querySelector('#next')
-    next.classList.add('inactive')
-    next.onclick = null
-
-    document.addEventListener('change', function () {
-        let selectionCt = document.querySelectorAll('h2').length
-        let selectedCt = 0
-        let inputs = document.querySelectorAll('input')
-        for (let input of inputs) {
-            if (input.checked) { selectedCt++ }
-        }
-
-        if (selectionCt === selectedCt) {
-            next.classList.remove('inactive')
-            next.onclick = function () { 
-                let equipmentArray = []
-                let inputs = document.querySelectorAll('input')
-                for(let input of inputs){
-                    if (input.checked){
-                        equipmentArray.push(input.parentElement.textContent)
-                    }
-                }
-                user.progress.push(equipmentArray)
-                return createDNDChar()
-             }
-        }
-    })
-}
-
-function spellDisplay(className, level) {
-    let spellHTML = {
-        attack: [],
-        utility: [],
-        strategy: [],
-        support: []
-    }
-
-    displayBoard.element.innerHTML = ''
-    for (let spell of spells) {
-        if (spell.level === level) {
-            for (let classList of spell.classes) {
-                if (classList.name === className) {
-
-                    let spellCardHTML =  displayBoard.htmlTemplate(undefined, spell.name, spell.desc[0], `Range: ${spell.range}`, `Duration: ${spell.duration}`, `Casting Time: ${spell.casting_time}`)
-
-                    if (spell.attack) {
-                        spellHTML.attack.push(spellCardHTML)
-                    }
-                    else if (spell.utility) {
-                        spellHTML.utility.push(spellCardHTML)
-                    }
-                    else if (spell.strategy) {
-                        spellHTML.strategy.push(spellCardHTML)
-                    }
-                    else {
-                        spellHTML.support.push(spellCardHTML)
-                    }
-                }
-            }
-        }
-    }
-
-    for(let key in spellHTML){
-        if (spellHTML[key].length > 0){
-            displayBoard.element.innerHTML += 
-                `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#attackSpells" aria-expanded="false" aria-controls="attackSpells">Attack Spells <span class="numSpellsSelected"></span></button>
-
-                <div class="collapse" id="attackSpells">
-                    <div class="horizontalScroll">
-                        ${spellHTML[key].join('')}
-                    </div>
-                </div>`
-        }
-        
-    }
-    let cardImgs = document.querySelectorAll('.cardImg')
-    for(let img of cardImgs){
-        img.classList.add('hidden')
-    }
-
-    displayBoard.prepForSelection()
-
-    document.addEventListener('click', function () {
-        let spellButtons = document.querySelectorAll('.spellButton')
-        let horizontalScrollDivs = document.querySelectorAll('.horizontalScroll')
-
-        for (let i = 0; i < horizontalScrollDivs.length; i++) {
-            let selectedCounter = 0
-            let scrollDiv = horizontalScrollDivs[i]
-            for (let child of scrollDiv.children) {
-                if (child.classList.contains('selected')) {
-                    selectedCounter++
-                }
-            }
-            spellButtons[i].children[0].textContent = `${selectedCounter} selected`
-        }
-    })
-
-
-
-}
-
-displayBoard.element.addEventListener('click',function(){
-    document.querySelector('#prompter span').textContent = displayBoard.choicesLeft
-    console.log('x')
-})
-
-
-//Procedural
-document.querySelector('.btn-secondary').addEventListener('click', function(){
-    let storageKeys = Object.keys(localStorage)
-    document.querySelector('body').innerHTML += '<b id="error">you have nothing to load</b>'
-
-})
-
-document.querySelector('.btn-primary').addEventListener('click', function () {
-    let storage = []
-    let stringStorage = JSON.stringify(storage)
-    localStorage.setItem('storedUser', stringStorage)
-    createDNDChar()
-})
-
-user.progress = ['Half-Elf', 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-user.raceIndex = 6
-function createDNDChar(){
-    console.log(user.progress)
-    controlBoard.back.onclick = user.revertProg
-    controlBoard.back.classList.remove('inactive')
-    switch(user.progress.length){
-        case 0:
-            controlBoard.back.onclick = null
-            controlBoard.back.classList.add('inactive')
-            displayBoard.clear()
-            document.querySelector('#user').classList.toggle('inactive')
-            displayBoard.display(races)
-            // displayBoard.prepForSelection()
-            controlBoard.updatePrompt("Here's your prompt")
-            break
-
-        case 1:
-            for (let race of races) {
-                if (race.name === user.progress[0]) {
-                    user.raceIndex = race.index - 1
-                }
-            }
-
-            //determine proficiency/language/trait options
-            if ( races[user.raceIndex].name === 'Dwarf' ){
-                displaySubchoice(races[user.raceIndex], 'starting_proficiency_options', equipment)
-                controlBoard.updatePrompt('Select a tool proficiency')
-            }
-            else if (races[user.raceIndex].name === "Half-Elf" || races[user.raceIndex].name === "Human" ){
-                displaySubchoice(races[user.raceIndex], 'language_options', languages)
-                controlBoard.updatePrompt('Select another language')
-            }
-            else if (races[user.raceIndex].name === "Dragonborn"){
-                displaySubchoice(races[user.raceIndex], 'trait_options', equipment)
-                controlBoard.updatePrompt('Select a Draconic Ancestry')
-            }
-            else{
-                user.choiceSkipped()
-            }
-
-            break
-
-        case 2:
-            //determine subrace/features options
-            if( races[user.raceIndex].name === 'Half-Elf' ){
-                dataDisplay(null, skills)
-                displayBoard.choicesLeft = 2
-            }
-            else if(races[user.raceIndex].subraces.length > 0){
-                let subraceTemplate = []
-                let subraceArray = subraces.filter(subrace => subrace.race.name === user.progress[0])
-                displayBoard.display(subraceArray)
- 
-                
-                // displayBoard.prepForSelection()   
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-
-        case 3:
-            //determine subrace options
-            for (let subrace of subraces) {
-                if (subrace.name === user.progress[2]) {
-                    user.subraceIndex = subrace.index - 1
-                }
-            }
-            
-            if( user.progress[2] === 'High Elf'){
-                displaySubchoice(subraces[user.subraceIndex], 'language_options', languages)
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-
-        case 4:
-            if (user.progress[2] === 'High Elf') {
-                displaySubchoice(subraces[user.subraceIndex], 'racial_trait_options', spells)
-            }
-            else {
-                user.choiceSkipped()
-            }
-            break
-        
-        case 5: 
-            displayBoard.display(classes)//classTemplateFn)
-            // displayBoard.prepForSelection()
-            controlBoard.updatePrompt('Select your class')
-            break
-
-        case 6:
-            //prof choices
-            for (let classType of classes) {
-                if (classType.name === user.progress[5]) {
-                    user.classIndex = classType.index - 1
-                }
-            }
-        
-            let skillChoiceArray = []
-            for (let skill of classes[user.classIndex].proficiency_choices[0].from){
-                skillChoiceArray.push(skill.name)
-            }
-        
-            dataDisplay(skillChoiceArray, skills)
-            displayBoard.choicesLeft = classes[user.classIndex].proficiency_choices[0].choose
-
-            controlBoard.updatePrompt(`Choose ${displayBoard.choicesLeft} skills`)
-            break
-
-        case 7:
-            if( user.progress[5] === 'Monk' || user.progress[5] === 'Bard' ){
-                let skillChoiceArray = []
-                let instrumentChoices = classes[user.classIndex].proficiency_choices[1] 
-                for (let instrument of instrumentChoices.from) {
-                    skillChoiceArray.push(instrument.name)
-                }
-                dataDisplay(skillChoiceArray, equipment)
-                displayBoard.choicesLeft = instrumentChoices.choose
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-        
-        case 8:
-            if (user.progress[5] === 'Monk' ) {
-                let skillChoiceArray = []
-                let toolChoices = classes[user.classIndex].proficiency_choices[2] 
-                for (let item of toolChoices.from) {
-                    skillChoiceArray.push(item.name)
-                }
-                dataDisplay(skillChoiceArray, equipment)
-                displayBoard.choicesLeft = toolChoices.choose
-            }
-            else {
-                user.choiceSkipped()
-            }
-            break
-        
-        case 9:
-        
-            if(user.classIndex >= 1 && user.classIndex <= 3 || user.classIndex >= 9){
-                displayBoard.choicesLeft = classes[user.classIndex].spellcasting.cantrips
-
-                controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.cantrips} Cantrips`)
-                
-                spellDisplay(classes[user.classIndex].name, 0)
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-
-        case 10: 
-            if(user.classIndex === 1 || user.classIndex === 10 || user.classIndex === 9){
-                displayBoard.choicesLeft = classes[user.classIndex].spellcasting.first_level
-
-                controlBoard.updatePrompt(`Choose ${classes[user.classIndex].spellcasting.first_level} level 1 spells`)
-
-                spellDisplay(classes[user.classIndex].name, 1)
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-
-        case 11:
-            controlBoard.updatePrompt('Choose your equipment')
-            displayBoard.element.innerHTML = ''
-            equipmentFunction(startingEquipment[user.classIndex].choice_1[0].from[0], startingEquipment[user.classIndex].choice_1[1].from, 1)
-            break
-
-        case 12: 
-            //class feature choices
-            controlBoard.updatePrompt(`${classes[user.classIndex].name} Choices`)
-            console.log(user.progress)
-            if(user.classIndex === 4 ){
-                function featureChoices(){
-                    for(let feature of features){
-                        if(feature.class.name === user.progress[5] && !!feature.choice){
-                            displayBoard.element.innerHTML = `${feature.desc}`
-                            for(let choice of feature.choice.from){
-                                displayBoard.element.innerHTML += `<p>${choice.name}</p><p>${choice.desc[0]}</p>`
-                            }
-                        } 
-
-                    }
-                }
-                featureChoices()
-            }
-            else if(user.classIndex === 8){
-                let rogueSkillArray = []
-                
-                if(user.progress[2] !== null){
-                    for (let skill of user.progress[2]){
-                        rogueSkillArray.push(skill)
-                    }
-                }
-
-                for(let skill of user.progress[6]){
-                    rogueSkillArray.push(skill)
-                }
-                
-                
-                dataDisplay(rogueSkillArray, skills, false)
-                displayBoard.choicesLeft = 2
-                controlBoard.updatePrompt('Choose 2 skills that receive a +4 bonus')
-            }
-
-            else if( user.classIndex === 9){
-                displayBoard.element.innerHTML = `
-                <div class="card" style="width: 100%;">
-                        <img class="card-img-top" src="" alt="Image of Wild Magic">
-                        <div class="card-body">
-                            <h5 class="card-title">Wild Magic</h5>
-                            <p class="card-text">You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again.
-                            <br>Your spellcasting can unleash surges of untamed magic. Immediately after you cast a sorcerer spell of 1st level or higher, the DM can have you roll a d20. If you roll a 1, roll on the Wild Magic Surge table to create a random magical effect.</p>
-                        </div>
-                    </div>
-                    <div class="card dragonAncestry" style="width: 100%;">
-                        <img class="card-img-top" src="" alt="Image of Draconic Bloodline">
-                        <div class="card-body">
-                            <h5 class="card-title">Draconic Bloodline</h5>
-                            <p class="card-text">'At 1st level, you choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later.
-                            <br>You can speak, read, and write Draconic. Additionally, whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled if it applies to the check.</p>
-                        </div>
-                    </div>`
-                    displayBoard.prepForSelection()
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-
-        case 13:
-            let draconicArray = []
-            if(user.progress[12] === 'Draconic Bloodline'){
-                controlBoard.updatePrompt('Select your draconic ancestry')
-                let draconicArray = []
-                for(let feature of features){
-                    if(feature.index === 305){
-                        for(let ancestorType of feature.choice.from){
-                            draconicArray.push(
-                                `<label name="ancestry">
-                                    ${ancestorType.name}
-                                    <input type="radio" value=${ancestorType.name.split(' ').join('')}>
-                                <label>`
-                            )
-                        }
-                    }
-                }
-                
-                displayBoard.element.innerHTML = `<form id="draconicAncestry">${draconicArray.join('')}</form>`
-                displayBoard.choicesLeft = 1
-                displayBoard.element.addEventListener('change', function(){
-                    let inputs = document.querySelectorAll('#draconicAncestry input')
-                    for(let input of inputs){
-                        if(input.selected === true){
-                            document.querySelector('#next').classList.remove('inactive')
-                        }
-                    }
-                })
-            }
-            else{
-                user.choiceSkipped()
-            }
-            break
-        
-        case 14: 
-            displayBoard.clear()
-            controlBoard.updatePrompt('Allocate Stats')
-            document.querySelector('#prompter span').style.display = 'none'
-
-            let stats = displayBoard.statGen(displayBoard.diceRoll, 4, 6, 6)
-
-//generate stats and render
-            let statHolderHTML = []
-            let statNumHTML = []
-            let raceBonusData = races[user.raceIndex].ability_bonuses
-            let subraceBonusData
-
-            for(let i = 0; i < 6; i++){
-                let bonusText = ''
-                
-                if(user.subraceIndex !== undefined){
-                    subraceBonusData = subraces[subraceIndex].abilityBonuses[i]
-                }
-                if (!!raceBonusData[i] || !!subraceBonusData){
-                    bonusText = ` (+${raceBonusData[i] || subraceBonusData})`
-                }
-                statHolderHTML.push(`
-                    <div id="${statNames[i]}">
-                        <div class="statHolder"></div>
-                        ${statNames[i]} ${bonusText}
-                    </div>`)
-            }
-            for(let i = 0; i < 6; i++){
-                statNumHTML.push(`
-                <div class="statNum">
-                    ${stats[i]}
-                </div>`)
-            }
-            displayBoard.element.innerHTML = `
-                <div class="statHolderRow">${statHolderHTML.join('')}</div>
-
-                <div class="statNumRow">${statNumHTML.join('')}</div>
-                <button class="btn clear">Clear</button>`
-                                
-//add racial bonuses
-            let statNums = document.querySelectorAll('.statNum')
-            let statHolders = document.querySelectorAll('.statHolder')
-            let statNumRow = document.querySelector('.statNumRow')
-            let statHolderRow = document.querySelector('.statHolderRow')
-            
-            user.statSelect()
-// Click and allocate
-            for (let statNum of statNums) {
-
-                statNum.onclick = function (e) {
-                    for (let statNum of statNums) {
-                        statNum.classList.remove('statSelected')
-                    }
-                    e.target.classList.toggle('statSelected')
-                }
-            }
-
-            for (let statHolder of statHolders) {
-                statHolder.onclick = function (e) {
-                    let stat = document.querySelector('.statSelected')
-                    if (e.target.children.length === 0) {
-                        e.target.appendChild(stat)
-                    }
-                }
-            }
-// Revert on clear click
-            document.querySelector('.clear').addEventListener('click', function () {
-                for (let statNum of statNums) {
-                    statNumRow.appendChild(statNum)
-                    
-                }
-            })
-
-            displayBoard.element.addEventListener('click', function(){
-                if(statNumRow.children.length === 0){
-                    next.classList.remove('inactive')
-
-                    next.onclick = function () {
-                        let allocatedStats = []
-                        for (let statHolder of statHolders) {
-                            allocatedStats.push(Number(statHolder.children[0].innerHTML))
-                        }
-                        let statArray = [allocatedStats, raceBonusData, subraceBonusData = [0,0,0,0,0,0]]
-                        let statResult = statArray.reduce((acc, arr) => {
-                            console.log(acc)
-                            for (let i = 0; i < arr.length; i++) {
-                                acc[i] += arr[i]
-                            }
-                            return acc
-                        }, [0, 0, 0, 0, 0, 0])
-
-                        user.progress.push(statResult)
-                        return createDNDChar()
-                    }
-                }
-                else{
-                    next.onclick = null
-                    next.classList.add('inactive')
-                }
-
-               
-            })
-            break
-
-            case 15:
-            if (user.progress[0] === 'Half-Elf') {
-                document.querySelector('#Charisma').remove()
-                let statNums = document.querySelectorAll('.statNum')
-                let statHolders = document.querySelectorAll('.statHolder')
-
-                for(let i = 0; i < 5; i++){
-                    statNums[i].onclick = null
-                    statHolders[i].onclick = null
-                }
-
-                displayBoard.choicesLeft = 2
-                controlBoard.updatePrompt('As a Half-Elf add 1 point to two stats')
-                next.classList.add('inactive')
-
-
-                
-
-                for (let i = 0; i < statNums.length; i++) {
-                    statNums[i].onclick = function () {
-                        console.log('recognizing click')
-
-                        if (statNums[i].classList.contains('numAdded')) {
-                            statNums[i].innerHTML = Number(statNums[i].innerHTML) - 1
-                            statNums[i].classList.remove('numAdded')
-                            displayBoard.choicesLeft++
-                        }
-                        else{
-                            if (displayBoard.choicesLeft > 0){
-                                statNums[i].innerHTML = Number(statNums[i].innerHTML) + 1
-                                statNums[i].classList.add('numAdded')
-                                displayBoard.choicesLeft--
-
-                            }
-                            else{
-                                alert('no choices left')
-                            }
-                        }
-                        
-                    }
-                }
-
-                displayBoard.element.addEventListener('click', function(){
-                    let numAdded = document.querySelectorAll('.numAdded')
-                    if(numAdded.length === 2){
-                        next.classList.remove('inactive')
-                        next.onclick = function(){
-                            console.log(user.progress[14])
-                            for(let i = 0; i < statNums.length; i++){
-                                if(statNums[i].classList.contains('numAdded')){
-                                    user.progress[14][i] += 1
-                                }
-                            }
-                            console.log(user.progress[14])
-                            displayBoard.clear()
-
-                            return createDNDChar()
-                        }
-                    }
-                    else{
-                        next.classList.add('inactive')
-                        next.onclick = null
-                    }
-                })
-            }
-            user.choiceSkipped()
-            break
-         }
-
-
-          
-    }
-
-    
-},{"./classes":1,"./equipment":2,"./features":3,"./languages":4,"./races":6,"./skills":7,"./spells":8,"./startingEquipment":9,"./subraces":10}],6:[function(require,module,exports){
 const races = [
 	{
 		"index": 1,
@@ -6558,7 +5038,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/2",
-        "img": "img/dwarf.jpg"
+        "img": "img/elf.jpg"
 	},
 	{
 		"index": 3,
@@ -6611,7 +5091,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/3",
-        "img": "img/dwarf.jpg"
+        "img": "img/halfling.jpg"
 	},
 	{
 		"index": 4,
@@ -6707,7 +5187,7 @@ const races = [
 		"traits": [],
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/4",
-        "img": "img/dwarf.jpg"
+        "img": "img/human.jpg"
 	},
 	{
 		"index": 5,
@@ -6805,7 +5285,7 @@ const races = [
 			},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/5",
-        "img": "img/dwarf.jpg"
+        "img": "img/dragonborn.jpg"
 	},
 	{
 		"index": 6,
@@ -6862,7 +5342,7 @@ const races = [
 			}
 		],
         "url": "http://www.dnd5eapi.co/api/races/6",
-        "img": "img/dwarf.jpg"
+        "img": "img/gnome.jpg"
 	},
 	{
 		"index": 7,
@@ -6977,7 +5457,7 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/7",
-        "img": "img/dwarf.jpg"
+        "img": "img/half-elf.jpg"
 	},
 	{
 		"index": 8,
@@ -7032,7 +5512,7 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/8",
-        "img": "img/dwarf.jpg"
+        "img": "img/half-orc.jpg"
 	},
 	{
 		"index": 9,
@@ -7081,12 +5561,12 @@ const races = [
 		"trait_options": {},
 		"subraces": [],
         "url": "http://www.dnd5eapi.co/api/races/9",
-        "img": "img/dwarf.jpg"
+        "img": "img/tiefling.jpg"
 	}
 ]
 
 module.exports = races
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const skills = [{
 	"index": 1,
 	"name": "Acrobatics",
@@ -7252,7 +5732,7 @@ const skills = [{
 }]
 
 module.exports = skills
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const spells = [
 { name: `Acid Splash`,
  attack: true,
@@ -8444,7 +6924,7 @@ name: `Warlock` },
 name: `Wizard` }] }]
 
 module.exports = spells
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const startingEquipment = [{
 	"index": 1,
 	"class": {
@@ -9297,7 +7777,7 @@ const startingEquipment = [{
 }]
 
 module.exports = startingEquipment
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const subraces = [
 	{
 		"index": 1,
@@ -9489,7 +7969,8 @@ const subraces = [
 			"type": "trait"
 		}
 		,
-		"url": "http://www.dnd5eapi.co/api/subraces/2"
+		"url": "http://www.dnd5eapi.co/api/subraces/2",
+		img: 'img/high-elf.jpg'
 	},
 	{
 		"index": 3,
@@ -9609,7 +8090,8 @@ const subraces = [
 			}
 		],
 		"racial_trait_options": {},
-		"url": "http://www.dnd5eapi.co/api/subraces/5"
+		"url": "http://www.dnd5eapi.co/api/subraces/5",
+		img: 'img/wood-elf.jpg'
 	},
 	{
 		"index": 6,
@@ -9661,9 +8143,269 @@ const subraces = [
 			}
 		],
 		"racial_trait_options": {},
-		"url": "http://www.dnd5eapi.co/api/subraces/6"
+		"url": "http://www.dnd5eapi.co/api/subraces/6",
+		img: 'img/dark-elf.jpg'
 	}
 ]
 
 module.exports = subraces
-},{}]},{},[5]);
+},{}],10:[function(require,module,exports){
+const user = require('./user')
+const races = require('./data/races')
+const subraces = require('./data/subraces')
+const choiceFns = require('./choice-functions')
+const {addIndex} = require('./selection')
+const languages = require('./data/languages')
+const spells = require('./data/spells')
+const classes = require('./data/classes')
+
+const displayBoard = document.querySelector('#displayBoard')
+const next = document.querySelector('#next')
+
+function createDNDChar(){
+    displayBoard.innerHTML = ''
+    next.classList.add('inactive')
+    switch(user.log.length){
+        case 0:
+            choiceFns.raceChoice(races, createDNDChar)
+            break
+        case 1: 
+            addIndex(user.log[0], races, 'raceId')
+            choiceFns.extraRaceChoices(createDNDChar)
+            break
+        case 2:
+            if(user.log[0] =='Half-Elf') return choiceFns.skillDisplay(2)
+            choiceFns.subraceChoice(createDNDChar)
+            break
+        case 3:
+            addIndex(user.log[2], subraces, 'subraceId')
+            choiceFns.subraceExtraChoices('racial_trait_options', spells, createDNDChar)
+            break
+        case 4:
+            choiceFns.subraceExtraChoices('language_options', languages, createDNDChar)
+            break
+        case 5:
+            choiceFns.raceChoice(classes, createDNDChar)
+            break
+        case 6:
+            addIndex(user.log[5], classes, 'classId')
+            choiceFns.classSkillChoice(createDNDChar)
+            break
+        case 7:
+            choiceFns.classExtraChoices(createDNDChar)
+            break
+        case 8:
+            choiceFns.spellChoices(0, createDNDChar)
+            break
+        case 9:
+            choiceFns.spellChoices(1, createDNDChar)
+            break
+        default:
+            console.log(user.log.length, 'doh!')
+    }
+}
+
+createDNDChar()
+
+
+
+module.exports = createDNDChar
+},{"./choice-functions":1,"./data/classes":2,"./data/languages":4,"./data/races":5,"./data/spells":7,"./data/subraces":9,"./selection":11,"./user":13}],11:[function(require,module,exports){
+const user = require('./user')
+const { standardTemplate, infoPageHTML } = require('./templates')
+const { addListenersToMany } = require('./utils')
+const races = require('./data/races')
+
+
+const displayBoard = document.querySelector('#displayBoard')
+
+function display(arr) {
+    let result = arr.map(item => standardTemplate(item))
+    displayBoard.innerHTML = result.join('')
+    prepCards(arr)
+}
+
+function prepCards(arr) {
+    addListenersToMany('.select', 'click', function (e) { select(e) })
+    addListenersToMany('.more', 'click', function (e) { showInfo(e, arr) })
+}
+
+function select(e) {
+    if (user.numChoices > 0) {
+        e.target.onclick = null
+        e.target.parentElement.classList.add('selected')
+        user.numChoices--
+        e.target.onclick = function (e) { unselect(e) }
+        e.target.textContent = 'unselect'
+    }
+    else{
+        return false
+    }
+}
+
+function unselect(e) {
+    e.target.onclick = null
+    e.target.parentElement.classList.remove('selected')
+    e.target.onclick = function(e){select(e)}
+    user.numChoices++
+    e.target.textContent = 'select'
+}
+
+function showInfo(e, arr) {
+    let id = e.target.getAttribute('data-id')
+    createInfoPage(id, arr)
+}
+
+function createInfoPage(index, arr) {
+    let specificItem = arr[index - 1]
+    displayBoard.innerHTML += infoPageHTML(specificItem)
+    document.querySelector('.back').onclick = function (e) { slideOut(e) }
+}
+
+
+function slideOut(e) {
+    setTimeout(function () {
+        e.target.parentElement.style.animation = 'slideOut .5s ease-in'
+        setTimeout(function () {
+            e.target.parentElement.remove()
+        }, 500)
+    }, 0)
+}
+
+function readyToGo(returnFn) {
+    if (user.numChoices === 0) {
+        document.querySelector('#next').classList.remove('inactive')
+        document.querySelector('#next').onclick = function () {
+            addSelection()
+            return returnFn()
+        }
+    }
+    else{
+        document.querySelector('#next').classList.add('inactive')
+        document.querySelector('#next').onclick = null
+    }
+}
+
+function addSelection() {
+    const selected = Array.from(document.querySelectorAll('.selected'))
+    const toLog = selected.reduce((acc, selection) => {
+        acc.push(selection.children[2].textContent)
+        return acc
+    }, [])
+    if (toLog.length === 1) user.log.push(toLog[0])
+    else user.log.push(toLog)
+}
+
+function addIndex(name, array, indexType){
+    if(!name) return false
+    for (let item of array){
+        if (item.name === name){
+            user[indexType] = item.index - 1
+        } 
+    }
+}
+
+function skipDisplay(returnFn){
+    user.log.push(null)
+    return returnFn()
+}
+
+
+function selectFrom(choiceObj, originArray) {
+    let choiceArray
+    if ( Array.isArray(choiceObj) ) choiceArray = choiceObj.map(item => item.name)
+    else choiceArray = choiceObj.from.map(item => item.name)
+    let displayArray = matchByName(originArray, choiceArray)
+    display(displayArray)
+}
+
+
+function matchByName(masterArray, optionArray) {
+    let result = masterArray.reduce((acc, item) => {
+        for (let choice of optionArray) {
+            if (item.name === choice) acc.push(item)
+        }
+        return acc
+    }, [])
+    return result
+}
+
+function preventDupe(arr){
+    let result = arr.reduce((acc, item) => {
+        for (let entry of user.log) {
+            if (entry === item.name) { return acc }
+            if (Array.isArray(entry)) {
+                for (let subEntry of entry) {
+                    if (subEntry === item.name) { return acc }
+                }
+            }
+        }
+        acc.push(item)
+        return acc
+    }, [])
+    return result
+}
+
+function createSpellList(lvl, spells) {
+    let spellList = spells.reduce((acc, spell) => {
+        for (let classType of spell.classes) {
+            if (spell.level === lvl && classType.name === user.log[5]){ 
+                acc.push(spell)
+            }
+        }
+        return acc
+    }, [])
+    return spellList
+}
+
+
+
+module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList}
+
+},{"./data/races":5,"./templates":12,"./user":13,"./utils":14}],12:[function(require,module,exports){
+function standardTemplate(item) {
+    return`
+    <div class="card">
+        <button class="select" type="button">select</button>
+        <img src="${item.img}" alt="Image of ${item.name}">
+        <h3>${item.name}</h3>
+        <p>${item.desc}</p>
+        <button class="more" type="button" data-id="${item.index}">more</button>
+    </div>`
+}
+
+function infoPageHTML(item){
+    
+    return `
+    <div class="infoPage">
+        <button type="button" class="back">back</button>
+        <h2>${item.name}</h2>
+    </div>`
+}
+
+module.exports = {standardTemplate, infoPageHTML}
+},{}],13:[function(require,module,exports){
+const user = {
+    log: [],
+    raceId: undefined,
+    subraceId: undefined,
+    classId: undefined,
+    numChoices: 1
+}
+
+module.exports = user
+},{}],14:[function(require,module,exports){
+
+
+function addListenersToMany(element, listenerType, fn) {
+    const elements = document.querySelectorAll(element)
+    elements.forEach(ele => ele.addEventListener(listenerType, fn))
+
+}
+
+function addDifferentListeners(element, listenerArray, fn){
+    listenerArray.forEach(listener => addListenersToMany(element, listener, fn))
+}
+
+module.exports = {addListenersToMany, addDifferentListeners}
+},{}]},{},[10]);

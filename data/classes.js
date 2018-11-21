@@ -2,6 +2,7 @@ const classes = [
 	{
 		"index": 1,
 		"name": "Barbarian",
+		img: 'img/barbarian.jpg',
 		"hit_die": 12,
 		"proficiency_choices": [
 			{
@@ -89,6 +90,7 @@ const classes = [
 	{
 		"index": 2,
 		"name": "Bard",
+		img: 'img/bard.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -277,6 +279,7 @@ const classes = [
 	{
 		"index": 3,
 		"name": "Cleric",
+		img: 'img/cleric.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -359,6 +362,7 @@ const classes = [
 	{
 		"index": 4,
 		"name": "Druid",
+		img: 'img/druid.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -493,6 +497,7 @@ const classes = [
 	{
 		"index": 5,
 		"name": "Fighter",
+		img: 'img/fighter.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -584,6 +589,7 @@ const classes = [
 	{
 		"index": 6,
 		"name": "Monk",
+		img: 'img/monk.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
             {
@@ -787,6 +793,7 @@ const classes = [
 	{
 		"index": 7,
 		"name": "Paladin",
+		img: 'img/paladin.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -870,6 +877,7 @@ const classes = [
 	{
 		"index": 8,
 		"name": "Ranger",
+		img: 'img/ranger.jpg',
 		"hit_die": 10,
 		"proficiency_choices": [
 			{
@@ -966,6 +974,7 @@ const classes = [
 	{
 		"index": 9,
 		"name": "Rogue",
+		img: 'img/rogue.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -1081,6 +1090,7 @@ const classes = [
 	{
 		"index": 10,
 		"name": "Sorcerer",
+		img: 'img/sorcerer.jpg',
 		"hit_die": 6,
 		"proficiency_choices": [
 			{
@@ -1167,6 +1177,7 @@ const classes = [
 	{
 		"index": 11,
 		"name": "Warlock",
+		img: 'img/warlock.jpg',
 		"hit_die": 8,
 		"proficiency_choices": [
 			{
@@ -1249,6 +1260,7 @@ const classes = [
 	{
 		"index": 12,
 		"name": "Wizard",
+		img: 'img/wizard.jpg',
 		"hit_die": 6,
 		"proficiency_choices": [
 			{
