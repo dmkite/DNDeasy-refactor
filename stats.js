@@ -1,3 +1,5 @@
+const utils = require('./utils')
+const {statTemplate} = require('./templates')
 function diceRoll(numDice, numSides) {
     let statNums = []
     for (let i = 0; i < numDice; i++) {
@@ -18,8 +20,37 @@ function statGen(numDice, numSides, numTimes) {
     return stats
 }
 
-function prepForStats(statGen){
-    document.querySelector('#displayBoard').innerHTML = statTemplate(statArr)
+function prepForStats(){
+    const stats = statGen(4, 6, 6)
+    document.querySelector('#displayBoard').innerHTML = statTemplate(stats)
+    clickToAllocate()
+}
+
+function clickToAllocate(){
+    utils.addListenersToMany('.stat', 'click', function(e){prepForAllocation(e)})
+}
+
+function prepForAllocation(e){
+    let selected = document.querySelectorAll('.selectedStat')
+    if(selected.length > 0){return false}
+    e.target.classList.add('selectedStat')
+    e.target.onclick = function(e){unselect(e)}
+    prepHolders()
+}
+
+function unselect(e) {
+    e.target.classList.remove('selectedStat')
+    clickToAllocate()
+}
+
+function prepHolders(){
+    const statHolders = document.querySelectorAll('.statType')
+    utils.addListenersToMany('.statType', 'click', function(e){addToHolder})
+}
+function addToHolder(e){
+    let statNum = document.querySelector('.selectedStat')
+    e.target.appendChild(statNum)
+
 }
 
 function HPGen() {
@@ -42,4 +73,4 @@ function rollingAnimation(hitDie, counter) {
 }
 
 
-module.exports = statGen
+module.exports = {prepForStats, prepForAllocation}

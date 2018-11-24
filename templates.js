@@ -65,24 +65,28 @@ function sorcererTemplate(){
     </div>`          
 }
 
-function statTemplate(statArr){}
-   return `<div id="statHolder" class="col-sm-12 col-md-6">
-        <div>STR</div>
-        <div>DEX</div>
-        <div>CON</div>
-        <div>INT</div>
-        <div>WIS</div>
-        <div>CHA</div>
-    </div>
-    <div id="stats" class="col-sm-12 col-md-6">
-        <div>${statArr[0]}</div>
-        <div>${statArr[1]}</div>
-        <div>${statArr[2]}</div>
-        <div>${statArr[3]}</div>
-        <div>${statArr[4]}</div>
-        <div>${statArr[5]}</div>
+function statTemplate(statArr){
+
+   return `
+   <div class="row">
+    <div id="statHolder" class="col-sm-12 col-md-6">
+            <div class="statType">STR</div>
+            <div class="statType">DEX</div>
+            <div class="statType">CON</div>
+            <div class="statType">INT</div>
+            <div class="statType">WIS</div>
+            <div class="statType">CHA</div>
+        </div>
+        <div id="stats" class="col-sm-12 col-md-6">
+            <div class="stat">${statArr[0]}</div>
+            <div class="stat">${statArr[1]}</div>
+            <div class="stat">${statArr[2]}</div>
+            <div class="stat">${statArr[3]}</div>
+            <div class="stat">${statArr[4]}</div>
+            <div class="stat">${statArr[5]}</div>
+        </div>
     </div>
     <button class="reset" type="button">reset</button>`
-    
+}
 
 module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate}

@@ -14,7 +14,7 @@ function createDNDChar(){
     displayBoard.innerHTML = ''
     next.classList.add('inactive')
     switch(user.log.length){
-        case 0:
+        case 10:
             choiceFns.raceChoice(races, createDNDChar)
             break
         case 1: 
@@ -69,8 +69,8 @@ function createDNDChar(){
         case 16:
             choiceFns.classFeatureChoices(5, createDNDChar)
             break
-        case 17:
-            choiceFns.allocateStates(createDNDChar)
+        case 0://17:
+            choiceFns.allocateStats(createDNDChar)
             break
         default:
             console.log(user.log.length, 'doh!')

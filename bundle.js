@@ -124,7 +124,7 @@ function classFeatureChoices(returnFn){
 }
 
 function allocateStats(){
-    let stats = statGen(6, 6, 4)
+    let statNums = stats.prepForStats()
 }
 
 
@@ -8203,7 +8203,7 @@ function createDNDChar(){
     displayBoard.innerHTML = ''
     next.classList.add('inactive')
     switch(user.log.length){
-        case 0:
+        case 10:
             choiceFns.raceChoice(races, createDNDChar)
             break
         case 1: 
@@ -8258,8 +8258,8 @@ function createDNDChar(){
         case 16:
             choiceFns.classFeatureChoices(5, createDNDChar)
             break
-        case 17:
-            choiceFns.allocateStates(createDNDChar)
+        case 0://17:
+            choiceFns.allocateStats(createDNDChar)
             break
         default:
             console.log(user.log.length, 'doh!')
@@ -8494,6 +8494,8 @@ function displaySorcererChoice(){
 module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice}
 
 },{"./data/races":5,"./data/skills":6,"./templates":13,"./user":14,"./utils":15}],12:[function(require,module,exports){
+const utils = require('./utils')
+const {statTemplate} = require('./templates')
 function diceRoll(numDice, numSides) {
     let statNums = []
     for (let i = 0; i < numDice; i++) {
@@ -8514,8 +8516,37 @@ function statGen(numDice, numSides, numTimes) {
     return stats
 }
 
-function prepForStats(statGen){
-    document.querySelector('#displayBoard').innerHTML = statTemplate(statArr)
+function prepForStats(){
+    const stats = statGen(4, 6, 6)
+    document.querySelector('#displayBoard').innerHTML = statTemplate(stats)
+    clickToAllocate()
+}
+
+function clickToAllocate(){
+    utils.addListenersToMany('.stat', 'click', function(e){prepForAllocation(e)})
+}
+
+function prepForAllocation(e){
+    let selected = document.querySelectorAll('.selectedStat')
+    if(selected.length > 0){return false}
+    e.target.classList.add('selectedStat')
+    e.target.onclick = function(e){unselect(e)}
+    prepHolders()
+}
+
+function unselect(e) {
+    e.target.classList.remove('selectedStat')
+    clickToAllocate()
+}
+
+function prepHolders(){
+    const statHolders = document.querySelectorAll('.statType')
+    utils.addListenersToMany('.statType', 'click', function(e){addToHolder})
+}
+function addToHolder(e){
+    let statNum = document.querySelector('.selectedStat')
+    e.target.appendChild(statNum)
+
 }
 
 function HPGen() {
@@ -8538,8 +8569,8 @@ function rollingAnimation(hitDie, counter) {
 }
 
 
-module.exports = statGen
-},{}],13:[function(require,module,exports){
+module.exports = {prepForStats, prepForAllocation}
+},{"./templates":13,"./utils":15}],13:[function(require,module,exports){
 function standardTemplate(item) {
     return`
     <div class="card">
@@ -8607,25 +8638,29 @@ function sorcererTemplate(){
     </div>`          
 }
 
-function statTemplate(statArr){}
-   return `<div id="statHolder" class="col-sm-12 col-md-6">
-        <div>STR</div>
-        <div>DEX</div>
-        <div>CON</div>
-        <div>INT</div>
-        <div>WIS</div>
-        <div>CHA</div>
-    </div>
-    <div id="stats" class="col-sm-12 col-md-6">
-        <div>${statArr[0]}</div>
-        <div>${statArr[1]}</div>
-        <div>${statArr[2]}</div>
-        <div>${statArr[3]}</div>
-        <div>${statArr[4]}</div>
-        <div>${statArr[5]}</div>
+function statTemplate(statArr){
+
+   return `
+   <div class="row">
+    <div id="statHolder" class="col-sm-12 col-md-6">
+            <div class="statType">STR</div>
+            <div class="statType">DEX</div>
+            <div class="statType">CON</div>
+            <div class="statType">INT</div>
+            <div class="statType">WIS</div>
+            <div class="statType">CHA</div>
+        </div>
+        <div id="stats" class="col-sm-12 col-md-6">
+            <div class="stat">${statArr[0]}</div>
+            <div class="stat">${statArr[1]}</div>
+            <div class="stat">${statArr[2]}</div>
+            <div class="stat">${statArr[3]}</div>
+            <div class="stat">${statArr[4]}</div>
+            <div class="stat">${statArr[5]}</div>
+        </div>
     </div>
     <button class="reset" type="button">reset</button>`
-    
+}
 
 module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate}
 
