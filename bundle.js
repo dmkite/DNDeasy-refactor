@@ -8384,7 +8384,7 @@ function addToLog(){
 
 function finalRender(){
     headerInfo()
-    statInfo()
+    // statInfo()
 
 }
 
@@ -8413,57 +8413,56 @@ function statInfo(){
 function statTemplate(arr){
     displabyBoard.innerHTML += `
     <div class="accordion" id="accordionExample">
-  <div class="card">
-    <div class="card-header" id="headingOne">
-      <h5 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Collapsible Group Item #1
-        </button>
-      </h5>
-    </div>
+        <div class="card">
+            <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Collapsible Group Item #1
+                </button>
+            </h5>
+            </div>
 
-    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-      <div class="card-body">
-        <div class="finalStat">
-            <p class="statName">STR</p>
-            <div class="rawStat">${arr[0]}</div>
-            <div class="mod">${modCalc(arr[0])}</div>
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="finalStat">
+                        <p class="statName">STR</p>
+                        <div class="rawStat">${arr[0]}</div>
+                        <div class="mod">${modCalc(arr[0])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">DEX</p>
+                        <div class="rawStat">${arr[1]}</div>
+                        <div class="mod">${modCalc(arr[1])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CON</p>
+                        <div class="rawStat">${arr[2]}</div>
+                        <div class="mod">${modCalc(arr[2])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">INT</p>
+                        <div class="rawStat">${arr[3]}</div>
+                        <div class="mod">${modCalc(arr[3])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">WIS</p>
+                        <div class="rawStat">${arr[4]}</div>
+                        <div class="mod">${modCalc(arr[4])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CHA</p>
+                        <div class="rawStat">${arr[5]}</div>
+                        <div class="mod">${modCalc(arr[5])}</div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="finalStat">
-            <p class="statName">DEX</p>
-            <div class="rawStat">${arr[1]}</div>
-            <div class="mod">${modCalc(arr[1])}</div>
-        </div>
-
-        <div class="finalStat">
-            <p class="statName">CON</p>
-            <div class="rawStat">${arr[2]}</div>
-            <div class="mod">${modCalc(arr[2])}</div>
-        </div>
-
-        <div class="finalStat">
-            <p class="statName">INT</p>
-            <div class="rawStat">${arr[3]}</div>
-            <div class="mod">${modCalc(arr[3])}</div>
-        </div>
-
-        <div class="finalStat">
-            <p class="statName">WIS</p>
-            <div class="rawStat">${arr[4]}</div>
-            <div class="mod">${modCalc(arr[4])}</div>
-        </div>
-
-        <div class="finalStat">
-            <p class="statName">CHA</p>
-            <div class="rawStat">${arr[5]}</div>
-            <div class="mod">${modCalc(arr[5])}</div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  </div>`
+    </div>`
 }
 
 function modCalc(num){
