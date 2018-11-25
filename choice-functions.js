@@ -9,8 +9,11 @@ const skills = require('./data/skills')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
-const {standardTemplate, radioTemplate} = require('./templates')
+const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate} = require('./templates')
 const stats = require('./stats')
+const hp = require('./hp')
+const backgrounds = require('./data/backgrounds')
+const forms = require('./forms.js')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
@@ -119,13 +122,45 @@ function classFeatureChoices(returnFn){
     if (user.classId === 4) return displayFighterChoice()
     if (user.classId === 8) return displayRogueChoice()
     if (user.classId === 9) return displaySorcererChoice()
+
     skipDisplay(returnFn)
 }
 
-function allocateStats(){
-    let statNums = stats.prepForStats()
+function allocateStats(returnFn){
+    stats.prepForStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, !document.querySelector('#stats').children.length) })  
+}
+
+function upgradeStats(returnFn){
+    if(user.raceId !== 6) return skipDisplay(returnFn)
+    stats.addBonusStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, document.querySelectorAll('.added').length === 2) })  
+}
+
+function rollHP(returnFn){
+    document.querySelector('#displayBoard').innerHTML = '<div class="dice"></div>'
+    const dice = document.querySelector('.dice')
+    dice.onclick = function(){hp(returnFn)}
+}
+
+function backgroundChoice(returnFn){
+    user.numChoices = 1
+    display(backgrounds)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn)})
+}
+
+function backStory(returnFn){
+    document.querySelector('#displayBoard').innerHTML = backStoryForm()
+    addDifferentListeners('#displayBoard', ['click', 'touch', 'keydown'], function () { forms.readyToGo(returnFn) })
+
+}
+
+function alignment(returnFn){
+    user.numChoices = 1
+    document.querySelector('#displayBoard').innerHTML = alignmentTemplate()
+    forms.prepForSelection()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { forms.addAlign(returnFn)})
 }
 
 
-
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats }
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats, upgradeStats, rollHP, backgroundChoice, backStory, alignment }

@@ -10,8 +10,11 @@ const skills = require('./data/skills')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const startingEquip = require('./data/startingEquipment')
-const {standardTemplate, radioTemplate} = require('./templates')
+const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate} = require('./templates')
 const stats = require('./stats')
+const hp = require('./hp')
+const backgrounds = require('./data/backgrounds')
+const forms = require('./forms.js')
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
@@ -120,17 +123,178 @@ function classFeatureChoices(returnFn){
     if (user.classId === 4) return displayFighterChoice()
     if (user.classId === 8) return displayRogueChoice()
     if (user.classId === 9) return displaySorcererChoice()
+
     skipDisplay(returnFn)
 }
 
-function allocateStats(){
-    let statNums = stats.prepForStats()
+function allocateStats(returnFn){
+    stats.prepForStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, !document.querySelector('#stats').children.length) })  
+}
+
+function upgradeStats(returnFn){
+    if(user.raceId !== 6) return skipDisplay(returnFn)
+    stats.addBonusStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, document.querySelectorAll('.added').length === 2) })  
+}
+
+function rollHP(returnFn){
+    document.querySelector('#displayBoard').innerHTML = '<div class="dice"></div>'
+    const dice = document.querySelector('.dice')
+    dice.onclick = function(){hp(returnFn)}
+}
+
+function backgroundChoice(returnFn){
+    user.numChoices = 1
+    display(backgrounds)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn)})
+}
+
+function backStory(returnFn){
+    document.querySelector('#displayBoard').innerHTML = backStoryForm()
+    addDifferentListeners('#displayBoard', ['click', 'touch', 'keydown'], function () { forms.readyToGo(returnFn) })
+
+}
+
+function alignment(returnFn){
+    user.numChoices = 1
+    document.querySelector('#displayBoard').innerHTML = alignmentTemplate()
+    forms.prepForSelection()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { forms.addAlign(returnFn)})
 }
 
 
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats, upgradeStats, rollHP, backgroundChoice, backStory, alignment }
+},{"./data/backgrounds":2,"./data/classes":3,"./data/equipment":4,"./data/languages":5,"./data/races":6,"./data/skills":7,"./data/spells":8,"./data/startingEquipment":9,"./data/subraces":10,"./forms.js":11,"./hp":12,"./selection":14,"./stats":15,"./templates":16,"./user":17,"./utils":18}],2:[function(require,module,exports){
+const languages = require('./languages')
 
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats }
-},{"./data/classes":2,"./data/equipment":3,"./data/languages":4,"./data/races":5,"./data/skills":6,"./data/spells":7,"./data/startingEquipment":8,"./data/subraces":9,"./selection":11,"./stats":12,"./templates":13,"./user":14,"./utils":15}],2:[function(require,module,exports){
+const backgrounds = [
+    {
+    name: "Acolyte",
+    index:1,
+    skills: ['Insight', 'Religion'], 
+    choices:{languages: [2, languages]},
+    equipment: ['holy symbol', 'prayer book', '5 sticks of incense', 'vestments', 'common clothes', '15 GP'],
+    desc:'',
+    img: 'img/acolyte.jpg'
+  },
+   {
+    name: "Charlatan",
+    index: 2,
+    skills: ['Deception', 'Sleight of Hand'],
+    profs:{tools:['disguise kit', 'forgery kit']},
+    equipment: ['fine clothes', 'disguise kit', 'tools of a con of your choice', '15 GP'],
+    desc: '',
+    img: 'img/charlatan.jpg'
+  },
+  {
+    name: "Criminal",
+    index: 3,
+    skills: ['Deception', 'Stealth'],
+    profs: { tools: ['One type of gaming set', "thieve's tools"] },
+    equipment: ['crowbar', 'dark common clothes', '15 GP'],
+    desc: '',
+    img: 'img/criminal.jpg'
+    
+  },
+  {
+    name:"Entertainer",
+    index: 4,
+    skills: ['Acrobatics', 'Performance'],
+    profs: { tools: ['disguise kit', 'musical instrument'] },
+    equipment: ['musical instrument', 'the favor of an admirer', 'costume', '15 GP'],
+    desc: '',
+    img: 'img/entertainer.jpg'
+  },
+  {
+    name: "Folk Hero",
+    index: 5,
+    skills: ['Animal Handling', 'Survival'],
+    profs: { tools: ["artisan's tools", 'land vehicles'] },
+    equipment: ["artisan's tools of your choice", 'shovel', 'iron pot', 'common clothes', '10 GP'],
+    desc: '',
+    img: 'img/folkHero.jpg'
+  },
+  { 
+    name: "Guild Artisan",
+    index: 6,
+    skills: ['Insight', 'Persuasion'],
+    profs: { tools: ["artisan's tools", 'land vehicles'] },
+    choices: { languages: [1, languages] },
+    equipment: ["artisan's tools of your choice", 'a letter of introduction from your guild', "traveler's clothes", '15 GP'],
+    desc: '',
+    img: 'img/stoutHalfling.jpg'
+  },
+  {
+    name: "Hermit",
+    index: 7,
+    skills: ['Medicine', 'Religion'],
+    profs: { tools: ['herbalism kit'] },
+    choices: { languages: [1, languages] },
+    equipment: ['scroll case full of notes from studies or prayers', 'winter blanket', 'common clothes', 'herbalism kit', '5 GP'],
+    desc: '',
+    img: 'img/hermit.jpg'
+  },
+  {
+    name: "Noble",
+    index: 8,
+    skills: ['History', 'Persuasion'],
+    profs: { tools: ['One type of gaming set'] },
+    choices: { languages: [1, languages] },
+    equipment: ['scroll of pedigree', 'signet ring', 'fine clothes', '25 GP'],
+    desc: '',
+    img: 'img/noble.jpg'
+  },
+  {
+    name: "Outlander",
+    index: 9,
+    skills: ['Athletics', 'Survival'],
+    profs: { tools: ['musical instrument'] },
+    choices: { languages: [1, languages] },
+    equipment: ['staff', 'hunting trap', 'trophy from an animal you killed', "traveler's kit", '10 GP'],
+    desc: '',
+    img: 'img/outlander.jpg'
+  },
+  {
+    name: "Sage",
+    index: 10,
+    skills: ['Arcana', 'History'],
+    choices: { languages: [2, languages] },
+    equipment: ['bottle of black ink', 'quill', 'small knife', 'letter from dead colleague posing an unanswered question', 'common clothes', '10 GP'],
+    desc: '',
+    img: 'img/wizard.jpg'
+  },
+  {
+    name: "Sailor",
+    index: 11,
+    skills: ['Athletics', 'Perception'],
+    profs: { tools: ["navigator's tools", 'water vehicles'] },
+    equipment: ['club', 'silk rope (50ft)', 'lucky charm', "common clothes", '10 GP'],
+    desc: '',
+    img: 'img/sailor.jpg'
+  },
+  {
+    name: "Soldier",
+    index: 12,
+    skills: ['Athletics', 'Intimidation'],
+    profs: { tools: ['disguise kit', 'land vehicles'] },
+    equipment: ['insignia of rank', 'trophy from a fallen enemy', 'common clothes', '10 GP'],
+    desc: '',
+    img: 'img/soldier.jpg'
+  },
+  {
+    name:"Urchin",
+    index: 13,
+    skills: ['Sleight of Hand', 'Stealth'],
+    profs: { tools: ['disguise kit', "thieves' tools"] },
+    equipment: ['small knife', 'map of home town', 'pet mouse', 'a toke to remember your parents', 'common clothes', '10 GP'],
+    desc: '',
+    img: 'img/urchin.jpg'
+  }
+]
+
+module.exports = backgrounds
+},{"./languages":5}],3:[function(require,module,exports){
 const classes = [
 	{
 		"index": 1,
@@ -1479,7 +1643,7 @@ const classes = [
 	}
 ]
 module.exports = classes
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 const equipment = [{
 	"index": 1,
 	"name": "Club",
@@ -4798,7 +4962,7 @@ const equipment = [{
 	}]
 
 module.exports = equipment
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const languages = [{
 	"index": 1,
 	"name": "Common",
@@ -4914,7 +5078,7 @@ const languages = [{
 }]
 
 module.exports = languages
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const races = [
 	{
 		"index": 1,
@@ -5603,7 +5767,7 @@ const races = [
 ]
 
 module.exports = races
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const skills = [{
 	"index": 1,
 	"name": "Acrobatics",
@@ -5769,7 +5933,7 @@ const skills = [{
 }]
 
 module.exports = skills
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const spells = [
 { name: `Acid Splash`,
  attack: true,
@@ -6961,7 +7125,7 @@ name: `Warlock` },
 name: `Wizard` }] }]
 
 module.exports = spells
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const startingEquipment = [{
 	"index": 1,
 	"class": {
@@ -7814,7 +7978,7 @@ const startingEquipment = [{
 }]
 
 module.exports = startingEquipment
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const subraces = [
 	{
 		"index": 1,
@@ -8186,7 +8350,219 @@ const subraces = [
 ]
 
 module.exports = subraces
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+const user = require('./user')
+const races = require('./data/races')
+const classes = require('./data/classes')
+const backgrounds = require('./data/backgrounds')
+const subraces = require('./data/subraces')
+const displayBoard = document.querySelector('#displayBoard')
+function readyToGo(returnFn){
+    const inputs = document.querySelectorAll('.backstory')
+    for( let input of inputs ){
+        if(!input.value){
+            document.querySelector('#next').onclick = null
+            document.querySelector('#next').classList.add('inactive')
+            return false
+        }
+    }
+    document.querySelector('#next').onclick = function(){
+        addToLog()
+        return returnFn()
+    }
+    document.querySelector('#next').classList.remove('inactive')
+}
+
+function addToLog(){
+    let inputs = document.querySelectorAll('.backstory')
+    let backstoryArray = []
+    for(let input of inputs){
+        backstoryArray.push(input.value)
+    }
+    user.log.push(backstoryArray)
+}
+
+function finalRender(){
+    headerInfo()
+    statInfo()
+
+}
+
+function headerInfo(){
+    let subrace = user.log[2]
+    if(user.raceId === 6) subrace = null
+    displayBoard.innerHTML = `
+    <div class="top">
+        <h3>${user.log[22][0]}</h3>    
+        <p>Level 1 ${user.log[5]} | ${user.log[20]} </p>
+        <p>${subrace || user.log[0]} | ${user.log[21]}</p>
+    </div>`
+}
+
+function statInfo(){
+    let finalStats = races[user.raceId].ability_bonuses
+    if(!!user.log[2] && !Array.isArray(user.log[2]) ) finalStats = combineArrays(finalStats, subraces[user.subraceId].ability_bonuses)
+    finalStats = combineArrays(finalStats, user.log[17])
+    if(!!user.log[18]){
+        let bonus = figureDifference(user.log[17], user.log[18])
+        finalStats = combineArrays(finalStats, bonus)
+    }
+    return statTemplate(finalStats)
+}
+
+function statTemplate(arr){
+    displabyBoard.innerHTML += `
+    <div class="accordion" id="accordionExample">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Collapsible Group Item #1
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+      <div class="card-body">
+        <div class="finalStat">
+            <p class="statName">STR</p>
+            <div class="rawStat">${arr[0]}</div>
+            <div class="mod">${modCalc(arr[0])}</div>
+        </div>
+
+        <div class="finalStat">
+            <p class="statName">DEX</p>
+            <div class="rawStat">${arr[1]}</div>
+            <div class="mod">${modCalc(arr[1])}</div>
+        </div>
+
+        <div class="finalStat">
+            <p class="statName">CON</p>
+            <div class="rawStat">${arr[2]}</div>
+            <div class="mod">${modCalc(arr[2])}</div>
+        </div>
+
+        <div class="finalStat">
+            <p class="statName">INT</p>
+            <div class="rawStat">${arr[3]}</div>
+            <div class="mod">${modCalc(arr[3])}</div>
+        </div>
+
+        <div class="finalStat">
+            <p class="statName">WIS</p>
+            <div class="rawStat">${arr[4]}</div>
+            <div class="mod">${modCalc(arr[4])}</div>
+        </div>
+
+        <div class="finalStat">
+            <p class="statName">CHA</p>
+            <div class="rawStat">${arr[5]}</div>
+            <div class="mod">${modCalc(arr[5])}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </div>`
+}
+
+function modCalc(num){
+    return Number(Math.floor((num - 10) / 2))
+}
+
+function combineArrays(arr1, arr2){
+    const newArr = []
+    for(let i = 0; i < arr1.length; i++){
+        newArr[i] = arr1[i] + arr2[i]
+    }
+    return newArr
+}
+
+function figureDifference(arr1, arr2){
+    const newArr = []
+    for(let i = 0; i < arr2.length; i++){
+        if(arr1[i] < arr2[i]) newArr[i] = 1
+        else newArr[i = 0]
+    }
+    newarr.push(0)
+    return newArr
+}
+
+function prepForSelection(){
+    let choices = document.querySelectorAll('.alignment')
+    for (let choice of choices){
+        choice.onclick = function(e){select(e)}
+    }
+}
+
+function select(e) {
+    if (user.numChoices > 0) {
+        e.target.onclick = null
+        e.target.classList.add('selected')
+        user.numChoices--
+        e.target.onclick = function (e) { unselect(e) }
+    }
+    else {
+        return false
+    }
+}
+
+function unselect(e) {
+    e.target.onclick = null
+    e.target.classList.remove('selected')
+    e.target.onclick = function (e) { select(e) }
+    user.numChoices++
+}
+
+function addAlign(returnFn){
+    document.querySelector('#next').onclick = function(){
+        user.log.push(document.querySelector('.selected').textContent)
+        return returnFn()
+    }
+}
+
+
+
+module.exports = {readyToGo, finalRender, prepForSelection, addAlign}
+},{"./data/backgrounds":2,"./data/classes":3,"./data/races":6,"./data/subraces":10,"./user":17}],12:[function(require,module,exports){
+const classes = require('./data/classes')
+const user = require('./user')
+const stats = require('./stats')
+
+function HPGen(returnFn) {
+    let counter = 20
+    let hitDie = classes[user.classId].hit_die
+    let rollingDie = setInterval(function () {
+        let diceNum = stats.diceRoll(1, hitDie)
+        document.querySelector('.dice').textContent = diceNum[0]
+        counter--
+        if (counter === 0) {
+            clearInterval(rollingDie)
+            setTimeout(function () { 
+                document.querySelector('.dice').classList.add('animatedNum') 
+                addHP(returnFn)
+            }, 0)
+    }
+     }, 100)
+}
+
+
+function addHP(returnFn){
+    const dice = document.querySelector('.dice')
+    let rolledNum = dice.textContent
+    const HP = Number(Math.floor((user.log[17][2] - 10) / 2)) + Number(rolledNum)
+    dice.onclick = null
+    user.log.push(HP)
+    document.querySelector('#next').classList.remove('inactive')
+    document.querySelector('#next').onclick = returnFn
+}
+
+
+
+
+
+module.exports = HPGen
+},{"./data/classes":3,"./stats":15,"./user":17}],13:[function(require,module,exports){
 const user = require('./user')
 const races = require('./data/races')
 const subraces = require('./data/subraces')
@@ -8195,6 +8571,7 @@ const {addIndex} = require('./selection')
 const languages = require('./data/languages')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
+const forms = require('./forms')
 
 const displayBoard = document.querySelector('#displayBoard')
 const next = document.querySelector('#next')
@@ -8203,7 +8580,7 @@ function createDNDChar(){
     displayBoard.innerHTML = ''
     next.classList.add('inactive')
     switch(user.log.length){
-        case 10:
+        case 0:
             choiceFns.raceChoice(races, createDNDChar)
             break
         case 1: 
@@ -8256,13 +8633,28 @@ function createDNDChar(){
             choiceFns.equipmentChoices(5, createDNDChar)
             break
         case 16:
-            choiceFns.classFeatureChoices(5, createDNDChar)
+            choiceFns.classFeatureChoices(createDNDChar)
             break
-        case 0://17:
+        case 17:
             choiceFns.allocateStats(createDNDChar)
             break
+        case 18:
+            choiceFns.upgradeStats(createDNDChar)
+            break
+        case 19:
+            choiceFns.rollHP(createDNDChar)
+            break
+        case 20:
+            choiceFns.backgroundChoice(createDNDChar)
+            break
+        case 21:
+            choiceFns.alignment(createDNDChar)
+            break
+        case 22: 
+            choiceFns.backStory(createDNDChar)
+            break
         default:
-            console.log(user.log.length, 'doh!')
+            forms.finalRender()
     }
 }
 
@@ -8271,7 +8663,7 @@ createDNDChar()
 
 
 module.exports = createDNDChar
-},{"./choice-functions":1,"./data/classes":2,"./data/languages":4,"./data/races":5,"./data/spells":7,"./data/subraces":9,"./selection":11,"./user":14}],11:[function(require,module,exports){
+},{"./choice-functions":1,"./data/classes":3,"./data/languages":5,"./data/races":6,"./data/spells":8,"./data/subraces":10,"./forms":11,"./selection":14,"./user":17}],14:[function(require,module,exports){
 const user = require('./user')
 const { standardTemplate, infoPageHTML, classchoiceTemplate, sorcererTemplate } = require('./templates')
 const { addListenersToMany } = require('./utils')
@@ -8349,7 +8741,7 @@ function readyToGo(returnFn) {
 }
 
 function addSelection() {
-    const selected = Array.from(document.querySelectorAll('.selected'))
+    let selected = Array.from(document.querySelectorAll('.selected'))
     const toLog = selected.reduce((acc, selection) => {
         acc.push(selection.children[2].textContent)
         return acc
@@ -8491,11 +8883,14 @@ function displaySorcererChoice(){
     displayBoard.innerHTML = sorcererTemplate()
     prepCards()
 }
-module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice}
+module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice, addSelection}
 
-},{"./data/races":5,"./data/skills":6,"./templates":13,"./user":14,"./utils":15}],12:[function(require,module,exports){
+},{"./data/races":6,"./data/skills":7,"./templates":16,"./user":17,"./utils":18}],15:[function(require,module,exports){
 const utils = require('./utils')
-const {statTemplate} = require('./templates')
+const user = require('./user')
+const {statTemplate, statUpgrade} = require('./templates')
+const selection = require('./selection')
+
 function diceRoll(numDice, numSides) {
     let statNums = []
     for (let i = 0; i < numDice; i++) {
@@ -8516,8 +8911,8 @@ function statGen(numDice, numSides, numTimes) {
     return stats
 }
 
-function prepForStats(){
-    const stats = statGen(4, 6, 6)
+function prepForStats(statArr){
+    const stats = statArr || statGen(4, 6, 6)
     document.querySelector('#displayBoard').innerHTML = statTemplate(stats)
     clickToAllocate()
 }
@@ -8528,49 +8923,83 @@ function clickToAllocate(){
 
 function prepForAllocation(e){
     let selected = document.querySelectorAll('.selectedStat')
-    if(selected.length > 0){return false}
+    for(let selection of selected){ selection.classList.remove('selectedStat') }
     e.target.classList.add('selectedStat')
     e.target.onclick = function(e){unselect(e)}
     prepHolders()
 }
 
-function unselect(e) {
-    e.target.classList.remove('selectedStat')
-    clickToAllocate()
-}
 
 function prepHolders(){
     const statHolders = document.querySelectorAll('.statType')
-    utils.addListenersToMany('.statType', 'click', function(e){addToHolder})
+    utils.addListenersToMany('.statType', 'click', function(e){addToHolder(e)})
 }
+
 function addToHolder(e){
+    if(e.target.children.length > 0) return false
     let statNum = document.querySelector('.selectedStat')
     e.target.appendChild(statNum)
 
 }
 
-function HPGen() {
-    let counter = 20
-    let hitDie = classes[user.classId].hit_die
-    let rollingDie = setInterval(function () { rollingAnimation(hitDie, counter) }, 100)
-    document.querySelector('.dice').onclick = null
-}
+function readyToGo(returnFn, condition) {
+    if (condition) {
+        document.querySelector('#next').classList.remove('inactive')
+        document.querySelector('#next').onclick = function () {
+            addStats()
+            return returnFn()
 
-function rollingAnimation(hitDie, counter) {
-    let diceNum = diceRoll(1, hitDie)
-    document.querySelector('.dice').textContent = diceNum[0]
-    counter--
-    if (counter === 0) {
-        clearInterval(rollingDie)
-        setTimeout(function () { document.querySelector('.dice').classList.add('animatedNum') }, 0)
-        let rolledNum = document.querySelector('.dice').textContent
-        const HP = Number(Math.floor((user.progress[14][1] - 10) / 2)) + Number(rolledNum)
+        }
+    }
+    else {
+        document.querySelector('#next').classList.add('inactive')
+        document.querySelector('#next').onclick = null
     }
 }
 
+function addStats(){
+    const statTypes = document.querySelectorAll('.statType')
+    const statArray = []
+    for (let stat of statTypes){
+        statArray.push(stat.children[0].textContent)
+    }
+    user.log.push(statArray)
+}
 
-module.exports = {prepForStats, prepForAllocation}
-},{"./templates":13,"./utils":15}],13:[function(require,module,exports){
+function addBonusStats(){
+    user.numChoices = 2
+    document.querySelector('#displayBoard').innerHTML = statUpgrade(user.log[17])
+    utils.addListenersToMany('.statType', 'click', function(e){addOne(e)})
+    
+}
+
+function addOne(e){
+    if (user.numChoices > 0 && !e.target.classList.contains('added')) {
+        e.target.onclick = null
+        e.target.classList.add('added')
+        user.numChoices--
+        e.target.children[0].textContent = Number(e.target.children[0].textContent) + 1
+        e.target.onclick = function (e) { removeOne(e) }
+    }
+    else {
+        return false
+    }
+}
+
+function removeOne(e){
+    e.target.onclick = null
+    e.target.classList.remove('added')
+    e.target.onclick = function (e) { addOne(e) }
+    user.numChoices++
+    e.target.children[0].textContent = Number(e.target.children[0].textContent) - 1
+}
+
+
+
+module.exports = {prepForStats, prepForAllocation, readyToGo, addBonusStats, diceRoll}
+},{"./selection":14,"./templates":16,"./user":17,"./utils":18}],16:[function(require,module,exports){
+const user = require('./user')
+
 function standardTemplate(item) {
     return`
     <div class="card">
@@ -8662,19 +9091,96 @@ function statTemplate(statArr){
     <button class="reset" type="button">reset</button>`
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate}
+function statUpgrade(statArr){ 
+    return `    
+        <div class="statType">STR <span>${statArr[0]}</span></div>
+        <div class="statType">DEX<span>${statArr[1]}</span></div>
+        <div class="statType">CON<span>${statArr[2]}</span></div>
+        <div class="statType">INT<span>${statArr[3]}</span></div>
+        <div class="statType">WIS<span>${statArr[4]}</span></div>
+        `
+}
 
-},{}],14:[function(require,module,exports){
+function backStoryForm(){
+    return `
+    <label for="name" required>Name:</label>
+    <input class="backstory" type="text" id="name">
+
+    <label for="traits">Traits:</label>
+    <textarea class="backstory" name="traits" id="traits" maxlength="150"></textarea>
+
+    <label for="ideals">Ideals:</label>
+    <textarea class="backstory" name="ideals" id="ideals" maxlength="150"></textarea>
+
+    <label for="bonds">Bonds:</label>
+    <textarea class="backstory" name="bonds" id="bonds" maxlength="150"></textarea>
+
+    <label for="flaws">Flaws:</label>
+    <textarea class="backstory" name="flaws" id="flaws" maxlength="150"></textarea>
+    `
+}
+
+function alignmentTemplate(){
+    return `
+    <div class="row">
+        <div class="alignment">Lawful<br>Good</div>
+        <div class="alignment">Neutral<br>Good</div>
+        <div class="alignment">Chaotic<br>Good</div>
+        <div class="alignment">Lawful<br>Neutral</div>
+        <div class="alignment">True<br>Neutral</div>
+        <div class="alignment">Chaotic<br>Nautral</div>
+        <div class="alignment">Lawful<br>Evil</div>
+        <div class="alignment">Neutral<br>Evil</div>
+        <div class="alignment">Chaotic<br>Evil</div>
+    </div>`
+}
+
+
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate}
+
+},{"./user":17}],17:[function(require,module,exports){
+// const user = {
+//     log: [],
+//     raceId: undefined,
+//     subraceId: undefined,
+//     classId: undefined,
+//     numChoices: 1
+// }
+
 const user = {
-    log: [],
-    raceId: undefined,
+    log: [
+        "Half-Elf", 
+        "Infernal", 
+        ["Acrobatics", "Animal Handling"], 
+        null, 
+        null, 
+        "Bard", 
+        ["Arcana", "Athletics", "Deception"], 
+        ["Bagpipes", "Drum", "Dulcimer"], 
+        null, 
+        ["Dancing Lights", "Light"], 
+        ["Bane", "Charm Person", "Comprehend Languages", "Cure Wounds"], 
+        [], 
+        [], 
+        [], 
+        null, 
+        null, 
+        null, 
+        ["9", "13", "17", "14", "9", "8"],
+        ["10", "14", "17", "14", "9"], 
+        8,
+        "Acolyte",
+        "Chaotic Evil",
+        ['dlyan', 'asg', 'asdf', 'awfew', 'aawg']],
+    classId: 1,
+    raceId: 6,
     subraceId: undefined,
-    classId: undefined,
     numChoices: 1
 }
 
-module.exports = user
-},{}],15:[function(require,module,exports){
+module.exports = user//{user, testUser}
+},{}],18:[function(require,module,exports){
 
 
 function addListenersToMany(element, listenerType, fn) {
@@ -8689,4 +9195,4 @@ function addDifferentListeners(element, listenerArray, fn){
 
 
 module.exports = {addListenersToMany, addDifferentListeners}
-},{}]},{},[10]);
+},{}]},{},[13]);

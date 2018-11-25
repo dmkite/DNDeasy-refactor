@@ -75,7 +75,7 @@ function readyToGo(returnFn) {
 }
 
 function addSelection() {
-    const selected = Array.from(document.querySelectorAll('.selected'))
+    let selected = Array.from(document.querySelectorAll('.selected'))
     const toLog = selected.reduce((acc, selection) => {
         acc.push(selection.children[2].textContent)
         return acc
@@ -217,4 +217,4 @@ function displaySorcererChoice(){
     displayBoard.innerHTML = sorcererTemplate()
     prepCards()
 }
-module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice}
+module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice, addSelection}

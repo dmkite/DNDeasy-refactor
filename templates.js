@@ -1,3 +1,5 @@
+const user = require('./user')
+
 function standardTemplate(item) {
     return`
     <div class="card">
@@ -89,4 +91,50 @@ function statTemplate(statArr){
     <button class="reset" type="button">reset</button>`
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate}
+function statUpgrade(statArr){ 
+    return `    
+        <div class="statType">STR <span>${statArr[0]}</span></div>
+        <div class="statType">DEX<span>${statArr[1]}</span></div>
+        <div class="statType">CON<span>${statArr[2]}</span></div>
+        <div class="statType">INT<span>${statArr[3]}</span></div>
+        <div class="statType">WIS<span>${statArr[4]}</span></div>
+        `
+}
+
+function backStoryForm(){
+    return `
+    <label for="name" required>Name:</label>
+    <input class="backstory" type="text" id="name">
+
+    <label for="traits">Traits:</label>
+    <textarea class="backstory" name="traits" id="traits" maxlength="150"></textarea>
+
+    <label for="ideals">Ideals:</label>
+    <textarea class="backstory" name="ideals" id="ideals" maxlength="150"></textarea>
+
+    <label for="bonds">Bonds:</label>
+    <textarea class="backstory" name="bonds" id="bonds" maxlength="150"></textarea>
+
+    <label for="flaws">Flaws:</label>
+    <textarea class="backstory" name="flaws" id="flaws" maxlength="150"></textarea>
+    `
+}
+
+function alignmentTemplate(){
+    return `
+    <div class="row">
+        <div class="alignment">Lawful<br>Good</div>
+        <div class="alignment">Neutral<br>Good</div>
+        <div class="alignment">Chaotic<br>Good</div>
+        <div class="alignment">Lawful<br>Neutral</div>
+        <div class="alignment">True<br>Neutral</div>
+        <div class="alignment">Chaotic<br>Nautral</div>
+        <div class="alignment">Lawful<br>Evil</div>
+        <div class="alignment">Neutral<br>Evil</div>
+        <div class="alignment">Chaotic<br>Evil</div>
+    </div>`
+}
+
+
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate}

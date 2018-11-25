@@ -49,5 +49,73 @@ nav div{
 
 .statType .stat{
     display:inline-block;
-    float:right:
+    float:right;
+    margin: 2.5px 2.5px 0 0;
+}
+
+.added{
+    font-weight: bold;
+}
+
+.statType span{
+    float:right;
+    margin-right:10px;
+}
+
+/*******************************************/
+.dice{
+    text-align:center;
+    color:white;
+    font: 300 36px/60px sans;
+    width: 100px;
+    height: 60px;
+    background:#239090;
+    position: relative;
+    margin: 50px auto;
+}
+.dice:before {
+	content: "";
+	position: absolute;
+	top: -25px;
+	left: 0;
+	width: 0;
+	height: 0;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 25px solid #239090
+}
+.dice:after {
+	content: "";
+	position: absolute;
+	bottom: -25px;
+	left: 0;
+	width: 0;
+	height: 0;
+	border-left: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-top: 25px solid #239090
+}
+
+@keyframes grow{
+  0%{font: 300 36px/60px sans}
+  100%{font: 700 48px/60px sans}
+}
+
+.animatedNum{
+  font: 700 48px/60px sans;
+  animation: grow 1s ease-in;
+}
+
+/*********************************/
+.alignment{
+    width:30%;
+    padding-bottom:22.5%;
+    height:0;
+    text-align:center;
+    border:1px solid white;
+    padding-top:7.5%;    
+}
+
+.alignment:hover{
+    cursor:pointer;
 }

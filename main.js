@@ -6,6 +6,7 @@ const {addIndex} = require('./selection')
 const languages = require('./data/languages')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
+const forms = require('./forms')
 
 const displayBoard = document.querySelector('#displayBoard')
 const next = document.querySelector('#next')
@@ -14,7 +15,7 @@ function createDNDChar(){
     displayBoard.innerHTML = ''
     next.classList.add('inactive')
     switch(user.log.length){
-        case 10:
+        case 0:
             choiceFns.raceChoice(races, createDNDChar)
             break
         case 1: 
@@ -67,13 +68,28 @@ function createDNDChar(){
             choiceFns.equipmentChoices(5, createDNDChar)
             break
         case 16:
-            choiceFns.classFeatureChoices(5, createDNDChar)
+            choiceFns.classFeatureChoices(createDNDChar)
             break
-        case 0://17:
+        case 17:
             choiceFns.allocateStats(createDNDChar)
             break
+        case 18:
+            choiceFns.upgradeStats(createDNDChar)
+            break
+        case 19:
+            choiceFns.rollHP(createDNDChar)
+            break
+        case 20:
+            choiceFns.backgroundChoice(createDNDChar)
+            break
+        case 21:
+            choiceFns.alignment(createDNDChar)
+            break
+        case 22: 
+            choiceFns.backStory(createDNDChar)
+            break
         default:
-            console.log(user.log.length, 'doh!')
+            forms.finalRender()
     }
 }
 
