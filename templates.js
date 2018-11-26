@@ -244,4 +244,23 @@ function utilityTemplate(){
       `
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate}
+function equipmentTemplate(arr){
+    return `
+    <div class="card">
+        <div class="card-header" id="headingFour">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                Equipment
+                </button>
+            </h5>
+        </div>
+        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
+            <div class="card-body">
+                ${arr.join('<br>')}
+            </div>
+        </div>
+    </div>
+      `
+}
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate}

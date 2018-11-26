@@ -27,4 +27,19 @@ function checkPW({username, password}){
         .then(result => result)
     })
     }
-module.exports = {getOne, createOne, checkPW}
+
+function login(username, password){
+    let user
+    return getOne(username)
+    .then(data => {
+        if(!data) throw {status:400, message:`No user with username ${username}`}
+        user = data
+        return bcrypt.compare(password, user.password)
+    })
+    .then(status => {
+        if(!status) throw {status:401, message:'unauthorized'}
+        delete user.password
+        return user
+    })
+}   
+module.exports = {login, getOne}

@@ -9,6 +9,8 @@ function finalRender() {
     statInfo()
     skillInfo()
     utilityInfo()
+    EquipmentInfo()
+    if(!!user.log[2] || !!user.log[9] || !!user.log[10]) spellInfo()
 }
 
 function headerInfo() {
@@ -93,5 +95,24 @@ function utilityInfo(){
     document.querySelector('.accordion').innerHTML += templates.utilityTemplate()
 }
 
+function EquipmentInfo(){
+    equipArray = []
+    for(let i = 11; i <= 15; i++){
+        if(!user.log[i]) break
+        for(let item of user.log[i]){
+            equipArray.push(item)
+        }
+    }
+    document.querySelector('.accordion').innerHTML += templates.equipmentTemplate(equipArray)
+}
+
+function spellInfo(){
+    spellArray = []
+    
+    if (!!user.log[2])
+    if (!!user.log[9])
+    if (!!user.log[10])
+        
+}
 
 module.exports = {modCalc, finalRender, figureSpeed}
