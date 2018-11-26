@@ -7,6 +7,7 @@ const languages = require('./data/languages')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const forms = require('./forms')
+const render = require('./final-render')
 
 const displayBoard = document.querySelector('#displayBoard')
 const next = document.querySelector('#next')
@@ -89,7 +90,7 @@ function createDNDChar(){
             choiceFns.backStory(createDNDChar)
             break
         default:
-            forms.finalRender()
+            render.finalRender()
     }
 }
 

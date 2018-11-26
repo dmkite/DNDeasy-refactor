@@ -1,5 +1,6 @@
 const user = require('./user')
 
+
 function standardTemplate(item) {
     return`
     <div class="card">
@@ -135,6 +136,112 @@ function alignmentTemplate(){
     </div>`
 }
 
+function statRender(arr) {
+    function modCalc(num) {
+        let result = Number(Math.floor((num - 10) / 2))
+        if (result > 0) return `+${result}`
+        return result
+    }
 
+    return `
+    <div class="accordion" id="accordionExample">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Stats
+                </button>
+            </h5>
+            </div>
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate}
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="finalStat">
+                        <p class="statName">STR</p>
+                        <div class="rawStat">${arr[0]}</div>
+                        <div class="mod">${modCalc(arr[0])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">DEX</p>
+                        <div class="rawStat">${arr[1]}</div>
+                        <div class="mod">${modCalc(arr[1])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CON</p>
+                        <div class="rawStat">${arr[2]}</div>
+                        <div class="mod">${modCalc(arr[2])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">INT</p>
+                        <div class="rawStat">${arr[3]}</div>
+                        <div class="mod">${modCalc(arr[3])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">WIS</p>
+                        <div class="rawStat">${arr[4]}</div>
+                        <div class="mod">${modCalc(arr[4])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CHA</p>
+                        <div class="rawStat">${arr[5]}</div>
+                        <div class="mod">${modCalc(arr[5])}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`
+}
+
+function skillTemplate(arr) {
+    let tempHTML = [
+        `<div class="card">
+    <div class="card-header" id="headingTwo">
+      <h5 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Skills
+        </button>
+      </h5>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+      <div class="card-body">
+     `]
+    for (let skill of arr) {
+        tempHTML.push(`<div class="skillHolder"><span class="skillMod"></span>${skill.name}</div>`)
+    }
+
+    tempHTML.push(`</div ></div ></div >`)
+    return tempHTML.join('')
+}
+
+function utilityTemplate(){
+    function figureSpeed() {
+        if (user.subraceId === 4) return 35
+        else if (user.raceId === 0 || user.raceId === 2 || user.raceId === 5) return 25
+        else return 30
+    }
+    
+    return `
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                DC/AC/HP/ST
+                </button>
+            </h5>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div class="card-body">
+                <div> Hit Points: ${user.log[19]}</div>
+                <div>Speed: ${figureSpeed()}</div>
+            </div>
+        </div>
+    </div>
+      `
+}
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate}

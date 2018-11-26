@@ -165,7 +165,7 @@ function alignment(returnFn){
 
 
 module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats, upgradeStats, rollHP, backgroundChoice, backStory, alignment }
-},{"./data/backgrounds":2,"./data/classes":3,"./data/equipment":4,"./data/languages":5,"./data/races":6,"./data/skills":7,"./data/spells":8,"./data/startingEquipment":9,"./data/subraces":10,"./forms.js":11,"./hp":12,"./selection":14,"./stats":15,"./templates":16,"./user":17,"./utils":18}],2:[function(require,module,exports){
+},{"./data/backgrounds":2,"./data/classes":3,"./data/equipment":4,"./data/languages":5,"./data/races":6,"./data/skills":7,"./data/spells":8,"./data/startingEquipment":9,"./data/subraces":10,"./forms.js":12,"./hp":13,"./selection":15,"./stats":16,"./templates":17,"./user":18,"./utils":19}],2:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = [
@@ -8351,6 +8351,104 @@ const subraces = [
 
 module.exports = subraces
 },{}],11:[function(require,module,exports){
+const templates = require('./templates')
+const user = require('./user')
+const races = require('./data/races')
+const subraces = require('./data/subraces')
+const skills = require('./data/skills')
+
+function finalRender() {
+    headerInfo()
+    statInfo()
+    skillInfo()
+    utilityInfo()
+}
+
+function headerInfo() {
+    let subrace = user.log[2]
+    if (user.raceId === 6) subrace = null
+    displayBoard.innerHTML = `
+    <div class="top">
+        <h3>${user.log[22][0]}</h3>    
+        <p>Level 1 ${user.log[5]} | ${user.log[20]} </p>
+        <p>${subrace || user.log[0]} | ${user.log[21]}</p>
+    </div>`
+}
+
+function statInfo() {
+    let finalStats = races[user.raceId].ability_bonuses
+
+    if (!!user.log[2] && !Array.isArray(user.log[2])) finalStats = combineArrays(finalStats, subraces[user.subraceId].ability_bonuses)
+    finalStats = combineArrays(finalStats, user.log[17])
+
+    if (!!user.log[18]) {
+        let bonus = figureDifference(user.log[17], user.log[18])
+        finalStats = combineArrays(finalStats, bonus)
+    }
+    displayBoard.innerHTML = templates.statRender(finalStats)
+}
+
+
+function modCalc(num) {
+    let result = Number(Math.floor((num - 10) / 2))
+    if (result > 0) return `+${result}`
+    return result
+}
+
+function combineArrays(arr1, arr2) {
+    const newArr = []
+    for (let i = 0; i < arr1.length; i++) {
+        newArr[i] = Number(arr1[i]) + Number(arr2[i])
+    }
+    return newArr
+}
+
+function figureDifference(arr1, arr2) {
+    const newArr = []
+    for (let i = 0; i < arr2.length; i++) {
+        if (Number(arr1[i]) < Number(arr2[i])) newArr[i] = 1
+        else newArr[i] = 0
+    }
+    newArr.push(0)
+    return newArr
+}
+
+function skillInfo(){
+    let skillArray = user.log[6]
+    if(user.raceId === 6 ){
+        for(let skill of user.log[2]){
+            skillArray.push(skill)
+        }
+    }
+    for(let skill of user.log[20]){
+        skillArray.push(skill)
+    }
+    document.querySelector('.accordion').innerHTML += templates.skillTemplate(skills)
+    addBonus(skillArray)
+}
+
+function addBonus(arr){
+    const skillHolders = document.querySelectorAll('.skillHolder')
+    for(let skillHolder of skillHolders){
+        for(let skill of arr){
+            if(skill === skillHolder.textContent) skillHolder.children[0].textContent = '+2 '
+            if (skillHolder.textContent === user.log[16]) skillHolder.children[0].textContent = '+4 '
+        }
+    }
+}
+
+function figureSpeed(){
+    if(user.subraceId === 4) return 35
+    else if(user.raceId === 0 || user.raceId === 2 || user.raceId === 5) return 25
+    else return 20
+}
+function utilityInfo(){
+    document.querySelector('.accordion').innerHTML += templates.utilityTemplate()
+}
+
+
+module.exports = {modCalc, finalRender, figureSpeed}
+},{"./data/races":6,"./data/skills":7,"./data/subraces":10,"./templates":17,"./user":18}],12:[function(require,module,exports){
 const user = require('./user')
 const races = require('./data/races')
 const classes = require('./data/classes')
@@ -8382,110 +8480,6 @@ function addToLog(){
     user.log.push(backstoryArray)
 }
 
-function finalRender(){
-    headerInfo()
-    // statInfo()
-
-}
-
-function headerInfo(){
-    let subrace = user.log[2]
-    if(user.raceId === 6) subrace = null
-    displayBoard.innerHTML = `
-    <div class="top">
-        <h3>${user.log[22][0]}</h3>    
-        <p>Level 1 ${user.log[5]} | ${user.log[20]} </p>
-        <p>${subrace || user.log[0]} | ${user.log[21]}</p>
-    </div>`
-}
-
-function statInfo(){
-    let finalStats = races[user.raceId].ability_bonuses
-    if(!!user.log[2] && !Array.isArray(user.log[2]) ) finalStats = combineArrays(finalStats, subraces[user.subraceId].ability_bonuses)
-    finalStats = combineArrays(finalStats, user.log[17])
-    if(!!user.log[18]){
-        let bonus = figureDifference(user.log[17], user.log[18])
-        finalStats = combineArrays(finalStats, bonus)
-    }
-    return statTemplate(finalStats)
-}
-
-function statTemplate(arr){
-    displabyBoard.innerHTML += `
-    <div class="accordion" id="accordionExample">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-            <h5 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Collapsible Group Item #1
-                </button>
-            </h5>
-            </div>
-
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-                <div class="card-body">
-                    <div class="finalStat">
-                        <p class="statName">STR</p>
-                        <div class="rawStat">${arr[0]}</div>
-                        <div class="mod">${modCalc(arr[0])}</div>
-                    </div>
-
-                    <div class="finalStat">
-                        <p class="statName">DEX</p>
-                        <div class="rawStat">${arr[1]}</div>
-                        <div class="mod">${modCalc(arr[1])}</div>
-                    </div>
-
-                    <div class="finalStat">
-                        <p class="statName">CON</p>
-                        <div class="rawStat">${arr[2]}</div>
-                        <div class="mod">${modCalc(arr[2])}</div>
-                    </div>
-
-                    <div class="finalStat">
-                        <p class="statName">INT</p>
-                        <div class="rawStat">${arr[3]}</div>
-                        <div class="mod">${modCalc(arr[3])}</div>
-                    </div>
-
-                    <div class="finalStat">
-                        <p class="statName">WIS</p>
-                        <div class="rawStat">${arr[4]}</div>
-                        <div class="mod">${modCalc(arr[4])}</div>
-                    </div>
-
-                    <div class="finalStat">
-                        <p class="statName">CHA</p>
-                        <div class="rawStat">${arr[5]}</div>
-                        <div class="mod">${modCalc(arr[5])}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`
-}
-
-function modCalc(num){
-    return Number(Math.floor((num - 10) / 2))
-}
-
-function combineArrays(arr1, arr2){
-    const newArr = []
-    for(let i = 0; i < arr1.length; i++){
-        newArr[i] = arr1[i] + arr2[i]
-    }
-    return newArr
-}
-
-function figureDifference(arr1, arr2){
-    const newArr = []
-    for(let i = 0; i < arr2.length; i++){
-        if(arr1[i] < arr2[i]) newArr[i] = 1
-        else newArr[i = 0]
-    }
-    newarr.push(0)
-    return newArr
-}
 
 function prepForSelection(){
     let choices = document.querySelectorAll('.alignment')
@@ -8522,8 +8516,10 @@ function addAlign(returnFn){
 
 
 
-module.exports = {readyToGo, finalRender, prepForSelection, addAlign}
-},{"./data/backgrounds":2,"./data/classes":3,"./data/races":6,"./data/subraces":10,"./user":17}],12:[function(require,module,exports){
+
+
+module.exports = {readyToGo, prepForSelection, addAlign}
+},{"./data/backgrounds":2,"./data/classes":3,"./data/races":6,"./data/subraces":10,"./user":18}],13:[function(require,module,exports){
 const classes = require('./data/classes')
 const user = require('./user')
 const stats = require('./stats')
@@ -8561,7 +8557,7 @@ function addHP(returnFn){
 
 
 module.exports = HPGen
-},{"./data/classes":3,"./stats":15,"./user":17}],13:[function(require,module,exports){
+},{"./data/classes":3,"./stats":16,"./user":18}],14:[function(require,module,exports){
 const user = require('./user')
 const races = require('./data/races')
 const subraces = require('./data/subraces')
@@ -8571,6 +8567,7 @@ const languages = require('./data/languages')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
 const forms = require('./forms')
+const render = require('./final-render')
 
 const displayBoard = document.querySelector('#displayBoard')
 const next = document.querySelector('#next')
@@ -8653,7 +8650,7 @@ function createDNDChar(){
             choiceFns.backStory(createDNDChar)
             break
         default:
-            forms.finalRender()
+            render.finalRender()
     }
 }
 
@@ -8662,7 +8659,7 @@ createDNDChar()
 
 
 module.exports = createDNDChar
-},{"./choice-functions":1,"./data/classes":3,"./data/languages":5,"./data/races":6,"./data/spells":8,"./data/subraces":10,"./forms":11,"./selection":14,"./user":17}],14:[function(require,module,exports){
+},{"./choice-functions":1,"./data/classes":3,"./data/languages":5,"./data/races":6,"./data/spells":8,"./data/subraces":10,"./final-render":11,"./forms":12,"./selection":15,"./user":18}],15:[function(require,module,exports){
 const user = require('./user')
 const { standardTemplate, infoPageHTML, classchoiceTemplate, sorcererTemplate } = require('./templates')
 const { addListenersToMany } = require('./utils')
@@ -8884,7 +8881,7 @@ function displaySorcererChoice(){
 }
 module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice, addSelection}
 
-},{"./data/races":6,"./data/skills":7,"./templates":16,"./user":17,"./utils":18}],15:[function(require,module,exports){
+},{"./data/races":6,"./data/skills":7,"./templates":17,"./user":18,"./utils":19}],16:[function(require,module,exports){
 const utils = require('./utils')
 const user = require('./user')
 const {statTemplate, statUpgrade} = require('./templates')
@@ -8996,8 +8993,9 @@ function removeOne(e){
 
 
 module.exports = {prepForStats, prepForAllocation, readyToGo, addBonusStats, diceRoll}
-},{"./selection":14,"./templates":16,"./user":17,"./utils":18}],16:[function(require,module,exports){
+},{"./selection":15,"./templates":17,"./user":18,"./utils":19}],17:[function(require,module,exports){
 const user = require('./user')
+
 
 function standardTemplate(item) {
     return`
@@ -9134,11 +9132,117 @@ function alignmentTemplate(){
     </div>`
 }
 
+function statRender(arr) {
+    function modCalc(num) {
+        let result = Number(Math.floor((num - 10) / 2))
+        if (result > 0) return `+${result}`
+        return result
+    }
 
+    return `
+    <div class="accordion" id="accordionExample">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Stats
+                </button>
+            </h5>
+            </div>
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate}
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="finalStat">
+                        <p class="statName">STR</p>
+                        <div class="rawStat">${arr[0]}</div>
+                        <div class="mod">${modCalc(arr[0])}</div>
+                    </div>
 
-},{"./user":17}],17:[function(require,module,exports){
+                    <div class="finalStat">
+                        <p class="statName">DEX</p>
+                        <div class="rawStat">${arr[1]}</div>
+                        <div class="mod">${modCalc(arr[1])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CON</p>
+                        <div class="rawStat">${arr[2]}</div>
+                        <div class="mod">${modCalc(arr[2])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">INT</p>
+                        <div class="rawStat">${arr[3]}</div>
+                        <div class="mod">${modCalc(arr[3])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">WIS</p>
+                        <div class="rawStat">${arr[4]}</div>
+                        <div class="mod">${modCalc(arr[4])}</div>
+                    </div>
+
+                    <div class="finalStat">
+                        <p class="statName">CHA</p>
+                        <div class="rawStat">${arr[5]}</div>
+                        <div class="mod">${modCalc(arr[5])}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>`
+}
+
+function skillTemplate(arr) {
+    let tempHTML = [
+        `<div class="card">
+    <div class="card-header" id="headingTwo">
+      <h5 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Skills
+        </button>
+      </h5>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+      <div class="card-body">
+     `]
+    for (let skill of arr) {
+        tempHTML.push(`<div class="skillHolder"><span class="skillMod"></span>${skill.name}</div>`)
+    }
+
+    tempHTML.push(`</div ></div ></div >`)
+    return tempHTML.join('')
+}
+
+function utilityTemplate(){
+    function figureSpeed() {
+        if (user.subraceId === 4) return 35
+        else if (user.raceId === 0 || user.raceId === 2 || user.raceId === 5) return 25
+        else return 30
+    }
+    
+    return `
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                DC/AC/HP/ST
+                </button>
+            </h5>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div class="card-body">
+                <div> Hit Points: ${user.log[19]}</div>
+                <div>Speed: ${figureSpeed()}</div>
+            </div>
+        </div>
+    </div>
+      `
+}
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate}
+
+},{"./user":18}],18:[function(require,module,exports){
 // const user = {
 //     log: [],
 //     raceId: undefined,
@@ -9179,7 +9283,7 @@ const user = {
 }
 
 module.exports = user//{user, testUser}
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 
 function addListenersToMany(element, listenerType, fn) {
@@ -9194,4 +9298,4 @@ function addDifferentListeners(element, listenerArray, fn){
 
 
 module.exports = {addListenersToMany, addDifferentListeners}
-},{}]},{},[13]);
+},{}]},{},[14]);

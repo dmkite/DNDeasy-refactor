@@ -119,3 +119,39 @@ nav div{
 .alignment:hover{
     cursor:pointer;
 }
+
+.card-body:nth-of-type(1){
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between
+}
+
+.finalStat{
+    border:1px solid black;
+    width:30%;
+    text-align:center;
+}
+.rawStat{
+    font-size:24px;
+    outline:1px dotted red;
+}
+.card-body p{
+    outline:1px solid blue;
+    margin-bottom:0;
+}
+
+.skillHolder{
+    width: 32%;
+    outline:1px solid red;
+    font-size:14px;
+    height:50px;
+
+}
+
+.accordion{
+    width:100%;
+}
+
+#displayBoard{
+    padding:0;
+}
