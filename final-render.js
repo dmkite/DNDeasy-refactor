@@ -10,7 +10,7 @@ function finalRender() {
     skillInfo()
     utilityInfo()
     EquipmentInfo()
-    if(!!user.log[2] || !!user.log[9] || !!user.log[10]) spellInfo()
+    if((!!user.log[2] && user.log[1] == 'High Elf') || !!user.log[9] || !!user.log[10]) spellInfo()
 }
 
 function headerInfo() {
@@ -109,10 +109,10 @@ function EquipmentInfo(){
 function spellInfo(){
     spellArray = []
     
-    if (!!user.log[2])
-    if (!!user.log[9])
-    if (!!user.log[10])
-        
+    if (!!user.log[2] && user.log[1] === 'High Elft') spellArray.push(user.log[2])
+    if (!!user.log[9]) user.log[9].forEach(spell => spellArray.push(spell))
+    if (!!user.log[10]) user.log[10].forEach(spell => spellArray.push(spell))
+    document.querySelector('.accordion').innerHTML += templates.spellTemplate(spellArray)
 }
 
 module.exports = {modCalc, finalRender, figureSpeed}
