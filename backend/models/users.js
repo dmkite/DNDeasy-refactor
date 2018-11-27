@@ -19,4 +19,9 @@ function create(username, password){
     })
 }
 
-module.exports = {create}
+function getChars(id){
+    return db('characters')
+        .where('user_id', id)
+}
+
+module.exports = {create, getChars}

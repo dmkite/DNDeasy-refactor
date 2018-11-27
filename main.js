@@ -6,11 +6,13 @@ const {addIndex} = require('./selection')
 const languages = require('./data/languages')
 const spells = require('./data/spells')
 const classes = require('./data/classes')
-const forms = require('./forms')
 const render = require('./final-render')
+const dataPer = require('./data-persistence')
 
 const displayBoard = document.querySelector('#displayBoard')
 const next = document.querySelector('#next')
+document.querySelector('#load').addEventListener('click', dataPer.prepLogin)
+document.querySelector('#new').addEventListener('click', createDNDChar)
 
 function createDNDChar(){
     displayBoard.innerHTML = ''
@@ -94,7 +96,7 @@ function createDNDChar(){
     }
 }
 
-createDNDChar()
+
 
 
 

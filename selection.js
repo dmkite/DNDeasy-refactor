@@ -24,7 +24,7 @@ function select(e) {
         e.target.parentElement.classList.add('selected')
         user.numChoices--
         e.target.onclick = function (e) { unselect(e) }
-        e.target.textContent = 'unselect'
+        // e.target.textContent = 'unselect'
     }
     else{
         return false
@@ -36,27 +36,33 @@ function unselect(e) {
     e.target.parentElement.classList.remove('selected')
     e.target.onclick = function(e){select(e)}
     user.numChoices++
-    e.target.textContent = 'select'
+    // e.target.textContent = 'select'
 }
 
 function showInfo(e, arr) {
+    
     let id = e.target.getAttribute('data-id')
+    console.log(e.target)
+    console.log(id, 'ppppppppppppppppppppppppppp')
     createInfoPage(id, arr)
 }
 
+
 function createInfoPage(index, arr) {
     let specificItem = arr[index - 1]
-    displayBoard.innerHTML += infoPageHTML(specificItem)
+    document.querySelector('body').innerHTML += infoPageHTML(specificItem)
+    document.querySelector('.infoPage').style.animation = 'slideIn .75s ease-out'
     document.querySelector('.back').onclick = function (e) { slideOut(e) }
 }
 
 
 function slideOut(e) {
     setTimeout(function () {
-        e.target.parentElement.style.animation = 'slideOut .5s ease-in'
-        setTimeout(function () {
-            e.target.parentElement.remove()
-        }, 500)
+        console.log(e.target.parentElement)
+        e.target.parentElement.style.animation = 'slideOut .75s ease-in'
+        // setTimeout(function () {
+        //     e.target.parentElement.remove()
+        // }, 750)
     }, 0)
 }
 

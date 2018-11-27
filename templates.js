@@ -1,14 +1,16 @@
 const user = require('./user')
-
+const classes = require('./data/classes')
 
 function standardTemplate(item) {
     return`
     <div class="card">
-        <button class="select" type="button">select</button>
-        <img src="${item.img}" alt="Image of ${item.name}">
+        <button class="more" type="button" data-id="${item.index}"><i class="fa fa-ellipsis-v" data-id="${item.index}"></i></button>
+        <img class="card-img-top cardImg" src="${item.img}" alt="Image of ${item.name}">
         <h3>${item.name}</h3>
         <p>${item.desc}</p>
-        <button class="more" type="button" data-id="${item.index}">more</button>
+        
+        <button class="select" type="button"><i class="fa fa-plus-circle"></i></button>
+        <div class="gradient"></div>
     </div>`
 }
 
@@ -17,7 +19,6 @@ function infoPageHTML(item){
     return `
     <div class="infoPage">
         <button type="button" class="back">back</button>
-        <h2>${item.name}</h2>
     </div>`
 }
 
@@ -124,15 +125,15 @@ function backStoryForm(){
 function alignmentTemplate(){
     return `
     <div class="row">
-        <div class="alignment">Lawful<br>Good</div>
-        <div class="alignment">Neutral<br>Good</div>
-        <div class="alignment">Chaotic<br>Good</div>
-        <div class="alignment">Lawful<br>Neutral</div>
-        <div class="alignment">True<br>Neutral</div>
-        <div class="alignment">Chaotic<br>Nautral</div>
-        <div class="alignment">Lawful<br>Evil</div>
-        <div class="alignment">Neutral<br>Evil</div>
-        <div class="alignment">Chaotic<br>Evil</div>
+        <div class="alignment">Lawful <br>Good</div>
+        <div class="alignment">Neutral <br>Good</div>
+        <div class="alignment">Chaotic <br>Good</div>
+        <div class="alignment">Lawful <br>Neutral</div>
+        <div class="alignment">True <br>Neutral</div>
+        <div class="alignment">Chaotic <br>Nautral</div>
+        <div class="alignment">Lawful <br>Evil</div>
+        <div class="alignment">Neutral <br>Evil</div>
+        <div class="alignment">Chaotic <br>Evil</div>
     </div>`
 }
 
@@ -230,7 +231,7 @@ function utilityTemplate(){
         <div class="card-header" id="headingThree">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                DC/AC/HP/ST
+                    Utils
                 </button>
             </h5>
         </div>
@@ -238,6 +239,7 @@ function utilityTemplate(){
             <div class="card-body">
                 <div> Hit Points: ${user.log[19]}</div>
                 <div>Speed: ${figureSpeed()}</div>
+                <div>Saving Throws: ${classes[user.classId].saving_throws[0].name}, ${classes[user.classId].saving_throws[1].name}</div>
             </div>
         </div>
     </div>
@@ -282,4 +284,29 @@ function spellTemplate(arr){
       `
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate}
+function backstoryTemplate(arr){
+    return `
+    <div class="card">
+        <div class="card-header" id="headingFive">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                    Backstory
+                </button>
+            </h5>
+        </div>
+        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
+            <div class="card-body">
+                <p>Traits:</p>
+                <p>${arr[1]}</p>
+                <p>Ideals:</p>
+                <p>${arr[2]}</p>
+                <p>Bonds:</p>
+                <p>${arr[3]}</p>
+                <p>Flaws:</p>
+                <p>${arr[4]}</p>
+            </div>
+        </div>
+    </div>`
+}
+
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate, backstoryTemplate}

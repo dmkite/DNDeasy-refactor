@@ -11,6 +11,7 @@ function finalRender() {
     utilityInfo()
     EquipmentInfo()
     if((!!user.log[2] && user.log[1] == 'High Elf') || !!user.log[9] || !!user.log[10]) spellInfo()
+    backstoryInfo()
 }
 
 function headerInfo() {
@@ -24,6 +25,8 @@ function headerInfo() {
     </div>`
 }
 
+
+
 function statInfo() {
     let finalStats = races[user.raceId].ability_bonuses
 
@@ -34,7 +37,7 @@ function statInfo() {
         let bonus = figureDifference(user.log[17], user.log[18])
         finalStats = combineArrays(finalStats, bonus)
     }
-    displayBoard.innerHTML = templates.statRender(finalStats)
+    displayBoard.innerHTML += templates.statRender(finalStats)
 }
 
 
@@ -108,11 +111,14 @@ function EquipmentInfo(){
 
 function spellInfo(){
     spellArray = []
-    
     if (!!user.log[2] && user.log[1] === 'High Elft') spellArray.push(user.log[2])
     if (!!user.log[9]) user.log[9].forEach(spell => spellArray.push(spell))
     if (!!user.log[10]) user.log[10].forEach(spell => spellArray.push(spell))
     document.querySelector('.accordion').innerHTML += templates.spellTemplate(spellArray)
+}
+
+function backstoryInfo(){
+    document.querySelector('.accordion').innerHTML += templates.backstoryTemplate(user.log[22])
 }
 
 module.exports = {modCalc, finalRender, figureSpeed}
