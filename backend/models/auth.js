@@ -8,26 +8,6 @@ function getOne(username){
         .first()
 }
 
-function createOne({username, password}){
-    return bcrypt.hash(password, saltRounds)
-    .then(result => {
-        return db('users')
-        .returning('*')
-        .insert({username, password: result})
-        .then(result => result)
-    })
-}
-
-function checkPW({username, password}){
-    return getOne(username)
-    .where({username})
-    .first()
-    .then(result => {
-        return bcrypt.compare(password, result.password)
-        .then(result => result)
-    })
-    }
-
 function login(username, password){
     let user
     return getOne(username)
@@ -42,4 +22,10 @@ function login(username, password){
         return user
     })
 }   
-module.exports = {login, getOne}
+
+function getChars(id){
+    return db('characters')
+        .where({user_id: id})
+        
+}
+module.exports = {login, getOne, getChars}

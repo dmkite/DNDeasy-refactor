@@ -407,4 +407,8 @@ input:focus, textarea:focus{
     line-height:1.2em
 }
 
-
+.skillCard .select{
+    opacity:1 !important;
+    position:static;
+    display:block;
+}

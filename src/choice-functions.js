@@ -1,19 +1,21 @@
 const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList, addQuantity, prepForRadioSelection, createChoiceArray, displayFighterChoice, displayRogueChoice, displaySorcererChoice} = require('./selection')
 const {addDifferentListeners} = require('./utils')
-const languages = require('./data/languages')
-const equipment = require('./data/equipment')
+const languages = require('../data/languages')
+const equipment = require('../data/equipment')
 const user = require('./user')
-const races = require('./data/races')
-const subraces = require('./data/subraces')
-const skills = require('./data/skills')
-const spells = require('./data/spells')
-const classes = require('./data/classes')
-const startingEquip = require('./data/startingEquipment')
-const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate} = require('./templates')
+const races = require('../data/races')
+const subraces = require('../data/subraces')
+const skills = require('../data/skills')
+const spells = require('../data/spells')
+const classes = require('../data/classes')
+const startingEquip = require('../data/startingEquipment')
+const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate, skillChoiceTemplate} = require('./templates')
 const stats = require('./stats')
 const hp = require('./hp')
-const backgrounds = require('./data/backgrounds')
+const backgrounds = require('../data/backgrounds')
 const forms = require('./forms.js')
+const spellSelect = require('./spell-selection')
+
 
 function raceChoice(array, returnFn){
     user.numChoices = 1
@@ -57,7 +59,7 @@ function skillDisplay(numChoices, list = null) {
         }, [])
         let result = preventDupe(optionsArray)
         
-        return display(result)
+        return display(result, skillChoiceTemplate)
     }
     let result = preventDupe(skills)
     display(result, standardTemplate)
@@ -96,11 +98,12 @@ function classExtraChoices(returnFn){
 function spellChoices(lvl, returnFn){
     const id = user.classId
     if(id >= 1 && id <= 3 || id >= 9){
-        let spellList = createSpellList(lvl, spells)
+        spellSelect(lvl)
+        // let spellList = createSpellList(lvl, spells)
         if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
         else user.numChoices = classes[user.classId].spellcasting.first_level
         if (!user.numChoices){ return skipDisplay(returnFn)}
-        display(spellList, standardTemplate)
+        // display(spellList, standardTemplate)
         addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
     }
     else skipDisplay(returnFn)

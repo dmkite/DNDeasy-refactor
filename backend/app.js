@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const port = process.env.PORT || 3000
+const ctrl = require('./controllers/auth')
 
 if(process.env.NODE_ENV !== 'production'){
   require('dotenv').load()
@@ -16,6 +17,16 @@ app.use(bodyParser.json())
 
 app.use('/auth', require('./routes/auth'))
 app.use('/users', require('./routes/users'))
+
+///////////////////////////////////////////////////////////////////////////////
+//  Protected routes
+///////////////////////////////////////////////////////////////////////////////
+app.get('/characters/:id', 
+        ctrl.authenticate,
+        ctrl.confirmReq,
+        ctrl.getChars
+)
+
 
 app.use((req, res, next) => {
     next({status:404, message: "we couldn't find what you're looking for"})

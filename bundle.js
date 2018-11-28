@@ -1,280 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList, addQuantity, prepForRadioSelection, createChoiceArray, displayFighterChoice, displayRogueChoice, displaySorcererChoice} = require('./selection')
-const {addDifferentListeners} = require('./utils')
-const languages = require('./data/languages')
-const equipment = require('./data/equipment')
-const user = require('./user')
-const races = require('./data/races')
-const subraces = require('./data/subraces')
-const skills = require('./data/skills')
-const spells = require('./data/spells')
-const classes = require('./data/classes')
-const startingEquip = require('./data/startingEquipment')
-const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate} = require('./templates')
-const stats = require('./stats')
-const hp = require('./hp')
-const backgrounds = require('./data/backgrounds')
-const forms = require('./forms.js')
-
-function raceChoice(array, returnFn){
-    user.numChoices = 1
-    display(array, standardTemplate)
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function(){readyToGo(returnFn)})  
-}
-
-function extraRaceChoices(returnFn){
-    user.numChoices = 1
-    if(user.raceId === 3 || user.raceId === 6){
-        display(languages, standardTemplate)
-    } 
-    else if(user.raceId === 0){
-        selectFrom(races[user.raceId].starting_proficiency_options, equipment)
-    }
-    else if(user.raceId === 4){
-        display(races[4].trait_options.from, standardTemplate)
-    }
-    else{
-        return skipDisplay(returnFn)
-    }
-
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
-}
-
-function subraceChoice(returnFn){
-    
-    if(races[user.raceId].subraces.length === 0) return skipDisplay(returnFn)
-    user.numChoices = 1
-    selectFrom(races[user.raceId].subraces, subraces)
-}
-
-function skillDisplay(numChoices, list = null) {
-    user.numChoices = numChoices
-    if (!!list) {
-        let optionsArray = skills.reduce((acc, skill) => {
-            for (let item of list) {
-                if (item.name === skill.name){ acc.push(skill)}
-            }
-            return acc
-        }, [])
-        let result = preventDupe(optionsArray)
-        
-        return display(result)
-    }
-    let result = preventDupe(skills)
-    display(result, standardTemplate)
-}
-
-
-function subraceExtraChoices(key, array, returnFn){
-    user.numChoices = 0
-    if (user.log[2] == 'High Elf') { 
-        user.numChoices = 1
-        selectFrom(subraces[user.subraceId][key], array)
-    }
-    else return skipDisplay(returnFn)
-}
-
-function classSkillChoice(returnFn){
-    user.numChoices = classes[user.classId].proficiency_choices[0].choose
-    skillDisplay(user.numChoices, classes[user.classId].proficiency_choices[0].from)
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
-}
-
-function classExtraChoices(returnFn){
-    if( (user.classId === 5 || user.classId === 1) && user.log.length === 7){
-        user.classId === 5 ? user.numChoices = 1 : user.numChoices = 3
-        selectFrom(classes[user.classId].proficiency_choices[1], equipment)
-        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
-    } 
-    else if(user.classId === 5){
-        user.numChoices = 1
-        selectFrom(classes[user.classId].proficiency_choices[2], equipment)
-        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
-    } 
-    skipDisplay(returnFn)
-}
-
-function spellChoices(lvl, returnFn){
-    const id = user.classId
-    if(id >= 1 && id <= 3 || id >= 9){
-        let spellList = createSpellList(lvl, spells)
-        if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
-        else user.numChoices = classes[user.classId].spellcasting.first_level
-        if (!user.numChoices){ return skipDisplay(returnFn)}
-        display(spellList, standardTemplate)
-        addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
-    }
-    else skipDisplay(returnFn)
-}
-
-function equipmentChoices(num, returnFn){
-    let equipOpts = startingEquip[user.classId][`choice_${num}`]
-    if (!equipOpts)return skipDisplay(returnFn)
-    const quantityArray = []
-    let choiceArray = createChoiceArray(equipOpts, quantityArray)
-    selectFrom(choiceArray, equipment, radioTemplate)
-    addQuantity(quantityArray)
-    prepForRadioSelection()
-    displayBoard.innerHTML = `<h2>Equipment Choice ${num}</h2> ${displayBoard.innerHTML}`
-}
-
-function classFeatureChoices(returnFn){
-    user.numChoices = 1
-    if (user.classId === 4) return displayFighterChoice()
-    if (user.classId === 8) return displayRogueChoice()
-    if (user.classId === 9) return displaySorcererChoice()
-
-    skipDisplay(returnFn)
-}
-
-function allocateStats(returnFn){
-    stats.prepForStats()
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, !document.querySelector('#stats').children.length) })  
-}
-
-function upgradeStats(returnFn){
-    if(user.raceId !== 6) return skipDisplay(returnFn)
-    stats.addBonusStats()
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, document.querySelectorAll('.added').length === 2) })  
-}
-
-function rollHP(returnFn){
-    document.querySelector('#displayBoard').innerHTML = '<div class="dice"></div>'
-    const dice = document.querySelector('.dice')
-    dice.onclick = function(){hp(returnFn)}
-}
-
-function backgroundChoice(returnFn){
-    user.numChoices = 1
-    display(backgrounds)
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn)})
-}
-
-function backStory(returnFn){
-    document.querySelector('#displayBoard').innerHTML = backStoryForm()
-    addDifferentListeners('#displayBoard', ['click', 'touch', 'keydown'], function () { forms.readyToGo(returnFn) })
-
-}
-
-function alignment(returnFn){
-    user.numChoices = 1
-    document.querySelector('#displayBoard').innerHTML = alignmentTemplate()
-    forms.prepForSelection()
-    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { forms.addAlign(returnFn)})
-}
-
-
-module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats, upgradeStats, rollHP, backgroundChoice, backStory, alignment }
-},{"./data/backgrounds":3,"./data/classes":4,"./data/equipment":5,"./data/languages":6,"./data/races":7,"./data/skills":8,"./data/spells":9,"./data/startingEquipment":10,"./data/subraces":11,"./forms.js":13,"./hp":14,"./selection":43,"./stats":44,"./templates":45,"./user":47,"./utils":48}],2:[function(require,module,exports){
-const axios = require('axios')
-const displayBoard = document.querySelector('#displayBoard')
-const baseURL = 'http://localhost:3000'
-const utils = require('./utils')
-const userTemplates = require('./user-templates')
-
-function prepLogin(){
-    userTemplates.loginTemplate()
-    document.querySelector('#signup').addEventListener('submit', function(e){signup(e)})
-    document.querySelector('#login').addEventListener('submit', function (e) { login(e) })
-    validate()
-}
-
-function signup(e){
-    e.preventDefault()
-    const username = document.querySelector('#username2').value
-    const password = document.querySelector('#password2').value 
-    axios.post(baseURL + '/users', {username, password})
-    .then(response => {
-        return signupSuccess()
-    })
-    .catch(err => {
-        removeHidden('.alert-danger', response.message)
-    })
-}
-
-function login(e){
-    e.preventDefault()
-    const username = document.querySelector('#username').value
-    const password = document.querySelector('#password').value
-    axios.post(baseURL + '/auth/login', {username, password})
-    .then(response => {
-        const token = response.data.token
-        localStorage.setItem('token', token)
-        return loginSuccess(token)
-    })
-    .catch(err => {
-        removeHidden('.alert-danger', 'Something went wrong')
-    })
-}
-
-function signupSuccess(){
-    clearInputs()
-    prepLogin()
-    removeHidden('.alert-success', 'Sign up successful, please log in')
-}
-
-function clearInputs(){
-    let inputs = document.querySelectorAll('inputs')
-    inputs.forEach(input => input.value = '')
-}
-
-function removeHidden(type, message){
-    let alert = document.querySelector(`${type}`)
-    alert.classList.remove('hidden')
-    alert.textContent = message
-}
-
-function validate(){
-    let pass1 = document.querySelector('#password2')
-    let pass2 = document.querySelector('#password3')
-    utils.addDifferentListeners('.passwordCheck', ['touch', 'keydown', 'keyup'], function () { match(pass1, pass2) })
-}
-
-function match(item1, item2){
-    if(item1.value !== item2.value){
-        removeHidden('.alert-danger', 'passwords do not match')
-        document.querySelector('#signup').onsubmit = null
-        document.querySelector('#login').onsubmit = null
-    } 
-    else{
-        document.querySelector('.alert-danger').classList.add('hidden')
-        document.querySelector('#signup').onsubmit = function(e){signup(e)}
-        document.querySelector('#login').onsubmit = function (e) { login(e) }
-    } 
-}
-
-function loginSuccess(token){
-    getChars(token)
-}
-
-function getChars(token){
-    axios.post(baseURL + '/users/characters', {token})
-    .then(response => {
-        utils.addToLocalStorage('chars', response.data.data)
-        let shortCharArray = characterShorts(response.data.data)
-        return userTemplates.charTemplate(shortCharArray)
-    })
-    .catch(err =>{
-        console.log(err)
-    })
-}
-
-function characterShorts(array){
-    const result = array.reduce((acc, character) => {
-        console.log(character.character)
-        console.log(typeof(character.character))
-        console.log(typeof(JSON.parse(character.character)))
-        character = JSON.parse(character.character)
-        let short = `${character.character.log[22][0]} the ${character.character.log[0]} ${character.character.log[5]}`
-        acc.push(short)
-        return acc
-    }, [])
-    return result
-}
-
-
-module.exports = {prepLogin}
-},{"./user-templates":46,"./utils":48,"axios":16}],3:[function(require,module,exports){
 const languages = require('./languages')
 
 const backgrounds = [
@@ -403,7 +127,7 @@ const backgrounds = [
 ]
 
 module.exports = backgrounds
-},{"./languages":6}],4:[function(require,module,exports){
+},{"./languages":4}],2:[function(require,module,exports){
 const classes = [
 	{
 		"index": 1,
@@ -1752,7 +1476,7 @@ const classes = [
 	}
 ]
 module.exports = classes
-},{}],5:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 const equipment = [{
 	"index": 1,
 	"name": "Club",
@@ -5071,7 +4795,7 @@ const equipment = [{
 	}]
 
 module.exports = equipment
-},{}],6:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 const languages = [{
 	"index": 1,
 	"name": "Common",
@@ -5187,7 +4911,7 @@ const languages = [{
 }]
 
 module.exports = languages
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const races = [
 	{
 		"index": 1,
@@ -5876,7 +5600,7 @@ const races = [
 ]
 
 module.exports = races
-},{}],8:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const skills = [{
 	"index": 1,
 	"name": "Acrobatics",
@@ -6042,7 +5766,7 @@ const skills = [{
 }]
 
 module.exports = skills
-},{}],9:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const spells = [
 { name: `Acid Splash`,
  attack: true,
@@ -7234,7 +6958,7 @@ name: `Warlock` },
 name: `Wizard` }] }]
 
 module.exports = spells
-},{}],10:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const startingEquipment = [{
 	"index": 1,
 	"class": {
@@ -8087,7 +7811,7 @@ const startingEquipment = [{
 }]
 
 module.exports = startingEquipment
-},{}],11:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 const subraces = [
 	{
 		"index": 1,
@@ -8459,347 +8183,49 @@ const subraces = [
 ]
 
 module.exports = subraces
-},{}],12:[function(require,module,exports){
-const templates = require('./templates')
-const user = require('./user')
-const races = require('./data/races')
-const subraces = require('./data/subraces')
-const skills = require('./data/skills')
+},{}],10:[function(require,module,exports){
+const login = require('./src/login')
+const createDNDChar = require('./src/create-function')
 
-function finalRender() {
-    headerInfo()
-    statInfo()
-    skillInfo()
-    utilityInfo()
-    EquipmentInfo()
-    if((!!user.log[2] && user.log[1] == 'High Elf') || !!user.log[9] || !!user.log[10]) spellInfo()
-    backstoryInfo()
+const pageInitialization = {
+    '/': main,
+    '/login.html': login.loginInit,
+    '/create.html': createDNDChar,
+    '/user.html': login.userInit
 }
 
-function headerInfo() {
-    let subrace = user.log[2]
-    if (user.raceId === 6) subrace = null
-    displayBoard.innerHTML = `
-    <div class="top">
-        <h3>${user.log[22][0]}</h3>    
-        <p>Level 1 ${user.log[5]} | ${user.log[20]} </p>
-        <p>${subrace || user.log[0]} | ${user.log[21]}</p>
-    </div>`
+const path = window.location.pathname
+
+if (pageInitialization.hasOwnProperty(path)) {
+    pageInitialization[path]()
+}
+else {
+    console.error(`${path} does not have an initializer`)
 }
 
-
-
-function statInfo() {
-    let finalStats = races[user.raceId].ability_bonuses
-
-    if (!!user.log[2] && !Array.isArray(user.log[2])) finalStats = combineArrays(finalStats, subraces[user.subraceId].ability_bonuses)
-    finalStats = combineArrays(finalStats, user.log[17])
-
-    if (!!user.log[18]) {
-        let bonus = figureDifference(user.log[17], user.log[18])
-        finalStats = combineArrays(finalStats, bonus)
+function main(){
+    const login = document.querySelector('#login')
+    const token = localStorage.getItem('token')
+    if (!token){
+        login.textContent = 'log in'
+        login.addEventListener('click', function () { window.location.pathname = '/login.html' })
     }
-    displayBoard.innerHTML += templates.statRender(finalStats)
-}
-
-
-function modCalc(num) {
-    let result = Number(Math.floor((num - 10) / 2))
-    if (result > 0) return `+${result}`
-    return result
-}
-
-function combineArrays(arr1, arr2) {
-    const newArr = []
-    for (let i = 0; i < arr1.length; i++) {
-        newArr[i] = Number(arr1[i]) + Number(arr2[i])
+    else{
+        login.textContent = 'characters'
+        login.addEventListener('click', function(){window.location.pathname = '/user.html'})
     }
-    return newArr
-}
-
-function figureDifference(arr1, arr2) {
-    const newArr = []
-    for (let i = 0; i < arr2.length; i++) {
-        if (Number(arr1[i]) < Number(arr2[i])) newArr[i] = 1
-        else newArr[i] = 0
-    }
-    newArr.push(0)
-    return newArr
-}
-
-function skillInfo(){
-    let skillArray = user.log[6]
-    if(user.raceId === 6 ){
-        for(let skill of user.log[2]){
-            skillArray.push(skill)
-        }
-    }
-    for(let skill of user.log[20]){
-        skillArray.push(skill)
-    }
-    document.querySelector('.accordion').innerHTML += templates.skillTemplate(skills)
-    addBonus(skillArray)
-}
-
-function addBonus(arr){
-    const skillHolders = document.querySelectorAll('.skillHolder')
-    for(let skillHolder of skillHolders){
-        for(let skill of arr){
-            if(skill === skillHolder.textContent) skillHolder.children[0].textContent = '+2 '
-            if (skillHolder.textContent === user.log[16]) skillHolder.children[0].textContent = '+4 '
-        }
-    }
-}
-
-function figureSpeed(){
-    if(user.subraceId === 4) return 35
-    else if(user.raceId === 0 || user.raceId === 2 || user.raceId === 5) return 25
-    else return 20
-}
-function utilityInfo(){
-    document.querySelector('.accordion').innerHTML += templates.utilityTemplate()
-}
-
-function EquipmentInfo(){
-    equipArray = []
-    for(let i = 11; i <= 15; i++){
-        if(!user.log[i]) break
-        for(let item of user.log[i]){
-            equipArray.push(item)
-        }
-    }
-    document.querySelector('.accordion').innerHTML += templates.equipmentTemplate(equipArray)
-}
-
-function spellInfo(){
-    spellArray = []
-    if (!!user.log[2] && user.log[1] === 'High Elft') spellArray.push(user.log[2])
-    if (!!user.log[9]) user.log[9].forEach(spell => spellArray.push(spell))
-    if (!!user.log[10]) user.log[10].forEach(spell => spellArray.push(spell))
-    document.querySelector('.accordion').innerHTML += templates.spellTemplate(spellArray)
-}
-
-function backstoryInfo(){
-    document.querySelector('.accordion').innerHTML += templates.backstoryTemplate(user.log[22])
-}
-
-module.exports = {modCalc, finalRender, figureSpeed}
-},{"./data/races":7,"./data/skills":8,"./data/subraces":11,"./templates":45,"./user":47}],13:[function(require,module,exports){
-const user = require('./user')
-const races = require('./data/races')
-const classes = require('./data/classes')
-const backgrounds = require('./data/backgrounds')
-const subraces = require('./data/subraces')
-const displayBoard = document.querySelector('#displayBoard')
-function readyToGo(returnFn){
-    const inputs = document.querySelectorAll('.backstory')
-    for( let input of inputs ){
-        if(!input.value){
-            document.querySelector('#next').onclick = null
-            document.querySelector('#next').classList.add('inactive')
-            return false
-        }
-    }
-    document.querySelector('#next').onclick = function(){
-        addToLog()
-        return returnFn()
-    }
-    document.querySelector('#next').classList.remove('inactive')
-}
-
-function addToLog(){
-    let inputs = document.querySelectorAll('.backstory')
-    let backstoryArray = []
-    for(let input of inputs){
-        backstoryArray.push(input.value)
-    }
-    user.log.push(backstoryArray)
-}
-
-
-function prepForSelection(){
-    let choices = document.querySelectorAll('.alignment')
-    for (let choice of choices){
-        choice.onclick = function(e){select(e)}
-    }
-}
-
-function select(e) {
-    if (user.numChoices > 0) {
-        e.target.onclick = null
-        e.target.classList.add('selected')
-        user.numChoices--
-        e.target.onclick = function (e) { unselect(e) }
-    }
-    else {
-        return false
-    }
-}
-
-function unselect(e) {
-    e.target.onclick = null
-    e.target.classList.remove('selected')
-    e.target.onclick = function (e) { select(e) }
-    user.numChoices++
-}
-
-function addAlign(returnFn){
-    document.querySelector('#next').onclick = function(){
-        user.log.push(document.querySelector('.selected').textContent)
-        return returnFn()
-    }
+    document.querySelector('#new').addEventListener('click', function(){window.location.pathname = '/create.html'})
 }
 
 
 
 
 
-module.exports = {readyToGo, prepForSelection, addAlign}
-},{"./data/backgrounds":3,"./data/classes":4,"./data/races":7,"./data/subraces":11,"./user":47}],14:[function(require,module,exports){
-const classes = require('./data/classes')
-const user = require('./user')
-const stats = require('./stats')
-
-function HPGen(returnFn) {
-    let counter = 20
-    let hitDie = classes[user.classId].hit_die
-    let rollingDie = setInterval(function () {
-        let diceNum = stats.diceRoll(1, hitDie)
-        document.querySelector('.dice').textContent = diceNum[0]
-        counter--
-        if (counter === 0) {
-            clearInterval(rollingDie)
-            setTimeout(function () { 
-                document.querySelector('.dice').classList.add('animatedNum') 
-                addHP(returnFn)
-            }, 0)
-    }
-     }, 100)
-}
 
 
-function addHP(returnFn){
-    const dice = document.querySelector('.dice')
-    let rolledNum = dice.textContent
-    const HP = Number(Math.floor((user.log[17][2] - 10) / 2)) + Number(rolledNum)
-    dice.onclick = null
-    user.log.push(HP)
-    document.querySelector('#next').classList.remove('inactive')
-    document.querySelector('#next').onclick = returnFn
-}
-
-
-
-
-
-module.exports = HPGen
-},{"./data/classes":4,"./stats":44,"./user":47}],15:[function(require,module,exports){
-const user = require('./user')
-const races = require('./data/races')
-const subraces = require('./data/subraces')
-const choiceFns = require('./choice-functions')
-const {addIndex} = require('./selection')
-const languages = require('./data/languages')
-const spells = require('./data/spells')
-const classes = require('./data/classes')
-const render = require('./final-render')
-const dataPer = require('./data-persistence')
-
-const displayBoard = document.querySelector('#displayBoard')
-const next = document.querySelector('#next')
-document.querySelector('#load').addEventListener('click', dataPer.prepLogin)
-document.querySelector('#new').addEventListener('click', createDNDChar)
-
-function createDNDChar(){
-    displayBoard.innerHTML = ''
-    next.classList.add('inactive')
-    switch(user.log.length){
-        case 0:
-            choiceFns.raceChoice(races, createDNDChar)
-            break
-        case 1: 
-            addIndex(user.log[0], races, 'raceId')
-            choiceFns.extraRaceChoices(createDNDChar)
-            break
-        case 2:
-            if(user.log[0] =='Half-Elf') return choiceFns.skillDisplay(2)
-            choiceFns.subraceChoice(createDNDChar)
-            break
-        case 3:
-            addIndex(user.log[2], subraces, 'subraceId')
-            choiceFns.subraceExtraChoices('racial_trait_options', spells, createDNDChar)
-            break
-        case 4:
-            choiceFns.subraceExtraChoices('language_options', languages, createDNDChar)
-            break
-        case 5:
-            choiceFns.raceChoice(classes, createDNDChar)
-            break
-        case 6:
-            addIndex(user.log[5], classes, 'classId')
-            choiceFns.classSkillChoice(createDNDChar)
-            break
-        case 7:
-            choiceFns.classExtraChoices(createDNDChar)
-            break
-        case 8:
-            choiceFns.classExtraChoices(createDNDChar)
-            break
-        case 9:
-            choiceFns.spellChoices(0, createDNDChar)
-            break
-        case 10:
-            choiceFns.spellChoices(1, createDNDChar)
-            break
-        case 11:
-            choiceFns.equipmentChoices(1, createDNDChar)
-            break
-        case 12:
-            choiceFns.equipmentChoices(2, createDNDChar)
-            break
-        case 13:
-            choiceFns.equipmentChoices(3, createDNDChar)
-            break
-        case 14:
-            choiceFns.equipmentChoices(4, createDNDChar)
-            break
-        case 15:
-            choiceFns.equipmentChoices(5, createDNDChar)
-            break
-        case 16:
-            choiceFns.classFeatureChoices(createDNDChar)
-            break
-        case 17:
-            choiceFns.allocateStats(createDNDChar)
-            break
-        case 18:
-            choiceFns.upgradeStats(createDNDChar)
-            break
-        case 19:
-            choiceFns.rollHP(createDNDChar)
-            break
-        case 20:
-            choiceFns.backgroundChoice(createDNDChar)
-            break
-        case 21:
-            choiceFns.alignment(createDNDChar)
-            break
-        case 22: 
-            choiceFns.backStory(createDNDChar)
-            break
-        default:
-            render.finalRender()
-    }
-}
-
-
-
-
-
-module.exports = createDNDChar
-},{"./choice-functions":1,"./data-persistence":2,"./data/classes":4,"./data/languages":6,"./data/races":7,"./data/spells":9,"./data/subraces":11,"./final-render":12,"./selection":43,"./user":47}],16:[function(require,module,exports){
+},{"./src/create-function":39,"./src/login":43}],11:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":18}],17:[function(require,module,exports){
+},{"./lib/axios":13}],12:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8983,7 +8409,7 @@ module.exports = function xhrAdapter(config) {
 };
 
 }).call(this,require('_process'))
-},{"../core/createError":24,"./../core/settle":27,"./../helpers/btoa":31,"./../helpers/buildURL":32,"./../helpers/cookies":34,"./../helpers/isURLSameOrigin":36,"./../helpers/parseHeaders":38,"./../utils":40,"_process":42}],18:[function(require,module,exports){
+},{"../core/createError":19,"./../core/settle":22,"./../helpers/btoa":26,"./../helpers/buildURL":27,"./../helpers/cookies":29,"./../helpers/isURLSameOrigin":31,"./../helpers/parseHeaders":33,"./../utils":35,"_process":37}],13:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -9037,7 +8463,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":19,"./cancel/CancelToken":20,"./cancel/isCancel":21,"./core/Axios":22,"./defaults":29,"./helpers/bind":30,"./helpers/spread":39,"./utils":40}],19:[function(require,module,exports){
+},{"./cancel/Cancel":14,"./cancel/CancelToken":15,"./cancel/isCancel":16,"./core/Axios":17,"./defaults":24,"./helpers/bind":25,"./helpers/spread":34,"./utils":35}],14:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9058,7 +8484,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],20:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -9117,14 +8543,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":19}],21:[function(require,module,exports){
+},{"./Cancel":14}],16:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 var defaults = require('./../defaults');
@@ -9205,7 +8631,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"./../defaults":29,"./../utils":40,"./InterceptorManager":23,"./dispatchRequest":25}],23:[function(require,module,exports){
+},{"./../defaults":24,"./../utils":35,"./InterceptorManager":18,"./dispatchRequest":20}],18:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9259,7 +8685,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":40}],24:[function(require,module,exports){
+},{"./../utils":35}],19:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -9279,7 +8705,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":26}],25:[function(require,module,exports){
+},{"./enhanceError":21}],20:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9367,7 +8793,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":21,"../defaults":29,"./../helpers/combineURLs":33,"./../helpers/isAbsoluteURL":35,"./../utils":40,"./transformData":28}],26:[function(require,module,exports){
+},{"../cancel/isCancel":16,"../defaults":24,"./../helpers/combineURLs":28,"./../helpers/isAbsoluteURL":30,"./../utils":35,"./transformData":23}],21:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9390,7 +8816,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -9418,7 +8844,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":24}],28:[function(require,module,exports){
+},{"./createError":19}],23:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9440,7 +8866,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":40}],29:[function(require,module,exports){
+},{"./../utils":35}],24:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -9540,7 +8966,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":17,"./adapters/xhr":17,"./helpers/normalizeHeaderName":37,"./utils":40,"_process":42}],30:[function(require,module,exports){
+},{"./adapters/http":12,"./adapters/xhr":12,"./helpers/normalizeHeaderName":32,"./utils":35,"_process":37}],25:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -9553,7 +8979,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],31:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 // btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
@@ -9591,7 +9017,7 @@ function btoa(input) {
 
 module.exports = btoa;
 
-},{}],32:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9659,7 +9085,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":40}],33:[function(require,module,exports){
+},{"./../utils":35}],28:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9675,7 +9101,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],34:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9730,7 +9156,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":40}],35:[function(require,module,exports){
+},{"./../utils":35}],30:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9746,7 +9172,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9816,7 +9242,7 @@ module.exports = (
   })()
 );
 
-},{"./../utils":40}],37:[function(require,module,exports){
+},{"./../utils":35}],32:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -9830,7 +9256,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":40}],38:[function(require,module,exports){
+},{"../utils":35}],33:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9885,7 +9311,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":40}],39:[function(require,module,exports){
+},{"./../utils":35}],34:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9914,7 +9340,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],40:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -10219,7 +9645,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":30,"is-buffer":41}],41:[function(require,module,exports){
+},{"./helpers/bind":25,"is-buffer":36}],36:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -10242,7 +9668,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],42:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -10428,13 +9854,609 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],43:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+const {display, readyToGo, skipDisplay, selectFrom, preventDupe, createSpellList, addQuantity, prepForRadioSelection, createChoiceArray, displayFighterChoice, displayRogueChoice, displaySorcererChoice} = require('./selection')
+const {addDifferentListeners} = require('./utils')
+const languages = require('../data/languages')
+const equipment = require('../data/equipment')
+const user = require('./user')
+const races = require('../data/races')
+const subraces = require('../data/subraces')
+const skills = require('../data/skills')
+const spells = require('../data/spells')
+const classes = require('../data/classes')
+const startingEquip = require('../data/startingEquipment')
+const {standardTemplate, radioTemplate, backStoryForm, alignmentTemplate, skillChoiceTemplate} = require('./templates')
+const stats = require('./stats')
+const hp = require('./hp')
+const backgrounds = require('../data/backgrounds')
+const forms = require('./forms.js')
+const spellSelect = require('./spell-selection')
+
+
+function raceChoice(array, returnFn){
+    user.numChoices = 1
+    display(array, standardTemplate)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function(){readyToGo(returnFn)})  
+}
+
+function extraRaceChoices(returnFn){
+    user.numChoices = 1
+    if(user.raceId === 3 || user.raceId === 6){
+        display(languages, standardTemplate)
+    } 
+    else if(user.raceId === 0){
+        selectFrom(races[user.raceId].starting_proficiency_options, equipment)
+    }
+    else if(user.raceId === 4){
+        display(races[4].trait_options.from, standardTemplate)
+    }
+    else{
+        return skipDisplay(returnFn)
+    }
+
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+}
+
+function subraceChoice(returnFn){
+    
+    if(races[user.raceId].subraces.length === 0) return skipDisplay(returnFn)
+    user.numChoices = 1
+    selectFrom(races[user.raceId].subraces, subraces)
+}
+
+function skillDisplay(numChoices, list = null) {
+    user.numChoices = numChoices
+    if (!!list) {
+        let optionsArray = skills.reduce((acc, skill) => {
+            for (let item of list) {
+                if (item.name === skill.name){ acc.push(skill)}
+            }
+            return acc
+        }, [])
+        let result = preventDupe(optionsArray)
+        
+        return display(result, skillChoiceTemplate)
+    }
+    let result = preventDupe(skills)
+    display(result, standardTemplate)
+}
+
+
+function subraceExtraChoices(key, array, returnFn){
+    user.numChoices = 0
+    if (user.log[2] == 'High Elf') { 
+        user.numChoices = 1
+        selectFrom(subraces[user.subraceId][key], array)
+    }
+    else return skipDisplay(returnFn)
+}
+
+function classSkillChoice(returnFn){
+    user.numChoices = classes[user.classId].proficiency_choices[0].choose
+    skillDisplay(user.numChoices, classes[user.classId].proficiency_choices[0].from)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+}
+
+function classExtraChoices(returnFn){
+    if( (user.classId === 5 || user.classId === 1) && user.log.length === 7){
+        user.classId === 5 ? user.numChoices = 1 : user.numChoices = 3
+        selectFrom(classes[user.classId].proficiency_choices[1], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
+    else if(user.classId === 5){
+        user.numChoices = 1
+        selectFrom(classes[user.classId].proficiency_choices[2], equipment)
+        return addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    } 
+    skipDisplay(returnFn)
+}
+
+function spellChoices(lvl, returnFn){
+    const id = user.classId
+    if(id >= 1 && id <= 3 || id >= 9){
+        spellSelect(lvl)
+        // let spellList = createSpellList(lvl, spells)
+        if (!lvl) user.numChoices = classes[user.classId].spellcasting.cantrips
+        else user.numChoices = classes[user.classId].spellcasting.first_level
+        if (!user.numChoices){ return skipDisplay(returnFn)}
+        // display(spellList, standardTemplate)
+        addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn) })  
+    }
+    else skipDisplay(returnFn)
+}
+
+function equipmentChoices(num, returnFn){
+    let equipOpts = startingEquip[user.classId][`choice_${num}`]
+    if (!equipOpts)return skipDisplay(returnFn)
+    const quantityArray = []
+    let choiceArray = createChoiceArray(equipOpts, quantityArray)
+    selectFrom(choiceArray, equipment, radioTemplate)
+    addQuantity(quantityArray)
+    prepForRadioSelection()
+    displayBoard.innerHTML = `<h2>Equipment Choice ${num}</h2> ${displayBoard.innerHTML}`
+}
+
+function classFeatureChoices(returnFn){
+    user.numChoices = 1
+    if (user.classId === 4) return displayFighterChoice()
+    if (user.classId === 8) return displayRogueChoice()
+    if (user.classId === 9) return displaySorcererChoice()
+
+    skipDisplay(returnFn)
+}
+
+function allocateStats(returnFn){
+    stats.prepForStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, !document.querySelector('#stats').children.length) })  
+}
+
+function upgradeStats(returnFn){
+    if(user.raceId !== 6) return skipDisplay(returnFn)
+    stats.addBonusStats()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { stats.readyToGo(returnFn, document.querySelectorAll('.added').length === 2) })  
+}
+
+function rollHP(returnFn){
+    document.querySelector('#displayBoard').innerHTML = '<div class="dice"></div>'
+    const dice = document.querySelector('.dice')
+    dice.onclick = function(){hp(returnFn)}
+}
+
+function backgroundChoice(returnFn){
+    user.numChoices = 1
+    display(backgrounds)
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { readyToGo(returnFn)})
+}
+
+function backStory(returnFn){
+    document.querySelector('#displayBoard').innerHTML = backStoryForm()
+    addDifferentListeners('#displayBoard', ['click', 'touch', 'keydown'], function () { forms.readyToGo(returnFn) })
+
+}
+
+function alignment(returnFn){
+    user.numChoices = 1
+    document.querySelector('#displayBoard').innerHTML = alignmentTemplate()
+    forms.prepForSelection()
+    addDifferentListeners('#displayBoard', ['click', 'touch'], function () { forms.addAlign(returnFn)})
+}
+
+
+module.exports = {raceChoice, extraRaceChoices, subraceChoice, skillDisplay, subraceExtraChoices, classSkillChoice, classExtraChoices, spellChoices, equipmentChoices, classFeatureChoices, allocateStats, upgradeStats, rollHP, backgroundChoice, backStory, alignment }
+},{"../data/backgrounds":1,"../data/classes":2,"../data/equipment":3,"../data/languages":4,"../data/races":5,"../data/skills":6,"../data/spells":7,"../data/startingEquipment":8,"../data/subraces":9,"./forms.js":41,"./hp":42,"./selection":44,"./spell-selection":45,"./stats":46,"./templates":47,"./user":48,"./utils":49}],39:[function(require,module,exports){
+const user = require('./user')
+const races = require('../data/races')
+const subraces = require('../data/subraces')
+const choiceFns = require('./choice-functions')
+const { addIndex } = require('./selection')
+const languages = require('../data/languages')
+const spells = require('../data/spells')
+const classes = require('../data/classes')
+const render = require('./final-render')
+
+const displayBoard = document.querySelector('#displayBoard')
+const next = document.querySelector('#next')
+
+function createDNDChar() {
+    displayBoard.innerHTML = ''
+    next.classList.add('inactive')
+    switch (user.log.length) {
+        case 0:
+            choiceFns.raceChoice(races, createDNDChar)
+            break
+        case 1:
+            addIndex(user.log[0], races, 'raceId')
+            choiceFns.extraRaceChoices(createDNDChar)
+            break
+        case 2:
+            if (user.log[0] == 'Half-Elf') return choiceFns.skillDisplay(2)
+            choiceFns.subraceChoice(createDNDChar)
+            break
+        case 3:
+            addIndex(user.log[2], subraces, 'subraceId')
+            choiceFns.subraceExtraChoices('racial_trait_options', spells, createDNDChar)
+            break
+        case 4:
+            choiceFns.subraceExtraChoices('language_options', languages, createDNDChar)
+            break
+        case 5:
+            choiceFns.raceChoice(classes, createDNDChar)
+            break
+        case 6:
+            addIndex(user.log[5], classes, 'classId')
+            choiceFns.classSkillChoice(createDNDChar)
+            break
+        case 7:
+            choiceFns.classExtraChoices(createDNDChar)
+            break
+        case 8:
+            choiceFns.classExtraChoices(createDNDChar)
+            break
+        case 9:
+            choiceFns.spellChoices(0, createDNDChar)
+            break
+        case 10:
+            choiceFns.spellChoices(1, createDNDChar)
+            break
+        case 11:
+            choiceFns.equipmentChoices(1, createDNDChar)
+            break
+        case 12:
+            choiceFns.equipmentChoices(2, createDNDChar)
+            break
+        case 13:
+            choiceFns.equipmentChoices(3, createDNDChar)
+            break
+        case 14:
+            choiceFns.equipmentChoices(4, createDNDChar)
+            break
+        case 15:
+            choiceFns.equipmentChoices(5, createDNDChar)
+            break
+        case 16:
+            choiceFns.classFeatureChoices(createDNDChar)
+            break
+        case 17:
+            choiceFns.allocateStats(createDNDChar)
+            break
+        case 18:
+            choiceFns.upgradeStats(createDNDChar)
+            break
+        case 19:
+            choiceFns.rollHP(createDNDChar)
+            break
+        case 20:
+            choiceFns.backgroundChoice(createDNDChar)
+            break
+        case 21:
+            choiceFns.alignment(createDNDChar)
+            break
+        case 22:
+            choiceFns.backStory(createDNDChar)
+            break
+        default:
+            render.finalRender()
+    }
+}
+
+module.exports = createDNDChar
+},{"../data/classes":2,"../data/languages":4,"../data/races":5,"../data/spells":7,"../data/subraces":9,"./choice-functions":38,"./final-render":40,"./selection":44,"./user":48}],40:[function(require,module,exports){
+const templates = require('./templates')
+const user = require('./user')
+const races = require('../data/races')
+const subraces = require('../data/subraces')
+const skills = require('../data/skills')
+
+function finalRender() {
+    headerInfo()
+    statInfo()
+    skillInfo()
+    utilityInfo()
+    EquipmentInfo()
+    if((!!user.log[2] && user.log[1] == 'High Elf') || !!user.log[9] || !!user.log[10]) spellInfo()
+    backstoryInfo()
+}
+
+function headerInfo() {
+    let subrace = user.log[2]
+    if (user.raceId === 6) subrace = null
+    displayBoard.innerHTML = `
+    <div class="top">
+        <h3>${user.log[22][0]}</h3>    
+        <p>Level 1 ${user.log[5]} | ${user.log[20]} </p>
+        <p>${subrace || user.log[0]} | ${user.log[21]}</p>
+    </div>`
+}
+
+
+
+function statInfo() {
+    let finalStats = races[user.raceId].ability_bonuses
+
+    if (!!user.log[2] && !Array.isArray(user.log[2])) finalStats = combineArrays(finalStats, subraces[user.subraceId].ability_bonuses)
+    finalStats = combineArrays(finalStats, user.log[17])
+
+    if (!!user.log[18]) {
+        let bonus = figureDifference(user.log[17], user.log[18])
+        finalStats = combineArrays(finalStats, bonus)
+    }
+    displayBoard.innerHTML += templates.statRender(finalStats)
+}
+
+
+function modCalc(num) {
+    let result = Number(Math.floor((num - 10) / 2))
+    if (result > 0) return `+${result}`
+    return result
+}
+
+function combineArrays(arr1, arr2) {
+    const newArr = []
+    for (let i = 0; i < arr1.length; i++) {
+        newArr[i] = Number(arr1[i]) + Number(arr2[i])
+    }
+    return newArr
+}
+
+function figureDifference(arr1, arr2) {
+    const newArr = []
+    for (let i = 0; i < arr2.length; i++) {
+        if (Number(arr1[i]) < Number(arr2[i])) newArr[i] = 1
+        else newArr[i] = 0
+    }
+    newArr.push(0)
+    return newArr
+}
+
+function skillInfo(){
+    let skillArray = user.log[6]
+    if(user.raceId === 6 ){
+        for(let skill of user.log[2]){
+            skillArray.push(skill)
+        }
+    }
+    for(let skill of user.log[20]){
+        skillArray.push(skill)
+    }
+    document.querySelector('.accordion').innerHTML += templates.skillTemplate(skills)
+    addBonus(skillArray)
+}
+
+function addBonus(arr){
+    const skillHolders = document.querySelectorAll('.skillHolder')
+    for(let skillHolder of skillHolders){
+        for(let skill of arr){
+            if(skill === skillHolder.textContent) skillHolder.children[0].textContent = '+2 '
+            if (skillHolder.textContent === user.log[16]) skillHolder.children[0].textContent = '+4 '
+        }
+    }
+}
+
+function figureSpeed(){
+    if(user.subraceId === 4) return 35
+    else if(user.raceId === 0 || user.raceId === 2 || user.raceId === 5) return 25
+    else return 20
+}
+function utilityInfo(){
+    document.querySelector('.accordion').innerHTML += templates.utilityTemplate()
+}
+
+function EquipmentInfo(){
+    equipArray = []
+    for(let i = 11; i <= 15; i++){
+        if(!user.log[i]) break
+        for(let item of user.log[i]){
+            equipArray.push(item)
+        }
+    }
+    document.querySelector('.accordion').innerHTML += templates.equipmentTemplate(equipArray)
+}
+
+function spellInfo(){
+    spellArray = []
+    if (!!user.log[2] && user.log[1] === 'High Elft') spellArray.push(user.log[2])
+    if (!!user.log[9]) user.log[9].forEach(spell => spellArray.push(spell))
+    if (!!user.log[10]) user.log[10].forEach(spell => spellArray.push(spell))
+    document.querySelector('.accordion').innerHTML += templates.spellTemplate(spellArray)
+}
+
+function backstoryInfo(){
+    document.querySelector('.accordion').innerHTML += templates.backstoryTemplate(user.log[22])
+}
+
+module.exports = {modCalc, finalRender, figureSpeed}
+},{"../data/races":5,"../data/skills":6,"../data/subraces":9,"./templates":47,"./user":48}],41:[function(require,module,exports){
+const user = require('./user')
+const races = require('../data/races')
+const classes = require('../data/classes')
+const backgrounds = require('../data/backgrounds')
+const subraces = require('../data/subraces')
+const displayBoard = document.querySelector('#displayBoard')
+function readyToGo(returnFn){
+    const inputs = document.querySelectorAll('.backstory')
+    for( let input of inputs ){
+        if(!input.value){
+            document.querySelector('#next').onclick = null
+            document.querySelector('#next').classList.add('inactive')
+            return false
+        }
+    }
+    document.querySelector('#next').onclick = function(){
+        addToLog()
+        return returnFn()
+    }
+    document.querySelector('#next').classList.remove('inactive')
+}
+
+function addToLog(){
+    let inputs = document.querySelectorAll('.backstory')
+    let backstoryArray = []
+    for(let input of inputs){
+        backstoryArray.push(input.value)
+    }
+    user.log.push(backstoryArray)
+}
+
+
+function prepForSelection(){
+    let choices = document.querySelectorAll('.alignment')
+    for (let choice of choices){
+        choice.onclick = function(e){select(e)}
+    }
+}
+
+function select(e) {
+    if (user.numChoices > 0) {
+        e.target.onclick = null
+        e.target.classList.add('selected')
+        user.numChoices--
+        e.target.onclick = function (e) { unselect(e) }
+    }
+    else {
+        return false
+    }
+}
+
+function unselect(e) {
+    e.target.onclick = null
+    e.target.classList.remove('selected')
+    e.target.onclick = function (e) { select(e) }
+    user.numChoices++
+}
+
+function addAlign(returnFn){
+    document.querySelector('#next').onclick = function(){
+        user.log.push(document.querySelector('.selected').textContent)
+        return returnFn()
+    }
+}
+
+
+
+
+
+module.exports = {readyToGo, prepForSelection, addAlign}
+},{"../data/backgrounds":1,"../data/classes":2,"../data/races":5,"../data/subraces":9,"./user":48}],42:[function(require,module,exports){
+const classes = require('../data/classes')
+const user = require('./user')
+const stats = require('./stats')
+
+function HPGen(returnFn) {
+    let counter = 20
+    let hitDie = classes[user.classId].hit_die
+    let rollingDie = setInterval(function () {
+        let diceNum = stats.diceRoll(1, hitDie)
+        document.querySelector('.dice').textContent = diceNum[0]
+        counter--
+        if (counter === 0) {
+            clearInterval(rollingDie)
+            setTimeout(function () { 
+                document.querySelector('.dice').classList.add('animatedNum') 
+                addHP(returnFn)
+            }, 0)
+    }
+     }, 100)
+}
+
+
+function addHP(returnFn){
+    const dice = document.querySelector('.dice')
+    let rolledNum = dice.textContent
+    const HP = Number(Math.floor((user.log[17][2] - 10) / 2)) + Number(rolledNum)
+    dice.onclick = null
+    user.log.push(HP)
+    document.querySelector('#next').classList.remove('inactive')
+    document.querySelector('#next').onclick = returnFn
+}
+
+
+
+
+
+module.exports = HPGen
+},{"../data/classes":2,"./stats":46,"./user":48}],43:[function(require,module,exports){
+const axios = require('axios')
+const displayBoard = document.querySelector('#displayBoard')
+const baseURL = 'http://localhost:3000'
+const utils = require('./utils')
+
+function loginInit(){
+    document.querySelector('#signup').addEventListener('submit', function(e){signup(e)})
+    document.querySelector('#login').addEventListener('submit', function (e) { login(e) })
+}
+
+function signup(e){
+    e.preventDefault()
+    const username = document.querySelector('#username2').value
+    const password = document.querySelector('#password2').value 
+    axios.post(baseURL + '/users', {username, password})
+    .then(response => {
+        return signupSuccess()
+    })
+    .catch(err => {
+        removeHidden('.alert-danger', response.message)
+    })
+}
+
+function login(e){
+    e.preventDefault()
+    const username = document.querySelector('#username').value
+    const password = document.querySelector('#password').value
+    axios.post(baseURL + '/auth/login', {username, password})
+    .then(response => {
+        const token = response.data.token
+        localStorage.setItem('token', token)
+        loginSuccess()
+    })
+    .catch(err => {
+        removeHidden('.alert-danger', 'Something went wrong')
+    })
+}
+
+function loginSuccess() {
+    console.log('triggering')
+    window.location.pathname = '/user.html'
+}
+
+function signupSuccess(){
+    clearInputs()
+    prepLogin()
+    removeHidden('.alert-success', 'Sign up successful, please log in')
+}
+
+function clearInputs(){
+    let inputs = document.querySelectorAll('inputs')
+    inputs.forEach(input => input.value = '')
+}
+
+function removeHidden(type, message){
+    let alert = document.querySelector(`${type}`)
+    alert.classList.remove('hidden')
+    alert.textContent = message
+}
+
+function userInit(){
+    const token = localStorage.getItem('token')
+    return axios.get(baseURL + '/auth/token', {headers: {Authorization: `Bearer ${token}`}})
+    .then(data => {
+        document.querySelector('body').setAttribute('data-id', data.data.data.id)
+        document.querySelector('#displayBoard').innerHTML += `<h3>Welcome ${data.data.data.name}</h3>`
+        return getChars()
+    })
+    .catch(() => {
+        localStorage.removeItem('token')
+        window.location.pathname = '/'
+    })
+}
+
+function getChars(){
+    const id = body.getAttribute('data-id')
+    return axios.get(`baseURL/characters/${id}`)
+
+}
+function authGate(){
+    const token = localStorage.getItem('token')
+    return axios.get(baseURL + '/auth/token', { headers: { Authorization: `Bearer ${token}` } })
+        .then()
+        .catch(() => {
+            localStorage.removeItem('token')
+            window.location.pathname = '/'
+        })
+}
+
+
+
+
+
+
+module.exports = {loginInit, userInit}
+},{"./utils":49,"axios":11}],44:[function(require,module,exports){
 const user = require('./user')
 const { standardTemplate, infoPageHTML, classchoiceTemplate, sorcererTemplate } = require('./templates')
 const { addListenersToMany } = require('./utils')
-const races = require('./data/races')
-const skills = require('./data/skills')
-
+const races = require('../data/races')
+const skills = require('../data/skills')
 
 const displayBoard = document.querySelector('#displayBoard')
 
@@ -10455,7 +10477,6 @@ function select(e) {
         e.target.parentElement.classList.add('selected')
         user.numChoices--
         e.target.onclick = function (e) { unselect(e) }
-        // e.target.textContent = 'unselect'
     }
     else{
         return false
@@ -10471,30 +10492,30 @@ function unselect(e) {
 }
 
 function showInfo(e, arr) {
-    
     let id = e.target.getAttribute('data-id')
-    console.log(e.target)
-    console.log(id, 'ppppppppppppppppppppppppppp')
     createInfoPage(id, arr)
 }
 
 
 function createInfoPage(index, arr) {
     let specificItem = arr[index - 1]
+    // console.log(specificItem)
     document.querySelector('body').innerHTML += infoPageHTML(specificItem)
     document.querySelector('.infoPage').style.animation = 'slideIn .75s ease-out'
-    document.querySelector('.back').onclick = function (e) { slideOut(e) }
+    document.querySelector('.back').onclick = function (e) { slideOut(e, arr) }
 }
 
 
-function slideOut(e) {
+function slideOut(e, arr) {
     setTimeout(function () {
         console.log(e.target.parentElement)
         e.target.parentElement.style.animation = 'slideOut .75s ease-in'
-        // setTimeout(function () {
-        //     e.target.parentElement.remove()
-        // }, 750)
+        setTimeout(function () {
+            e.target.parentElement.remove()
+        }, 750)
     }, 0)
+    prepCards(arr)
+    
 }
 
 function readyToGo(returnFn) {
@@ -10656,7 +10677,91 @@ function displaySorcererChoice(){
 }
 module.exports = {display, readyToGo, addIndex, skipDisplay, selectFrom, preventDupe, createSpellList, createChoiceArray, addQuantity, prepForRadioSelection, displayFighterChoice, displayRogueChoice, displaySorcererChoice, addSelection}
 
-},{"./data/races":7,"./data/skills":8,"./templates":45,"./user":47,"./utils":48}],44:[function(require,module,exports){
+},{"../data/races":5,"../data/skills":6,"./templates":47,"./user":48,"./utils":49}],45:[function(require,module,exports){
+const spells = require('../data/spells')
+const user = require('./user')
+
+function spellFunction(lvl){
+    const spellHTML = {
+        attack: [],
+        utility: [],
+        strategy: [],
+        support: []
+    }
+    const spellList = filterSpells(lvl)
+    divvySpells(spellHTML, spellList)
+    displaySpells(spellList)
+    prepSpellSelection()
+}
+
+function spellCardTemplate(spell){
+    return `
+    <div class="card">
+        <h5 class="title">${spell.name}</h5>
+        <p> ${spell.desc.join('<br>')}</p>
+        <p>Range: ${spell.range} | Casting Time: ${spell.casting_time}</p>
+    </div>`
+}
+
+function divvySpells(spellHTML, filteredList){
+    filteredList.forEach(spell => {
+        if (spell.attack) spellHTML.attack.push(spellCardTemplate(spell))
+        else if (spell.utility) spellHTML.utility.push(spellCardTemplate(spell))
+        else if (spell.strategy) spellHTML.strategy.push(spellCardTemplate(spell))
+        else spellHTML.support.push(spellCardTemplate(spell))
+        return spellHTML
+    })
+
+    
+}
+
+function filterSpells(lvl){
+    const result =  spells.reduce((acc, spell) => {
+        spell.classes = classes.map(classType => classType.name)
+        if(spell.level === lvl && spell.classes.includes(user.log[5])){
+            acc.push(spell)
+        }
+        return acc
+    }, [])
+    return result
+}
+
+function displaySpells(spellList){
+    for (let key in spellHTML) {
+        if (spellHTML[key].length > 0) {
+            displayBoard.element.innerHTML +=
+                `<button class="btn spellButton" type="button" data-toggle="collapse" data-target="#${key}Spells" aria-expanded="false" aria-controls="${key}Spells">${key} Spells <span class="numSpellsSelected"></span></button>
+
+                <div class="collapse" id="${key}Spells">
+                    <div class="horizontalScroll">
+                        ${spellHTML[key].join('')}
+                    </div>
+                </div>`
+        }
+    }
+}
+
+function prepSpellSelection(){
+    document.addEventListener('click', function () {
+        let spellButtons = document.querySelectorAll('.spellButton')
+        let horizontalScrollDivs = document.querySelectorAll('.horizontalScroll')
+
+        for (let i = 0; i < horizontalScrollDivs.length; i++) {
+            let selectedCounter = 0
+            let scrollDiv = horizontalScrollDivs[i]
+            for (let child of scrollDiv.children) {
+                if (child.classList.contains('selected')) {
+                    selectedCounter++
+                }
+            }
+            spellButtons[i].children[0].textContent = `${selectedCounter} selected`
+        }
+    })
+}
+   
+
+    module.exports = spellFunction
+},{"../data/spells":7,"./user":48}],46:[function(require,module,exports){
 const utils = require('./utils')
 const user = require('./user')
 const {statTemplate, statUpgrade} = require('./templates')
@@ -10768,28 +10873,62 @@ function removeOne(e){
 
 
 module.exports = {prepForStats, prepForAllocation, readyToGo, addBonusStats, diceRoll}
-},{"./selection":43,"./templates":45,"./user":47,"./utils":48}],45:[function(require,module,exports){
+},{"./selection":44,"./templates":47,"./user":48,"./utils":49}],47:[function(require,module,exports){
 const user = require('./user')
-const classes = require('./data/classes')
+const classes = require('../data/classes')
 
 function standardTemplate(item) {
-    return`
+    return `
     <div class="card">
         <button class="more" type="button" data-id="${item.index}"><i class="fa fa-ellipsis-v" data-id="${item.index}"></i></button>
         <img class="card-img-top cardImg" src="${item.img}" alt="Image of ${item.name}">
         <h3>${item.name}</h3>
-        <p>${item.desc}</p>
         
         <button class="select" type="button"><i class="fa fa-plus-circle"></i></button>
         <div class="gradient"></div>
     </div>`
 }
 
+function skillChoiceTemplate(item) {
+    return `
+    <div class="card skillCard">
+        <button type="button" class="select"></button>
+        <h5>${item.name}</h5>
+        <p>${item.desc}</p>
+    </div>
+    `
+}
+
+function justX(title, array, key, join){
+    console.log(title, array, key, join)
+    let result = array.reduce((acc, item) => {
+        acc.push(item[key]) 
+        return acc
+    }, [])
+    if(!result.length) result = ['N/A']
+
+    return title + result.join(join)
+}
+
+function calcAbility(abilityArr){
+    let abilities = ['Strength', 'Dexterity', 'Constitution', 'Wisdom', 'Intelligence', 'Charisma']
+    let newArray = []
+    for(let i = 0; i < 6; i++){
+        newArray[i] = `+${abilityArr[i]} ${abilities[i]}`
+    }
+    return newArray
+}
 function infoPageHTML(item){
-    
+    console.log(item)
     return `
     <div class="infoPage">
-        <button type="button" class="back">back</button>
+
+        <button type="button" class="back fa fa-chevron-circle-left"></button>
+        <h2>${item.name}</h2>
+        <p>${item.alignment || item.desc}</p>
+        <p>${item.language_desc || 'Hi there!'}</p>
+        <p>${calcAbility(item.ability_bonuses).join('<br>')}</p>
+
     </div>`
 }
 
@@ -11080,69 +11219,9 @@ function backstoryTemplate(arr){
     </div>`
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate, backstoryTemplate}
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate, backstoryTemplate, skillChoiceTemplate}
 
-},{"./data/classes":4,"./user":47}],46:[function(require,module,exports){
-const displayBoard = document.querySelector('#displayBoard')
-
-function loginTemplate() {
-    displayBoard.innerHTML = `<div class="accordion" id = "loginSignup" >
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Log In</button>
-                </h5>
-            </div>
-
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#loginSignup">
-                <div class="card-body">
-                    <form id="login">
-                        <label for="username">Username:</label>
-                        <input id="username" type="text" required>
-                        <label for"password">Password:</label>
-                        <input id="password" type="password" required>
-                        <button class="btn btn-primary" type="submit">log in</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingTwo">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        Sign Up
-        </button>
-                </h5>
-            </div>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#loginSignup">
-                <div class="card-body">
-                    <form id="signup">
-                        <label for="username2">Username:</label>
-                        <input id="username2" type="text" required>
-                        <label for"password2">Password:</label>
-                        <input id="password2" type="password" required>
-                        <label for"password3">Retype password:</label>
-                        <input id="password3" class="passwordCheck" type="password" required>
-                        <button class="btn btn-primary" type="submit">sign up</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="alert alert-danger hidden" role="alert"></div>
-         <div class="alert alert-success hidden" role="alert">Sign up successful, please log in</div>
-        `
-}
-
-function charTemplate(arr){
-    let charHTML = arr.reduce((acc, char) => {
-        acc.push(`<p>${char}</p>`)
-    }, [])
-    displayBoard.innerHTML = charHTML.join('')
-}
-
-module.exports = {loginTemplate, charTemplate}
-
-},{}],47:[function(require,module,exports){
+},{"../data/classes":2,"./user":48}],48:[function(require,module,exports){
 const user = {
     log: [],
     raceId: undefined,
@@ -11183,7 +11262,7 @@ const user = {
 // }
 
 module.exports = user//{user, testUser}
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 
 
 function addListenersToMany(element, listenerType, fn) {
@@ -11207,4 +11286,4 @@ function getFromLocalStorage(name){
 }
 
 module.exports = {addListenersToMany, addDifferentListeners, addToLocalStorage, getFromLocalStorage}
-},{}]},{},[15]);
+},{}]},{},[10]);

@@ -1,8 +1,8 @@
 const user = require('./user')
-const races = require('./data/races')
-const classes = require('./data/classes')
-const backgrounds = require('./data/backgrounds')
-const subraces = require('./data/subraces')
+const races = require('../data/races')
+const classes = require('../data/classes')
+const backgrounds = require('../data/backgrounds')
+const subraces = require('../data/subraces')
 const displayBoard = document.querySelector('#displayBoard')
 function readyToGo(returnFn){
     const inputs = document.querySelectorAll('.backstory')

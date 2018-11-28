@@ -1,8 +1,8 @@
 const templates = require('./templates')
 const user = require('./user')
-const races = require('./data/races')
-const subraces = require('./data/subraces')
-const skills = require('./data/skills')
+const races = require('../data/races')
+const subraces = require('../data/subraces')
+const skills = require('../data/skills')
 
 function finalRender() {
     headerInfo()

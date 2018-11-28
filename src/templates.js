@@ -1,24 +1,58 @@
 const user = require('./user')
-const classes = require('./data/classes')
+const classes = require('../data/classes')
 
 function standardTemplate(item) {
-    return`
+    return `
     <div class="card">
         <button class="more" type="button" data-id="${item.index}"><i class="fa fa-ellipsis-v" data-id="${item.index}"></i></button>
         <img class="card-img-top cardImg" src="${item.img}" alt="Image of ${item.name}">
         <h3>${item.name}</h3>
-        <p>${item.desc}</p>
         
         <button class="select" type="button"><i class="fa fa-plus-circle"></i></button>
         <div class="gradient"></div>
     </div>`
 }
 
+function skillChoiceTemplate(item) {
+    return `
+    <div class="card skillCard">
+        <button type="button" class="select"></button>
+        <h5>${item.name}</h5>
+        <p>${item.desc}</p>
+    </div>
+    `
+}
+
+function justX(title, array, key, join){
+    console.log(title, array, key, join)
+    let result = array.reduce((acc, item) => {
+        acc.push(item[key]) 
+        return acc
+    }, [])
+    if(!result.length) result = ['N/A']
+
+    return title + result.join(join)
+}
+
+function calcAbility(abilityArr){
+    let abilities = ['Strength', 'Dexterity', 'Constitution', 'Wisdom', 'Intelligence', 'Charisma']
+    let newArray = []
+    for(let i = 0; i < 6; i++){
+        newArray[i] = `+${abilityArr[i]} ${abilities[i]}`
+    }
+    return newArray
+}
 function infoPageHTML(item){
-    
+    console.log(item)
     return `
     <div class="infoPage">
-        <button type="button" class="back">back</button>
+
+        <button type="button" class="back fa fa-chevron-circle-left"></button>
+        <h2>${item.name}</h2>
+        <p>${item.alignment || item.desc}</p>
+        <p>${item.language_desc || 'Hi there!'}</p>
+        <p>${calcAbility(item.ability_bonuses).join('<br>')}</p>
+
     </div>`
 }
 
@@ -309,4 +343,4 @@ function backstoryTemplate(arr){
     </div>`
 }
 
-module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate, backstoryTemplate}
+module.exports = {standardTemplate, infoPageHTML, radioTemplate, classChoiceTemplate, sorcererTemplate, statTemplate, statUpgrade, backStoryForm, alignmentTemplate, statRender, skillTemplate, utilityTemplate, equipmentTemplate, spellTemplate, backstoryTemplate, skillChoiceTemplate}

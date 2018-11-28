@@ -1,4 +1,4 @@
-const classes = require('./data/classes')
+const classes = require('../data/classes')
 const user = require('./user')
 const stats = require('./stats')
 
