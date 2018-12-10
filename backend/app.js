@@ -4,7 +4,8 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const port = process.env.PORT || 3000
-const ctrl = require('./controllers/auth')
+const authCtrl = require('./controllers/auth')
+const charCtrl = require('./controllers/characters')
 
 if(process.env.NODE_ENV !== 'production'){
   require('dotenv').load()
@@ -22,9 +23,9 @@ app.use('/users', require('./routes/users'))
 //  Protected routes
 ///////////////////////////////////////////////////////////////////////////////
 app.get('/characters/:id', 
-        ctrl.authenticate,
-        ctrl.confirmReq,
-        ctrl.getChars
+        authCtrl.authenticate,
+        authCtrl.confirmReq,
+        charCtrl.getChars
 )
 
 

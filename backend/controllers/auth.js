@@ -18,21 +18,18 @@ function login(req, res, next){
 }
 
 function authenticate(req, res, next){
+    if(!req.headers.authorization) return next({status:401, message: 'Unauthorized'})
+
     const [, token] = req.headers.authorization.split(' ')
-    console.log(token)
     jwt.verify(token, process.env.SECRET, (err, payload) => {
         if(err) return next({status: 401, message: err})
-        console.log(payload)
         req.claim = payload
-        
         next()
     })
-    
-
 }
 
 function confirmReq(req, res, next){
-    if(req.claim.id !== req.params.id) next({status:401, message: 'Unauthorized'})
+    if(req.claim.id != req.params.id) next({status:401, message: 'Unauthorized'})
     next()
 }
 
@@ -40,11 +37,6 @@ function authStatus(req, res, next){
     res.status(200).send({data: req.claim})
 }
 
-function getChars(req, res, next){
-    const id = req.params.id
-    return model.getChars(id)
-
-}
 
 
 module.exports = {login, authenticate, confirmReq, authStatus}

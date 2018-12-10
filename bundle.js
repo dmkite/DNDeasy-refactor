@@ -10395,7 +10395,6 @@ function login(e){
 }
 
 function loginSuccess() {
-    console.log('triggering')
     window.location.pathname = '/user.html'
 }
 
@@ -10424,15 +10423,15 @@ function userInit(){
         document.querySelector('#displayBoard').innerHTML += `<h3>Welcome ${data.data.data.name}</h3>`
         return getChars()
     })
-    .catch(() => {
-        localStorage.removeItem('token')
-        window.location.pathname = '/'
+    .catch(err => {
+        authGate()
     })
 }
 
 function getChars(){
     const id = body.getAttribute('data-id')
     return axios.get(`baseURL/characters/${id}`)
+    .then(result => console.log(result))
 
 }
 function authGate(){

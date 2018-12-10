@@ -1,6 +1,5 @@
 const db = require('../db')
 const bcrypt = require('bcrypt')
-const saltRounds = 10
 
 function getOne(username){
     return db('users')
@@ -26,6 +25,5 @@ function login(username, password){
 function getChars(id){
     return db('characters')
         .where({user_id: id})
-        
 }
 module.exports = {login, getOne, getChars}
